@@ -1,19 +1,14 @@
 import React, {useEffect} from 'react';
 import { StyleSheet} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-
 import {Ionicons} from "@expo/vector-icons";
-// import TabBar from '../components/tab-bar';
-import HomeU from '../screens/UserPanel/Main/HomeU';
+import Home from '../screens/UserPanel/Main/Home';
 import MyDoctor from '../screens/UserPanel/Main/MyDoctor';
-import OtherU from '../screens/UserPanel/Main/OtherU';
+import Other from '../screens/UserPanel/Main/Other';
 import Search from "../screens/UserPanel/Main/Search";
-import ProfilU0 from '../screens/UserPanel/Main/ProfilU0';
-
+import Profile from '../screens/UserPanel/Main/Profile';
 import {createStackNavigator } from '@react-navigation/stack';
 import { HeaderBackButton } from '@react-navigation/elements';
-
-const Stack = createStackNavigator();
 import firebase from 'firebase/compat//app';
 import {useNavigation} from '@react-navigation/native';
 
@@ -70,11 +65,11 @@ const TabUBottom = () => {
         TabBar={props => <MyTabBar {...props} />}
 
         >       
-            <Tab.Screen name="Home" component ={HomeU} options={{headerShown: false , title:"Ana Sayfa"}} />
+            <Tab.Screen name="Home" component ={Home} options={{headerShown: false , title:"Ana Sayfa"}} />
             <Tab.Screen name="MyDoctor" component ={MyDoctor} options={{headerShown: false , title:"Doktorlarım"}}/>
             <Tab.Screen name="Search" component ={Search} options={{headerShown: false , title:"Arama"} } />
-            <Tab.Screen name="ProfilU0" component ={ProfilU0} options={{headerShown: false , title:"Profil"}}/>
-            <Tab.Screen name="Other" component ={OtherU} options={{headerShown: false, title:"Diğer"}}/>
+            <Tab.Screen name="Profile" component ={Profile} options={{headerShown: false , title:"Profil"}}/>
+            <Tab.Screen name="Other" component ={Other} options={{headerShown: false, title:"Diğer"}}/>
         </Tab.Navigator>
         // title kaldırmak için , tabBarShowLabel:false
 );
@@ -97,8 +92,8 @@ const ChatsScreen = () => {
   )
 }
 
-import MoreDoctorInfoU from '../screens/UserPanel/Main/MoreDoctorInfoU';
-import Randevu from "../screens/UserPanel/Main/Randevu"
+import MoreDoctorInfo from '../screens/UserPanel/Main/MoreDoctorInfo';
+import Appointment from "../screens/UserPanel/Main/Appointment"
 import SignUp00 from '../screens/UserPanel/SignUp/SignUp0';
 
 import Notifications from '../screens/UserPanel/Main/Notifications';
@@ -112,11 +107,11 @@ const TabU = () => {
         <HeaderBackButton onPress={()=> navigation.navigate("Login")}/>
       )
     }}/>
-      <MainStack.Screen name = "SignUp00" component={SignUp00} options={{title:"Hasta Kayıt", headerShown:false}}/>
-      <MainStack.Screen name = "TabU" component={TabUBottom} options={{headerShown:false}}/>
-      <MainStack.Screen name = "ChatsScreen" component={ChatsScreen} options={{headerShown:false}}/>
-      <MainStack.Screen name="MoreDoctorInfoU" component={MoreDoctorInfoU} options={{title: "Doktor Profili", headerBackTitle:"Geri"}}/>
-      <MainStack.Screen name="Randevu" component={Randevu} options={{title: "Randevu", headerBackTitle:"Geri"}}/>
+      <MainStack.Screen name="SignUp00" component={SignUp00} options={{title:"Hasta Kayıt", headerShown:false}}/>
+      <MainStack.Screen name="TabU" component={TabUBottom} options={{headerShown:false}}/>
+      <MainStack.Screen name="ChatsScreen" component={ChatsScreen} options={{headerShown:false}}/>
+      <MainStack.Screen name="MoreDoctorInfo" component={MoreDoctorInfo} options={{title: "Doktor Profili", headerBackTitle:"Geri"}}/>
+      <MainStack.Screen name="Appointment" component={Appointment} options={{title: "Randevu", headerBackTitle:"Geri"}}/>
       <MainStack.Screen name="Notifications" component={Notifications} options={{title: "Bildirimler", headerBackTitle:"Geri"}}/>
     </MainStack.Navigator>
   )

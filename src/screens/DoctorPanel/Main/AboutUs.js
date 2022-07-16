@@ -1,7 +1,7 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 
-const Hakkımızda = () => {
+const AboutUs = () => {
     return (
         <View>
             <Text style={{fontSize:45}}>Hakkımızda!</Text>
@@ -9,4 +9,4 @@ const Hakkımızda = () => {
     )
 }
 
-export default Hakkımızda
+export default AboutUs

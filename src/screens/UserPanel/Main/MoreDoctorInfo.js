@@ -9,7 +9,7 @@ import trLocale from "moment/locale/tr"
 import { useRoute } from "@react-navigation/native";
 
 
-const MoreDoctorInfoU = ({navigation}) => {
+const MoreDoctorInfo = ({navigation}) => {
     const route = useRoute();
     const DoctorId = route.params.doctorId;
     const [H_name, setH_name]= useState();
@@ -118,7 +118,7 @@ tintColor="white"
         avatar == "" ?
 
       <Avatar
-      source={require("../../../components/Icons/DefaultDoctorAvatar.png")}
+      source={require("../../../rec/Avatars//DefaultDoctorAvatar.png")}
       size={100}
       rounded     
       >
@@ -204,7 +204,7 @@ tintColor="white"
        </View>
 
           <View style={styles.btnCont}>
-  <TouchableOpacity onPress={()=> navigation.navigate("Randevu", {id: DoctorId})} style={{flex:1, justifyContent:"center"}}>
+  <TouchableOpacity onPress={()=> navigation.navigate("Appointment", {id: DoctorId})} style={{flex:1, justifyContent:"center"}}>
    
   <LinearGradient
         // Button Linear Gradient
@@ -329,4 +329,4 @@ const styles = StyleSheet.create({
       
 })
 
-export default MoreDoctorInfoU;
+export default MoreDoctorInfo;

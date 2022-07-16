@@ -146,7 +146,7 @@ const MyPatients = (props) => {
                 </Modal>
                             {/* --- Modal --- */}
 
-                 <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("NotificationsD")}/>
+                 <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
                  {/* <ScrollView> */}
                  <FlatList 
                  data = {users}

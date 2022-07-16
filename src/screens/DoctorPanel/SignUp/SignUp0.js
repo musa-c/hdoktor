@@ -1,26 +1,13 @@
-import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, TextInput, Button, TouchableOpacity, StatusBar, ScrollView, Image,  Platform, KeyboardAvoidingView, Dimensions, LogBox, Pressable } from 'react-native'
+import React, {useState } from 'react'
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Image, LogBox } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
-import * as Progress from 'react-native-progress';
-import Constants from 'expo-constants';
-import { NavigationContainer, useNavigation, useRoute } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Avatar } from 'react-native-elements';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { CheckBox } from 'react-native-elements'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
-import { LinearGradient } from 'expo-linear-gradient';
-import Modal from "react-native-modal";
-import * as ImagePicker from 'expo-image-picker';
-import firebase from 'firebase/compat/app';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import AnimatedLottieView from "lottie-react-native";
-import { KeyboardAccessoryView } from 'react-native-keyboard-accessory'
 
 import trLocale from "moment/locale/tr"
 
-const SingUpStack = createNativeStackNavigator();
 
 const SignUp0 = ({navigation, route}) => {
 
@@ -239,7 +226,7 @@ const SignUp0 = ({navigation, route}) => {
         />
           <View style={styles.InputCard}>
               <View style={{flex:0.7, justifyContent:"center", alignItems:"center"}}>
-  <Image source={require("../../../components/Icons/hdoktor-logo-dikeyImageSize.png")} />
+  <Image source={require("../../../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
   </View>
   
   <Text style={{fontSize:18, fontWeight:"bold", color:"red", alignSelf:"center"}}>{error}</Text>

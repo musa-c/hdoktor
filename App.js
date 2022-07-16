@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import TabD from './src/Tab/TabD';
-import TabU from './src/Tab/TabU';
+import TabD from './src/Tabs/TabD';
+import TabU from './src/Tabs/TabU';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './src/screens/Login';
 import { LogBox } from 'react-native';

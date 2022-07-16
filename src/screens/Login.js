@@ -3,13 +3,12 @@ import React from 'react'
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import {FontAwesome} from "@expo/vector-icons"
-
 const Login = () => {
     const navigation = useNavigation();
     return (
         <View style={{flex:1, justifyContent:"center", alignItems:"center", backgroundColor:"#fff"}}>
             <View style={{flex:3, justifyContent:"center",}}>
-            <Image source={require("../components/Icons/hdoktor-logo-dikeyImageSize.png")} />
+            <Image source={require("../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
             </View>
             <View style={{flex:4}}>
             <TouchableOpacity onPress={()=> navigation.navigate("DMain", {screen:"D_SignIn"})}>

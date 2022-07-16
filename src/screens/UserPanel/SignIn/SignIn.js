@@ -1,8 +1,7 @@
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { TouchableOpacity } from 'react-native-gesture-handler';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import LogoLogin from '../../../components/LogoLogin';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Form from './SignInForm';

@@ -1,7 +1,7 @@
-import React, { Component, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import firebase from "firebase/compat/app";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 const Form = () => {
     const [email, setEmail] = useState("");

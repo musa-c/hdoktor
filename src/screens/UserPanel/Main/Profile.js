@@ -5,7 +5,7 @@ import {Avatar } from 'react-native-elements';
 import Modal from "react-native-modal";
 import firebase from 'firebase/compat/app';
 
-const ProfilU0 = () => {
+const Profile = () => {
     // const [raiting, setRaiting] = useState();
     const [isModalVisible, setModalVisible] = useState(false);
     const [avatar, setAvatar] = useState();
@@ -197,4 +197,4 @@ const styles = StyleSheet.create({
     
 })
 
-export default ProfilU0
+export default Profile

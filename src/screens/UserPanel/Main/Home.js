@@ -42,7 +42,7 @@ function HomeU(props) {
     renderItem={(element) =>
         (
     <View style={styles.DenemeCont}>
-    <TouchableOpacity onPress={() =>navigation.navigate("MoreDoctorInfoU", {doctorId: element.item.key})}>
+    <TouchableOpacity onPress={() =>navigation.navigate("MoreDoctorInfo", {doctorId: element.item.key})}>
     <View style={styles.card}>
       <View style={styles.cardImage}>
 
@@ -51,7 +51,7 @@ function HomeU(props) {
 
          <Avatar
   size={95}
-  source={require("../../../components/Icons/DefaultDoctorAvatar.png")}
+  source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
   avatarStyle={styles.imageStyle}
   activeOpacity={0.7}
   rounded

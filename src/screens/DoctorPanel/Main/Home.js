@@ -50,7 +50,7 @@ function HomeD(props) {
   const navigation = useNavigation();
   return (
     <View style={{flex:1, backgroundColor:"white"}}>
-    <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("NotificationsD")}/>
+    <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
     <Ad />
     
     <FlatList
@@ -68,10 +68,9 @@ function HomeD(props) {
       
       {
          element.item.avatar == "" ?
-// ../../components/Icons/DefaultDoctorAvatar.png
          <Avatar
   size={95}
-  source={require("../../../components/Icons/DefaultDoctorAvatar.png")}
+  source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
   avatarStyle={styles.imageStyle}
   activeOpacity={0.7}
   rounded

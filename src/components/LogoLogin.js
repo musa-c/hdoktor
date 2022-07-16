@@ -1,12 +1,12 @@
-import React, { Component } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import React from "react";
+import { View, StyleSheet, Image } from "react-native";
 
 
 
 const LogoLogin = () => {
     return(
         <View  style ={style.container}>
-            <Image source={require("./Icons/hdoktor-logo-dikeyImageSize.png")} />
+            <Image source={require("../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
         </View>
     );
 }

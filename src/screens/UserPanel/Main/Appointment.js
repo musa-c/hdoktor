@@ -71,7 +71,7 @@ if (day < 10) {
 var maxDate = year + "-" + month  + "-" + day.toString();
 
 
-const Randevu = ({route}) => {
+const Appointment = ({route}) => {
   const id = route.params.id;
   // console.log(id);
 
@@ -531,4 +531,4 @@ const styles = StyleSheet.create({
   } 
 })
 
-export default Randevu;
+export default Appointment;

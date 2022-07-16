@@ -1,7 +1,7 @@
-import React, { Component, useEffect, useState } from "react";
+import React, {useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import firebase from "firebase/compat/app";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
 const Form = () => {
     const [email, setEmail] = useState("");
@@ -24,7 +24,7 @@ const Form = () => {
                 }).then(()=>{
 
 
-                  firebase.firestore().collection("_user").where("email", "==", email.toLowerCase()).get().then((snapshot)=>{
+                  firebase.firestore().collection("H_user").where("email", "==", email.toLowerCase()).get().then((snapshot)=>{
                     // console.log(snapshot.);
                    if(!(snapshot.empty)){
                     navigation.navigate("TabU");

@@ -1,12 +1,12 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 
-const OdemePlan = () => {
+const Contract = () => {
     return (
         <View>
-            <Text>Odenme Plan</Text>
+            <Text>Sözleşme!</Text>
         </View>
     )
 }
 
-export default OdemePlan
+export default Contract

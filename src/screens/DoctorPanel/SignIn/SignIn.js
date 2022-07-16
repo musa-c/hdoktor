@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import LogoLogin from '../../../components/LogoLogin';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import Form from './D_SignInForm';
+import Form from './SignInForm';
 
 const SignIn = ({route}) => {
     const navigation = useNavigation();

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, StyleSheet } from "react-native";
 
 import Header from "../../../components/Header/Header";
-import Icon from 'react-native-vector-icons/FontAwesome';
 import { SearchBar } from 'react-native-elements';
 
 const Search = () => {

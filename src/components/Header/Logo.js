@@ -5,7 +5,7 @@ const Logo = (props) => {
     return(
         <View style={style.styles}>
             <Image 
-            source={require("../Icons/logoHeader.png")}
+            source={require("../../rec/Logos/logoHeader.png")}
             ></Image>
         </View>
     )

@@ -6,7 +6,7 @@ import firebase from 'firebase/compat/app';
 import moment from "moment";
 import trLocale from "moment/locale/tr"
 
-const MoreDoctorInfo0 = () => {
+const MoreDoctorInfo = () => {
     const [raiting, setRaiting] = useState();
     const [isModalVisible, setModalVisible] = useState(false);
     const [avatar, setAvatar] = useState();
@@ -184,4 +184,4 @@ const styles = StyleSheet.create({
     
 })
 
-export default MoreDoctorInfo0
+export default MoreDoctorInfo

@@ -1,10 +1,10 @@
 import React from 'react'
-import { View} from 'react-native'
+import { View } from 'react-native'
 import Cell from '../../../components/Cell'
 import Header from '../../../components/Header/Header'
 import firebase from 'firebase/compat/app'
 
-const OtherU = () => {
+const Other = ({navigation}) => {
     return (
         <View style={{flex:1, backgroundColor:"white"}}>
             <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
@@ -21,21 +21,15 @@ const OtherU = () => {
             />
             
             <Cell 
-            title="Sıkça Sorulan Sorular"     
-            icon="help-outline"
+            title="İletişim"     
+            icon="call-outline"
             tintColor="#00ca00"       
             />
             
             <Cell 
-            title="İletişim"            
-            icon="call-outline"
-            tintColor="#f4e035"
-            />
-
-            <Cell 
             title="Bizi Değerlendirin"            
             icon="star-outline"
-            tintColor="#fdd835"
+            tintColor="#f4e035"
             />
             
             <Cell 
@@ -48,4 +42,4 @@ const OtherU = () => {
     )
 }
 
-export default OtherU
+export default Other

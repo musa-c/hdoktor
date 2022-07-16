@@ -1,13 +1,13 @@
 import React from 'react'
-import { View, Text } from 'react-native'
+import { View} from 'react-native'
 import Cell from '../../../components/Cell'
 import Header from '../../../components/Header/Header'
 import firebase from 'firebase/compat/app'
 
-const Other0 = ({navigation}) => {
+const Other = ({navigation}) => {
     return (
         <View style={{flex:1, backgroundColor:"white"}}>
-            <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("NotificationsD")}/>
+            <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
             <Cell 
             title="Hakkımızda"            
             icon="information-outline"  
@@ -21,15 +21,21 @@ const Other0 = ({navigation}) => {
             />
             
             <Cell 
-            title="İletişim"     
-            icon="call-outline"
+            title="Sıkça Sorulan Sorular"     
+            icon="help-outline"
             tintColor="#00ca00"       
             />
             
             <Cell 
+            title="İletişim"            
+            icon="call-outline"
+            tintColor="#f4e035"
+            />
+
+            <Cell 
             title="Bizi Değerlendirin"            
             icon="star-outline"
-            tintColor="#f4e035"
+            tintColor="#fdd835"
             />
             
             <Cell 
@@ -42,4 +48,4 @@ const Other0 = ({navigation}) => {
     )
 }
 
-export default Other0
+export default Other

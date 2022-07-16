@@ -10,7 +10,7 @@ import Header from '../../../components/Header/Header';
 // import * as InAppPurchases from 'expo-in-app-purchases';
 
 
-const ProfileD0 = ({navigation}) => {
+const Profile = ({navigation}) => {
     const [raiting, setRaiting] = useState();
     const [isModalVisible, setModalVisible] = useState(false);
     const [avatar, setAvatar] = useState();
@@ -58,7 +58,7 @@ const ProfileD0 = ({navigation}) => {
     return (
         
         <View style={styles.cont}>
-            <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("NotificationsD")}/>
+            <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
             <View style={styles.userImg}>
            
 
@@ -221,4 +221,4 @@ const styles = StyleSheet.create({
     
 })
 
-export default ProfileD0
+export default Profile

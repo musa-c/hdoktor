@@ -22,9 +22,19 @@ const Chats = ({navigation}) => {
             }
         })
         const user = firebase.auth().currentUser;
-        firebase.firestore().collection("D_user").doc(user.uid).onSnapshot((snapshot)=>{
-            setDavatar(snapshot.data().avatar)
+        firebase.firestore().collection("D_user").where("email", "==", user.email).get().then((snapshot) =>{
+            if(snapshot.empty){
+                firebase.firestore().collection("H_user").doc(user.uid).onSnapshot((snapshot)=>{
+                    setDavatar(snapshot.data().avatar)
+                })
+            }else{
+                firebase.firestore().collection("D_user").doc(user.uid).onSnapshot((snapshot)=>{
+                    setDavatar(snapshot.data().avatar)
+                })
+            }
+
         })
+     
         return () => {
             unmounted = true;
           };

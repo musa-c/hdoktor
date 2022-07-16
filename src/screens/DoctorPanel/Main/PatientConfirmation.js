@@ -10,7 +10,7 @@ import { Avatar } from "react-native-elements";
 import moment from "moment";
 import trLocale from "moment/locale/tr"
 
-const HastaOnayy = ({navigation}) => {
+const PatientConfirmation = ({navigation}) => {
 
     const [users, SetUsers] = useState([]);
     const [DName, setD_Name]= useState("");
@@ -131,7 +131,7 @@ const HastaOnayy = ({navigation}) => {
 
     return (
              <View style={styles.ViewStyle}>
-                 <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("NotificationsD")}/>
+                 <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
                  <FlatList 
                  data = {users}
                  renderItem = {(element)=>(
@@ -339,4 +339,4 @@ const styles = StyleSheet.create({
  
 });
 
-export default HastaOnayy;
+export default PatientConfirmation;

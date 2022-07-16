@@ -272,7 +272,7 @@ const timeNow = new Date();
       />
         <View style={styles.InputCard}>
             <View style={{justifyContent:"center", alignItems:"center", flex:1}}>
-<Image source={require("../../../components/Icons/hdoktor-logo-dikeyImageSize.png")} />
+<Image source={require("../../../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
 </View>
       <Text style={{fontSize:18, fontWeight:"bold", color:"red", alignSelf:"center"}}>{error}</Text>
       <View style={{flex:2}}>
@@ -431,7 +431,7 @@ const uploadAvatar = async (uri, imageName)  => {
   const response = await fetch(uri);
   const blob = await response.blob();
 
-  var ref = await firebase.storage().ref("avatars/").child(imageName);
+  var ref = await firebase.storage().ref("avatars/H_avatars").child(imageName);
   return ref.put(blob);
 }
 
@@ -518,7 +518,7 @@ avatarLocal == ''
 size={130}
 rounded
 onPress={toggleModal}
-source= {require("../../../components/Icons/DefaultHastaAvatar.png")}
+source= {require("../../../rec/Avatars/DefaultHastaAvatar.png")}
 > 
 
 <Avatar.Accessory  size={27}   onPress={toggleModal} />

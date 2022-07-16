@@ -2,24 +2,15 @@ import React, {useEffect} from 'react';
 import { StyleSheet} from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import {Ionicons} from "@expo/vector-icons";
-
-// import TabBar from '../components/tab-bar';
-
-import Home from '../screens/DoctorPanel/Main/HomeD';
-
+import Home from '../screens/DoctorPanel/Main/Home';
 import MyPatients from "../screens/DoctorPanel/Main/MyPatients";
-import ProfileD0 from '../screens/DoctorPanel/Main/ProfileD0';
-
+import ProfileD0 from '../screens/DoctorPanel/Main/Profile';
 import { useNavigation } from '@react-navigation/native';
 import firebase from 'firebase/compat/app';
-
-import HastaOnayy from '../screens/DoctorPanel/Main/HastaOnayy';
+import PatientConfirmation from '../screens/DoctorPanel/Main/PatientConfirmation';
 import { createStackNavigator  } from '@react-navigation/stack';
-
-
 import { HeaderBackButton } from '@react-navigation/elements';
-
-import Other0 from '../screens/DoctorPanel/Main/Other0';
+import Other from '../screens/DoctorPanel/Main/Other';
 
 
 const Tab = createBottomTabNavigator();
@@ -51,13 +42,13 @@ const TabDBottom = () => {
                   } else if (route.name === 'MyPatients') {
                     iconName = focused ? 'person' : "person-outline";
 
-                  } else if (route.name === 'PatientRequest') {
+                  } else if (route.name === 'PatientConfirmation') {
                     iconName = focused ? 'person-add' : "person-add-outline";
 
                   } else if (route.name === 'ProfileD0') {
                     iconName = focused ? 'person-circle' : "person-circle-outline";
                   }
-                    else if (route.name === 'Other0') {
+                    else if (route.name === 'Other') {
                     iconName = focused ? 'ellipsis-horizontal' : "ellipsis-horizontal-outline";
                   }
                   
@@ -77,9 +68,9 @@ const TabDBottom = () => {
                 
                 <Tab.Screen name="Home" component ={Home} options={{headerShown: false , title:"Ana Sayfa"}} />
                 <Tab.Screen name="MyPatients" component ={MyPatients} options={{headerShown: false , title:"Hastalarım"}}/>
-                <Tab.Screen name="PatientRequest" component ={HastaOnayy} options={{headerShown: false , title:"Hasta Onay"} } />
+                <Tab.Screen name="PatientConfirmation" component ={PatientConfirmation} options={{headerShown: false , title:"Hasta Onay"} } />
                 <Tab.Screen name="ProfileD0" component ={ProfileD0} options={{headerShown: false , title:"Profil"}}/>
-                <Tab.Screen name="Other0" component ={Other0} options={{headerShown: false, title:"Diğer"}}/>
+                <Tab.Screen name="Other" component ={Other} options={{headerShown: false, title:"Diğer"}}/>
             </Tab.Navigator>
             // title kaldırmak için , tabBarShowLabel:false
     );
@@ -87,20 +78,20 @@ const TabDBottom = () => {
 
 
 const OtherStack = createStackNavigator();
-import Hakkımızda from '../screens/DoctorPanel/Main/Hakkımızda';
-import Sozlesme from '../screens/DoctorPanel/Main/Sozlesme';
+import AboutUs from '../screens/DoctorPanel/Main/AboutUs';
+import Contract from '../screens/DoctorPanel/Main/Contract';
 import Deglerendir from '../screens/DoctorPanel/Main/Degerlendir';
-import OdemePlan from '../screens/DoctorPanel/Main/OdemePlan';
+import PaymentPlan from '../screens/DoctorPanel/Main/PaymentPlan';
 
-import NotificationsD from '../screens/DoctorPanel/Main/NotificationsD';
+import Notifications from '../screens/DoctorPanel/Main/Notifications';
 
 const OtherScreen = () => {
   return(
     <OtherStack.Navigator>
-    <OtherStack.Screen name ="Hakkımızda" component ={Hakkımızda} />
-    <OtherStack.Screen name ="Sozlesme" component ={Sozlesme} />
+    <OtherStack.Screen name ="Hakkımızda" component ={AboutUs} />
+    <OtherStack.Screen name ="Sozlesme" component ={Contract} />
     <OtherStack.Screen name ="Deglerendir" component ={Deglerendir} />
-    <OtherStack.Screen name ="OdemePlan" component ={OdemePlan} />
+    <OtherStack.Screen name ="OdemePlan" component ={PaymentPlan} />
     </OtherStack.Navigator>
   )
   
@@ -124,14 +115,14 @@ const ChatsScreen = () => {
 const MainStack = createStackNavigator();
 
 
-import D_SignIn from "../screens/DoctorPanel/SignIn/D_SignIn";
+import D_SignIn from "../screens/DoctorPanel/SignIn/SignIn";
 // import DSignUp from "../screens/SignUp/DSignUp";
 
-import MoreDoctorInfo0 from '../screens/DoctorPanel/Main/MoreDoctorInfo0';
+import MoreDoctorInfo from '../screens/DoctorPanel/Main/MoreDoctorInfo';
 
 const DSignUpStack = createStackNavigator();
-import DSignUp0 from "../screens/DoctorPanel/DSignUp/DSignUp0"
-import DSignUp1 from "../screens/DoctorPanel/DSignUp/DSignUp1"
+import DSignUp0 from "../screens/DoctorPanel/SignUp/SignUp0"
+import DSignUp1 from "../screens/DoctorPanel/SignUp/SignUp1"
 
 const DSignUpScreen = () =>{
   return(
@@ -158,14 +149,14 @@ const TabD = () => {
       <MainStack.Screen name = "TabD" component={TabDBottom} options={{headerShown:false}}/>
       <MainStack.Screen name = "OtherScreen" component={OtherScreen} options={{headerShown:false}}/>
       <MainStack.Screen name = "ChatsScreen" component={ChatsScreen} options={{headerShown:false}}/>  
-      <MainStack.Screen name="MoreDoctorInfo" component={MoreDoctorInfo0} 
+      <MainStack.Screen name="MoreDoctorInfo" component={MoreDoctorInfo} 
                                       options={{
                                         headerBackTitle:"Ana Sayfa",  
                                         headerTitle:"Profil",
                                         headerShown:true,
                                          }}
                                         />
-      <MainStack.Screen name = "NotificationsD" component={NotificationsD} options={{headerTitle:"Bildirimler", headerBackTitle:"Geri"}} />  
+      <MainStack.Screen name = "Notifications" component={Notifications} options={{headerTitle:"Bildirimler", headerBackTitle:"Geri"}} />  
                                       
         
     </MainStack.Navigator>

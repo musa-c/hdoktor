@@ -8,8 +8,6 @@ import trLocale from "moment/locale/tr"
 
 const SingUpStack = createNativeStackNavigator();
 
-
-
 const DSignUp = ({navigation}) => {;
 
    LogBox.ignoreLogs([

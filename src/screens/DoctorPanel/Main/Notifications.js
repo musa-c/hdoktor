@@ -5,7 +5,7 @@ import moment from "moment";
 import { Avatar, Badge  } from 'react-native-elements';
 import Separator from '../../../components/Separator';
 
-const NotificationsD = () => {
+const Notifications = () => {
   const user = firebase.auth().currentUser;
   const [data, setData] = useState([]);
   useEffect(()=>{
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default NotificationsD;
+export default Notifications;
