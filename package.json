@@ -29,6 +29,7 @@
     "expo-status-bar": "^1.2.0",
     "firebase": "^9.6.2",
     "fontisto": "^3.0.4",
+    "formik": "^2.2.9",
     "lodash": "^4.17.21",
     "lottie-react-native": "^5.0.1",
     "moment": "^2.29.1",
@@ -55,7 +56,8 @@
     "react-native-vector-icons": "^9.0.0",
     "react-native-web": "^0.17.5",
     "react-navigation-tabbar-collection": "^1.0.0",
-    "recompose": "^0.30.0"
+    "recompose": "^0.30.0",
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",

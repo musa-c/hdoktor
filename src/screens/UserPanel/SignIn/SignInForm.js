@@ -98,7 +98,7 @@ const Form = () => {
     return(
         <View  style ={style.container}>
          {errroMessage == "Yanlış e-posta/şifre kombinasyonu." || "Email adresi geçersiz." || 'Bu e-posta ile kullanıcı bulunamadı.'? 
-        <Text style={{color:"red", fontSize:17, fontWeight:"bold"}}>{"*"+ errroMessage}</Text> 
+        <Text style={{color:"red", fontSize:17, fontWeight:"bold"}}>{""+ errroMessage}</Text> 
      : ""}
             <TextInput style={style.inputBox}
                 placeholder="E-mail"

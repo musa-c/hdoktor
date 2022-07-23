@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, ScrollView, Image,  Platform, Dimensions, Pressable } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Image,  Platform, Dimensions, Pressable } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
 import { useRoute } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
-import { CheckBox } from 'react-native-elements'
+import { CheckBox } from 'react-native-elements';
+import { TextInput } from "react-native-paper";
 import Modal from "react-native-modal";
 import * as ImagePicker from 'expo-image-picker';
 import firebase from 'firebase/compat/app';
@@ -12,6 +13,17 @@ import AnimatedLottieView from "lottie-react-native";
 
 
 const SignUp1 =  ({navigation}) => {
+  const route = useRoute()
+  const [cinsiyet, setCinsiyet] = useState(route.params?.cinsiyet ?? "");
+
+  
+    // if(cinsiyet == "Erkek"){
+    //   setCheckedE(true)
+    // }else if(cinsiyet == "Kadın"){
+    //   setCheckedK(true)
+    // }
+ 
+
 
     const [isLoading, setIsLoading] = useState(false);
   
@@ -138,7 +150,6 @@ const SignUp1 =  ({navigation}) => {
   }
   
    
-    const route = useRoute();
     const name = route.params.name;
     const email = route.params.email;
     const brans = route.params.brans;
@@ -170,22 +181,12 @@ const SignUp1 =  ({navigation}) => {
   
     const result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, presentationStyle: 0});
   
-    // Explore the result
-    // console.log(result);
-  
     if (!result.cancelled) {
       setAvatarImagePath(result.uri);
      
       const filename = result.uri.split('/').pop();
       uploadAvatar(result.uri, filename);
       setavataruri(filename);
-  
-      // .then(()=>{
-      //   alert("Başarılı");
-      // });
-      // .catch(()=>{
-      //   alert("Başarısız")
-      // });  
     }
   }
   
@@ -269,9 +270,9 @@ const SignUp1 =  ({navigation}) => {
   }
   
   
-  const [checkedE, setCheckedE] = useState(false);
-  const [checkedK, setCheckedK] = useState(false);
-  const [cinsiyet, setCinsiyet] = useState(route.params?.cinsiyet ?? "");
+  const [checkedE, setCheckedE] = useState(route.params?.cinsiyet == "Erkek" ?  true : false);
+  const [checkedK, setCheckedK] = useState(route.params?.cinsiyet == "Kadın" ? true : false);
+ 
   const isCheckedErkek = () => {
     if (checkedE == true) {
       setCheckedE(false)
@@ -294,6 +295,7 @@ const SignUp1 =  ({navigation}) => {
     }
   }
   
+  
   const [isModalVisible, setModalVisible] = useState(false);
   
   const toggleModal = () => {
@@ -303,14 +305,79 @@ const SignUp1 =  ({navigation}) => {
   
   const { height } = Dimensions.get("window");
   
-  
   const [screenHeight, setScreenHeight] = useState(height);
   
   const onContentSizeChange = (contentWidth, contentHeight) => {
     setScreenHeight(contentHeight);
   };
-  
-  const scrollEnabled = screenHeight > height
+
+  const [ispasswordSee, setispasswordSee] = useState(true);
+  const [isAgainPasswordSee, setAgainPasswordSee] = useState(true);
+  const [againPassword, setAgainPassword] = useState(route.params?.againPassword ?? "");
+
+
+  const passwordSee = () =>{
+    if(!ispasswordSee){
+      return(
+        <TextInput.Icon name="eye-outline" forceTextInputFocus={false} onPress={()=> setispasswordSee(!ispasswordSee)}/>
+      )
+    }else{
+      return(
+        <TextInput.Icon name="eye-off-outline" forceTextInputFocus={false} onPress={()=> setispasswordSee(!ispasswordSee)}/>
+      )
+    }
+  }
+
+  const againPasswordSee = () => {
+    if(!isAgainPasswordSee){
+      return(
+        <TextInput.Icon name="eye-outline" forceTextInputFocus={false} onPress={()=> setAgainPasswordSee(!isAgainPasswordSee)}/>
+      )
+    }else{
+      return(
+        <TextInput.Icon name="eye-off-outline" forceTextInputFocus={false} onPress={()=> setAgainPasswordSee(!isAgainPasswordSee)}/>
+      )
+    }
+  }
+
+  const againPasswordValidate = () =>{
+    if(againPassword != ""){
+      if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)){
+        if(password == againPassword){
+          return(
+            <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
+          )
+        }else{
+          return(
+            <TextInput.Icon name="close-circle-outline" forceTextInputFocus={false} color={"#f44336"}/>
+          )
+        }
+      }else{
+        return(
+          <TextInput.Icon name="close-circle-outline" forceTextInputFocus={false} color={"#f44336"}/>
+        )
+      }
+     
+    }
+
+  }
+
+  const passwordValidate = () =>{
+    if(password != ""){
+      if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)){
+        return(
+          <TextInput.Icon name="check-circle-outline" color={"green"}/>
+        )
+      }else{
+        return(
+          <TextInput.Icon name="close-circle-outline" color={"#f44336"}/>
+        )
+      }
+    }
+  }
+
+
+  const scrollEnabled = screenHeight > height-40
   
       return (
 
@@ -491,11 +558,19 @@ const SignUp1 =  ({navigation}) => {
               placeholderTextColor="grey"
               value={CalisilanYer}
               onChangeText={text=> SetCalisilanYer(text)}
+              underlineColor="#f44336"
+              activeUnderlineColor='#f44336'
+              outlineColor="white"
+              activeOutlineColor="red"
+              //right={NameValidate(name)}
               />
   
               
   <TouchableOpacity onPress={PhotosShowImagePicker}>
-              <View style={[styles.input, {justifyContent:"space-between", alignItems:"center", flexDirection:"row"}]}>
+              <View style={[styles.input, {justifyContent:"space-between", alignItems:"center", flexDirection:"row",
+              borderBottomColor:"red", borderBottomWidth:1  
+                
+                }]}>
                 <Text style={{color:"grey", fontSize:18}}>Fotoğraflarını ekle</Text>
                 <Ionicons name="images-outline" size={20} />
               </View>
@@ -525,10 +600,15 @@ const SignUp1 =  ({navigation}) => {
               style={styles.input}
               placeholder="Şifre"
               placeholderTextColor="grey"
-              secureTextEntry={true}
+              secureTextEntry={ispasswordSee}
+              underlineColor="#f44336"
+              activeUnderlineColor='#f44336'
+              outlineColor="white"
+              left={passwordSee()}
+              right={passwordValidate(password)}
               value={password}
               onChangeText={text => setPassword(text)}
-              keyboardType="visible-password"
+
               />
   
   
@@ -536,7 +616,14 @@ const SignUp1 =  ({navigation}) => {
               style={styles.input}
               placeholder="Tekrar Şifre"
               placeholderTextColor="grey"
-              secureTextEntry={true}
+              secureTextEntry={isAgainPasswordSee}
+              left={againPasswordSee()}
+              value={againPassword}
+              onChangeText={text => setAgainPassword(text)}
+              underlineColor="#f44336"
+              activeUnderlineColor='#f44336'
+              outlineColor="white"
+              right={againPasswordValidate(againPassword)}
               />
   
   
@@ -604,9 +691,9 @@ const SignUp1 =  ({navigation}) => {
                    {
                         CalisilanYer: CalisilanYer,
                         password:password,
+                        againPassword: againPassword,
                         cinsiyet: cinsiyet,
                         avatar: AvatarImagePath
-                       
                    })}>
   
            <Text style={{borderRadius:20, paddingHorizontal:2, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10}}>
@@ -686,10 +773,7 @@ const SignUp1 =  ({navigation}) => {
         width:300,
         height:50,
         margin:15,
-        borderColor:"#f44336",
-        borderBottomWidth:2,
-        borderRadius:0,
-        paddingLeft:10,
+        backgroundColor:"white",
         fontSize:18,
         // backgroundColor:"red"
     },

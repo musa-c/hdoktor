@@ -1,9 +1,10 @@
 import React, {useState } from 'react'
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, StatusBar, Image, LogBox } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, LogBox } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import moment from "moment";
+import { TextInput } from "react-native-paper";
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import trLocale from "moment/locale/tr"
@@ -19,7 +20,8 @@ const SignUp0 = ({navigation, route}) => {
     const password = route.params?.password ?? ""
     const cinsiyet = route.params?.cinsiyet ?? ""
     const avatar = route.params?.avatar ?? ""
-    const error = route.params?.error ?? ""
+    const againPassword = route.params?.againPassword ?? ""
+   // const error = route.params?.error ?? ""
   
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -178,8 +180,8 @@ const SignUp0 = ({navigation, route}) => {
   
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isDatePickerVisible2, setDatePickerVisibility2] = useState(false);
-  const [time1, setTime1] = useState(new Date());
-  const [time2, setTime2] = useState(new Date());
+  const [time1, setTime1] = useState("Başlangıç Saati");
+  const [time2, setTime2] = useState("Bitiş Saati");
   
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -206,8 +208,67 @@ const SignUp0 = ({navigation, route}) => {
     setTime2(time2)
     hideDatePicker2();
   };
+  const [error, setError] = useState(route.params?.error ?? ""); 
+
+
+  const NextForm = (name, email, brans, time1, time2) =>{
+    if(name == "" || email == "" || brans == "" || time1 == "Başlangıç Saati" || time2 == "Bitiş Saati"){
+      setError("Formu lütfen doldurunuz.")
+    }else{
+      setError("")
+      navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
+        cinsiyet: cinsiyet, avatar: avatar,
+        againPassword: againPassword
+      })
+    }
+  }
+
+
+  const NameValidate = (name) =>{
+    if(name != ""){
+      if(name.length > 1){
+        return(
+          <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
+        )
+      }else{
+        return(
+          <TextInput.Icon name="close-circle-outline" forceTextInputFocus={false} color={"#f44336"}/>
+        )
+      }
+    }
+}
+
+const emailValidate = (email) =>{
+
+  // const [isEmail, setIsEmail] = useState(false);
   
-  const timeNow = new Date();
+    if(email != ""){
+      if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email.toLowerCase())){
+        // firebase.auth().fetchSignInMethodsForEmail(email.toLowerCase()).then((signInMethods)=>{
+        //   // fetchSignInMethodsForEmail : Belirli bir kullanıcıda oturum açmak için kullanılabilecek kimlik doğrulama yöntemlerinin bir listesini döndürür (ana e-posta adresiyle tanımlanır).
+        //  setIsEmail(signInMethods.length == 0)
+        // })
+        // if(isEmail){
+        //   return(
+        //     <TextInput.Icon name="check-circle-outline" color={"green"}/>
+        //   )
+        // }else{
+        //   return(
+        //     <TextInput.Icon name="close-circle-outline" color={"#f44336"}/>
+        //   )
+        // }
+        return(
+          <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
+        )
+      }else{
+        return(
+          <TextInput.Icon name="close-circle-outline" forceTextInputFocus={false} color={"#f44336"}/>
+        )
+      }
+    }
+  }
+
+  
     return (
       
 
@@ -238,14 +299,23 @@ const SignUp0 = ({navigation, route}) => {
               placeholderTextColor="grey"
               value={name}
               onChangeText={text => setName(text)}
+              underlineColor="#f44336"
+              activeUnderlineColor='#f44336'
+              outlineColor="white"
+              activeOutlineColor="red"
+              right={NameValidate(name)}
               />
                <TextInput 
-              style={styles.input}
-              placeholder="E-mail"
-              placeholderTextColor="grey"
-              value={email}
-              onChangeText={text => setEmail(text)}
-              keyboardType="email-address"
+               style={styles.input}
+               placeholder="E-mail"
+               placeholderTextColor="grey"
+               underlineColor="#f44336"
+               activeUnderlineColor='#f44336'
+               outlineColor="white"
+               keyboardType="email-address"
+               right={emailValidate(email)}
+               value={email}
+               onChangeText={text => setEmail(text)}
   
               />
               <DropDownPicker
@@ -326,7 +396,15 @@ const SignUp0 = ({navigation, route}) => {
           <Text style={{marginLeft:10, color:"grey", fontSize:18, marginTop:5}}>Başlangıç</Text>
           <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:2, height:50, paddingHorizontal:10, alignItems:"center"}}>
             {/* <Text>Başlangıç: </Text> */}
-         <Text  style={{fontSize:18}}>{moment(time1).locale("tr", trLocale).format('LT')}</Text>
+         <Text  style={{fontSize:18}}>
+         
+         {time1 == "Başlangıç Saati" ? 
+         time1 : 
+         moment(time1).locale("tr", trLocale).format('LT')}
+
+
+         
+         </Text>
           <Ionicons name="chevron-down-outline" size={18} style={{marginLeft:10}}/>
           </View>
           </TouchableOpacity>
@@ -334,7 +412,14 @@ const SignUp0 = ({navigation, route}) => {
           <TouchableOpacity onPress={showDatePicker2}>
           <Text style={{marginLeft:10, color:"grey", fontSize:18, marginTop:5}}>Bitiş</Text>
           <View style={{flexDirection:"row", borderBottomColor:"red",  borderBottomWidth:2, height:50,  paddingHorizontal:10, alignItems:"center"}}>
-         <Text style={{fontSize:18}}>{moment(time2).locale("tr", trLocale).format('LT')}</Text>
+         <Text style={{fontSize:18}}>
+          
+          
+          {time2 == "Bitiş Saati" ? 
+          time2 : 
+          moment(time2).locale("tr", trLocale).format('LT')}
+          
+          </Text>
           <Ionicons name="chevron-down-outline" size={18} style={{marginLeft:10}}/>
           </View>
           </TouchableOpacity>
@@ -373,19 +458,10 @@ const SignUp0 = ({navigation, route}) => {
              </Text>
              </TouchableOpacity>
   
-             <TouchableOpacity onPress={() => navigation.navigate("DSignUp1", {
-             name: name, 
-             email: email, 
-             brans: brans, 
-             time1: time1, 
-             time2: time2, 
-             CalisilanYer: 
-             CalisilanYer, 
-             password:password, 
-             cinsiyet:cinsiyet, 
-             avatar:avatar
-             
-             })} >
+             <TouchableOpacity onPress={()=>{
+              NextForm(name, email, brans, time1, time2)
+             }}
+         >
              
              
              
@@ -444,10 +520,7 @@ const SignUp0 = ({navigation, route}) => {
         width:300,
         height:50,
         margin:15,
-        borderColor:"#f44336",
-        borderBottomWidth:2,
-        borderRadius:0,
-        paddingLeft:10,
+        backgroundColor:"white",
         fontSize:18,
         // backgroundColor:"red"
     },
