@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Image,  Platform, Dimensions, Pressable } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Image,  Platform, Dimensions, Pressable, Alert } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
 import { useRoute } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
@@ -29,26 +29,12 @@ const SignUp1 =  ({navigation}) => {
   
     const [isCreateAccount, setIsCreateAccount] = useState(false);
     
-    const [isSozlesmeOnay, setIsSozlesmeOnay] = useState(false);
+    const [isSozlesmeOnay, setIsSozlesmeOnay] = useState(route.params?.isSozlesmeOnay ?? false);
     const [SozlesmeModal, setSozlesmeModal] = useState(false);
-    const [checkFirst, setcheckFirst] = useState(false);
   
   
     const Sozlesme = (param) =>{
-      if(param == "onayla"){
-      setSozlesmeModal(!SozlesmeModal)
-      setIsSozlesmeOnay(true)
-      }else if (param == "check"){
-        if(!(checkFirst)){
-          setSozlesmeModal(!SozlesmeModal)
-        }else{
-          setIsSozlesmeOnay(!isSozlesmeOnay)
-        }
-        setcheckFirst(true);
-      }else{
-        setcheckFirst(true)
-        setSozlesmeModal(true)
-      }
+     
     }
   
   
@@ -130,19 +116,15 @@ const SignUp1 =  ({navigation}) => {
           break;
           case 'ERROR_OPERATION_NOT_ALLOWED':
           case 'operation-not-allowed':
-            alert('Sunucu hatası, lütfen daha sonra tekrar deneyin.')
+            Alert.alert("Hata❗", "Sunucu hatası, lütfen daha sonra tekrar deneyin.", [{text:"Tamam", style:"cancel"}])
             break;                    
           case 'ERROR_INVALID_EMAIL':
           case 'invalid-email':
           errorMessage('Email adresi geçersiz.')
-          // navigation.navigate("SignUp0", {error: "Email adresi geçersiz."})
-  
-          //   alert("Email adresi geçersiz.")
-          //   alert('Email adresi geçersiz.');
             break;                    
           default:
             // console.log(errorCode) // auth/weak-password' zayıf şifre de var.
-            alert('Kayıt başarısız. Lütfen tekrar deneyin.');
+            Alert.alert("Hata❗", "Kayıt başarısız. Lütfen tekrar deneyin.", [{text:"Tamam", style:"cancel"}])
             break;
         }
       });
@@ -315,7 +297,6 @@ const SignUp1 =  ({navigation}) => {
   const [isAgainPasswordSee, setAgainPasswordSee] = useState(true);
   const [againPassword, setAgainPassword] = useState(route.params?.againPassword ?? "");
 
-
   const passwordSee = () =>{
     if(!ispasswordSee){
       return(
@@ -339,11 +320,13 @@ const SignUp1 =  ({navigation}) => {
       )
     }
   }
+  let isAgainPasswordValidate = false
 
   const againPasswordValidate = () =>{
     if(againPassword != ""){
       if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)){
         if(password == againPassword){
+          isAgainPasswordValidate = true
           return(
             <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
           )
@@ -362,9 +345,12 @@ const SignUp1 =  ({navigation}) => {
 
   }
 
+let isPasswordValidate = false;
+
   const passwordValidate = () =>{
     if(password != ""){
       if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)){
+        isPasswordValidate = true;
         return(
           <TextInput.Icon name="check-circle-outline" color={"green"}/>
         )
@@ -534,7 +520,7 @@ const SignUp1 =  ({navigation}) => {
   title='Erkek'
   checkedIcon='dot-circle-o'
   uncheckedIcon='circle-o'
-  containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)', borderWidth:0, borderRadius:0, borderBottomWidth:2, borderColor:"#f44336"}}
+  containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)', borderWidth:0, borderRadius:0, borderBottomWidth:0.8, borderColor:"#f44336"}}
   checked={checkedE}
   checkedColor="#ba000d"
   onPress={()=> isCheckedErkek(true)}
@@ -544,7 +530,7 @@ const SignUp1 =  ({navigation}) => {
   title='Kadın'
   checkedIcon='dot-circle-o'
   uncheckedIcon='circle-o'
-  containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)',borderWidth:0, borderRadius:0, borderBottomWidth:2, borderColor:"#f44336"}}
+  containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)',borderWidth:0, borderRadius:0, borderBottomWidth:0.8, borderColor:"#f44336"}}
   checked={checkedK}
   checkedColor="#ba000d"
   onPress={() => isCheckedKadın(true)}
@@ -634,9 +620,9 @@ const SignUp1 =  ({navigation}) => {
         checked={isSozlesmeOnay}
         checkedColor="#ba000d"
         size={20}
-        onPress={() => Sozlesme("check")}
+        onPress={() => setIsSozlesmeOnay(!isSozlesmeOnay)}
       />
-            <Pressable onPress={()=> Sozlesme("abc")}>
+            <Pressable onPress={()=> setSozlesmeModal(true)}>
       <View style={{flex:1, flexDirection:"row", width:300, alignItems:"center"}}>
       <Text style={{fontSize:15, color:"grey"}}> 
       <Text style={{fontSize:15, borderBottomWidth:1, color:"black", borderBottomColor:"black", textDecorationLine:"underline" }}>Kullanıcı Sözleşmesini </Text>
@@ -676,7 +662,11 @@ const SignUp1 =  ({navigation}) => {
     </Text>
   
     </ScrollView>
-    <Pressable onPress={()=> Sozlesme("onayla")}>
+    <Pressable onPress={()=> {
+      setIsSozlesmeOnay(true)
+      setSozlesmeModal(false)
+    }
+      }>
     <Text style={{alignSelf:"flex-end", marginRight:10, color:"blue", fontSize:18, margin:15 }}>
       ONAYLA
     </Text>
@@ -693,7 +683,8 @@ const SignUp1 =  ({navigation}) => {
                         password:password,
                         againPassword: againPassword,
                         cinsiyet: cinsiyet,
-                        avatar: AvatarImagePath
+                        avatar: AvatarImagePath,
+                        isSozlesmeOnay: isSozlesmeOnay
                    })}>
   
            <Text style={{borderRadius:20, paddingHorizontal:2, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10}}>
@@ -710,7 +701,21 @@ const SignUp1 =  ({navigation}) => {
            </TouchableOpacity>
            
   
-            <TouchableOpacity onPress={() => createAccount(name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar)}> 
+            <TouchableOpacity onPress={() => 
+              {
+                if(isAgainPasswordValidate & isPasswordValidate & cinsiyet != "" & isSozlesmeOnay){
+                  createAccount(name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar)
+
+                }else{
+                  Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [
+                    {
+                      text: "Tamam",
+                      style: "cancel"
+                    }
+                  ])
+                }
+              }
+              }> 
            <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
                KAYIT OL
            </Text>
