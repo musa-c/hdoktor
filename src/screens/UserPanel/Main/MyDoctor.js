@@ -53,7 +53,6 @@ const MyDoctor = ({route}) => {
             data = {DrUsers}
             renderItem = {(element)=>
                 // console.log(element)
-
                 (
                 
                <View style={{flex:1, backgroundColor:"#fff"}}>        
@@ -61,7 +60,7 @@ const MyDoctor = ({route}) => {
                <View style={styles.card}>
                    <View style={styles.cardImage}>
                    <Image style={styles.imageStyle}
-                       source={{uri: element?.item?.avatar ?? ""}}></Image>
+                       source={{uri: element.item?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"}}></Image>
                    </View>
                    <View style={styles.CardInfo}>
                    <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold",}}>
