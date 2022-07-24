@@ -46,7 +46,7 @@ const TabUBottom = () => {
               } else if (route.name === 'Search') {
                 iconName = focused ? 'search' : "search-outline";
 
-              } else if (route.name === 'ProfilU0') {
+              } else if (route.name === 'Profile') {
                 iconName = focused ? 'person-circle' : "person-circle-outline";
               }
                 else if (route.name === 'Other') {
