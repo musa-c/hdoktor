@@ -214,11 +214,10 @@ const SignUp0 = ({navigation, route}) => {
 
   const NextForm = (name, email, brans, time1, time2) =>{
        
-    if(name == "" || email == "" || brans == "" || time1 == "Başlangıç Saati" || time2 == "Bitiş Saati"){
+    if(name == "" || email == "" || brans == "" || time1 == "Başlangıç Saati" || time2 == "Bitiş Saati" || !isNameValidation || !isEmailValitadion){
       setError("Formu lütfen doldurunuz.")
     }
    
-    
     else{
       var clock1 = moment(time1).locale("tr", trLocale).format('LT')
       var clock2 = moment(time2).locale("tr", trLocale).format('LT')
@@ -234,21 +233,22 @@ const SignUp0 = ({navigation, route}) => {
       setError("Çalışma saatiniz en az 1 saat olmalıdır.")
       }
       else{
-        setError("")
-        navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
-          cinsiyet: cinsiyet, avatar: avatar,
-          againPassword: againPassword, isSozlesmeOnay: isSozlesmeOnay
-        })
+          setError("")
+          navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
+            cinsiyet: cinsiyet, avatar: avatar,
+            againPassword: againPassword, isSozlesmeOnay: isSozlesmeOnay
+          })
       }
     
     }
   }
 
 
-
+let isNameValidation = false;
   const NameValidate = (name) =>{
     if(name != ""){
       if(name.length > 1){
+        isNameValidation = true
         return(
           <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
         )
@@ -259,6 +259,8 @@ const SignUp0 = ({navigation, route}) => {
       }
     }
 }
+
+let isEmailValitadion = false;
 
 const emailValidate = (email) =>{
 
@@ -279,6 +281,7 @@ const emailValidate = (email) =>{
         //     <TextInput.Icon name="close-circle-outline" color={"#f44336"}/>
         //   )
         // }
+        isEmailValitadion = true;
         return(
           <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
         )
