@@ -16,15 +16,7 @@ const SignUp1 =  ({navigation}) => {
   const route = useRoute()
   const [cinsiyet, setCinsiyet] = useState(route.params?.cinsiyet ?? "");
 
-  
-    // if(cinsiyet == "Erkek"){
-    //   setCheckedE(true)
-    // }else if(cinsiyet == "Kadın"){
-    //   setCheckedK(true)
-    // }
  
-
-
     const [isLoading, setIsLoading] = useState(false);
   
     const [isCreateAccount, setIsCreateAccount] = useState(false);

@@ -104,6 +104,7 @@ const Form = () => {
                 placeholder="E-mail"
                 placeholderTextColor="#fff"
                 value={email}
+                keyboardType="email-address"
                 onChangeText={text => setEmail(text)}
                 />
 
