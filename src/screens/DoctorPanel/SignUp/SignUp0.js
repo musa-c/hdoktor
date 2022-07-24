@@ -21,6 +21,7 @@ const SignUp0 = ({navigation, route}) => {
     const cinsiyet = route.params?.cinsiyet ?? ""
     const avatar = route.params?.avatar ?? ""
     const againPassword = route.params?.againPassword ?? ""
+    const isSozlesmeOnay = route.params?.isSozlesmeOnay ?? false
    // const error = route.params?.error ?? ""
   
     const [email, setEmail] = useState("");
@@ -236,7 +237,7 @@ const SignUp0 = ({navigation, route}) => {
         setError("")
         navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
           cinsiyet: cinsiyet, avatar: avatar,
-          againPassword: againPassword
+          againPassword: againPassword, isSozlesmeOnay: isSozlesmeOnay
         })
       }
     
