@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, Text, StyleSheet,  TouchableOpacity, StatusBar, ScrollView, Image, Platform, Dimensions, Pressable } from 'react-native'
+import { View, Text, StyleSheet,  TouchableOpacity, StatusBar, ScrollView, Image, Platform, Dimensions, Pressable, Alert } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
 import {Feather} from "@expo/vector-icons";
 import { useRoute } from '@react-navigation/native';
@@ -23,17 +23,13 @@ const SignUp00 = ({navigation}) => {
 
   const [error, setError] = useState(""); 
   
-  const errorMessage = (error) =>{
-    navigation.navigate("SignUp0");
-    setError(error)
-  }
+ 
 
-  const createAccount = async (name, email, password, cinsiyet, avatar, phoneNumber, date, isSozlesmeOnay) => {
-    if(isSozlesmeOnay){
+  const createAccount = async (name, email, password, cinsiyet, avatar, phoneNumber, date, KHastalik) => {
       firebase
       .auth()
       .createUserWithEmailAndPassword(email, password).then((userCredential)=>{
-         firebase.storage().ref("avatars/H_avatars/").child(avatar).getDownloadURL().then((avatarUrl)=> {
+         firebase.storage().ref("avatars/H_avatars/").child(avatar == "" ? "DefaultHastaAvatar.png" : avatar).getDownloadURL().then((avatarUrl)=> {
             firebase.firestore().collection("H_user").doc(userCredential.user.uid).set({
                      name: name,
                      email:email.toLowerCase(),
@@ -41,7 +37,8 @@ const SignUp00 = ({navigation}) => {
                      Id:userCredential.user.uid,
                      avatar: avatarUrl,
                      date:date,
-                     phoneNumber:phoneNumber
+                     phoneNumber:phoneNumber,
+                     KHastalik: KHastalik
              })
             //  console.log("userCredential: ", userCredential)
              userCredential.user.updateProfile({
@@ -83,12 +80,23 @@ const SignUp00 = ({navigation}) => {
             break;
         }
       })
-    }else{
-      alert("Lütfen Kullanıcı sözleşmesini onaylayınız.")
-    }
-
-    console.log(name, email, password, cinsiyet, avatar, phoneNumber, date)
     
+
+      const errorMessage = (error) =>{
+        navigation.navigate("SignUp0", {
+          name:name,
+          email:email,
+          password:password,
+          cinsiyet:cinsiyet,
+          avatar:avatar,
+          phoneNumber:phoneNumber,
+          dogumTarih:date,
+          KHastalik:KHastalik,
+          againPassword: password,
+          isSozlesmeOnay: true
+        });
+        setError(error)
+      }
       
 
 
@@ -97,20 +105,38 @@ const SignUp00 = ({navigation}) => {
 
 const SignUp0 = ({navigation, route}) => {
 
+  const password = route.params?.password;
+  const againPassword = route.params?.againPassword;
+  const cinsiyet = route.params?.cinsiyet;
+  const isSozlesmeOnay = route.params?.isSozlesmeOnay;
+  const KHastalik = route.params?.KHastalik;
+
   
 const NextForm = (name, email, dogumTarih, PhoneNumber) =>{
-  if(name == "" || email == "" || dogumTarih == "GÜN.AY.YIL" || PhoneNumber == ""){
+  if(name == "" || email == "" || dogumTarih == "GÜN.AY.YIL" || PhoneNumber == "" || !isEmailValidation || !isNameValidation || !isPhoneNumberValidation){
     setError("Formu lütfen doldurunuz.")
   }else{
-    navigation.navigate("SignUp1", {name: name, email: email, dogumTarih:dogumTarih, phoneNumber: PhoneNumber})
+    navigation.navigate("SignUp1", 
+    {
+      name: name, 
+      email: email, 
+      dogumTarih:dogumTarih, 
+      phoneNumber: PhoneNumber, 
+      password: password, 
+      againPassword:againPassword, 
+      cinsiyet:cinsiyet, 
+      isSozlesmeOnay:isSozlesmeOnay,
+      KHastalik: KHastalik
+    })
   }
 }
 
 
-
+let isNameValidation = false;
 const NameValidate = (name) =>{
     if(name != ""){
       if(name.length > 1){
+        isNameValidation = true;
         return(
           <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
         )
@@ -121,6 +147,9 @@ const NameValidate = (name) =>{
       }
     }
 }
+
+
+var isEmailValidation = false;
 
 const emailValidate = (email) =>{
 
@@ -141,6 +170,7 @@ const emailValidate = (email) =>{
       //     <TextInput.Icon name="close-circle-outline" color={"#f44336"}/>
       //   )
       // }
+      isEmailValidation = true;
       return(
         <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
       )
@@ -152,10 +182,13 @@ const emailValidate = (email) =>{
   }
 }
 
+
+let isPhoneNumberValidation = false;
 const PhoneNumberValidate = (phoneNumber) =>{
     // refex if els
     if(phoneNumber != ""){
       if(/(^[0\s]?[\s]?)([(]?)([5])([0-9]{2})([)]?)([\s]?)([0-9]{3})([\s]?)([0-9]{2})([\s]?)([0-9]{2})$/g.test(phoneNumber)){
+        isPhoneNumberValidation = true;
         return(
         <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
         )
@@ -262,7 +295,7 @@ const handleConfirm = (dogumTarih) => {
   <View style={{flexDirection:"row", justifyContent:"space-evenly"}}> 
 
       <TouchableOpacity onPress={showDatePicker}>
-        <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:2, height:50, paddingHorizontal:10, alignItems:"center"}}>
+        <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:0.8, height:50, paddingHorizontal:10, alignItems:"center"}}>
         <Text>{
         dogumTarih
         }</Text>
@@ -333,17 +366,16 @@ const SignUp1 =  ({navigation}) => {
   const email = route.params.email;
   const dogumTarih = route.params.dogumTarih;
   const phoneNumber = route.params.phoneNumber;
-  // console.log(dogumTarih)
-  // // console.log("name: ",name, " email: ", email);
-  // const IletisimSaat = route.params.IletisimSaat;
-  const [CalisilanYer, SetCalisilanYer] = useState("");
-  const [password, setPassword] = useState("");
-  const [againPassword, setAgainPassword] = useState("");
+  
+  const [KHastalik, SetKHastalik] = useState(route.params?.KHastalik ?? "");
+  const [password, setPassword] = useState(route.params?.password ?? "");
+  const [againPassword, setAgainPassword] = useState(route.params?.againPassword ??"");
 
-
+let isPasswordValidation = false;
   const passwordValidate = () =>{
     if(password != ""){
       if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)){
+        isPasswordValidation = true;
         return(
           <TextInput.Icon name="check-circle-outline" color={"green"}/>
         )
@@ -383,10 +415,12 @@ const SignUp1 =  ({navigation}) => {
     }
   }
 
+  let isAgainPasswordValidation = false;
   const againPasswordValidate = () =>{
     if(againPassword != ""){
       if(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)){
         if(password == againPassword){
+          isAgainPasswordValidation = true;
           return(
             <TextInput.Icon name="check-circle-outline" forceTextInputFocus={false} color={"green"}/>
           )
@@ -474,9 +508,9 @@ const uploadAvatar = async (uri, imageName)  => {
   return ref.put(blob);
 }
 
-const [checkedE, setCheckedE] = useState(false);
-const [checkedK, setCheckedK] = useState(false);
-const [cinsiyet, setCinsiyet] = useState("");
+const [checkedE, setCheckedE] = useState(route.params?.cinsiyet == "Erkek" ?  true : false);
+const [checkedK, setCheckedK] = useState(route.params?.cinsiyet == "Kadın" ? true : false);
+const [cinsiyet, setCinsiyet] = useState(route.params?.cinsiyet ?? "");
 const isCheckedErkek = () => {
   if (checkedE == true) {
     setCheckedE(false)
@@ -501,27 +535,8 @@ const isCheckedKadın = () => {
 
 const [isModalVisible, setModalVisible] = useState(false);
 
-const [isSozlesmeOnay, setIsSozlesmeOnay] = useState(false);
+const [isSozlesmeOnay, setIsSozlesmeOnay] = useState(route.params?.isSozlesmeOnay ?? false);
 const [SozlesmeModal, setSozlesmeModal] = useState(false);
-
-const [checkFirst, setcheckFirst] = useState(false);
-
-const Sozlesme = (param) =>{
-  if(param == "onayla"){
-  setSozlesmeModal(!SozlesmeModal)
-  setIsSozlesmeOnay(true)
-  }else if (param == "check"){
-    if(!(checkFirst)){
-      setSozlesmeModal(!SozlesmeModal)
-    }else{
-      setIsSozlesmeOnay(!isSozlesmeOnay)
-    }
-    setcheckFirst(true);
-  }else{
-    setcheckFirst(true)
-    setSozlesmeModal(true)
-  }
-}
 
 const [isKronik, setIsKronik] = useState(false);
 
@@ -640,7 +655,7 @@ center
 title='Erkek'
 checkedIcon='dot-circle-o'
 uncheckedIcon='circle-o'
-containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)', borderWidth:0, borderRadius:0, borderBottomWidth:2, borderColor:"#f44336"}}
+containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)', borderWidth:0, borderRadius:0, borderBottomWidth:0.8, borderColor:"#f44336"}}
 checked={checkedE}
 checkedColor="#ba000d"
 onPress={()=> isCheckedErkek(true)}
@@ -650,7 +665,7 @@ center
 title='Kadın'
 checkedIcon='dot-circle-o'
 uncheckedIcon='circle-o'
-containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)',borderWidth:0, borderRadius:0, borderBottomWidth:2, borderColor:"#f44336"}}
+containerStyle={{alignSelf:"baseline", backgroundColor:'rgba(52, 52, 52, 0.0)',borderWidth:0, borderRadius:0, borderBottomWidth:0.8, borderColor:"#f44336"}}
 checked={checkedK}
 checkedColor="#ba000d"
 onPress={() => isCheckedKadın(true)}
@@ -694,7 +709,7 @@ onPress={() => isCheckedKadın(true)}
             placeholder="Lütfen belirtin"
             theme={"dark"}
             placeholderTextColor="grey"
-            value={CalisilanYer}
+            value={KHastalik}
             // underlineColor="#f44336"
             activeUnderlineColor='white'
             selectionColor="blue"
@@ -703,7 +718,7 @@ onPress={() => isCheckedKadın(true)}
             numberOfLines={5}
             textAlignVertical='top'
             multiline
-            onChangeText={text=> SetCalisilanYer(text)}
+            onChangeText={text=> SetKHastalik(text)}
             />
 
 </View>
@@ -762,9 +777,9 @@ onPress={() => isCheckedKadın(true)}
       checked={isSozlesmeOnay}
       checkedColor="#ba000d"
       size={20}
-      onPress={() => Sozlesme("check")}
+      onPress={() => setIsSozlesmeOnay(!isSozlesmeOnay)}
     />
-          <Pressable onPress={()=> Sozlesme("abc")}>
+          <Pressable onPress={()=> setSozlesmeModal(true)}>
     <View style={{flex:1, flexDirection:"row", width:300, alignItems:"center"}}>
     <Text style={{fontSize:15, color:"grey"}}> 
     <Text style={{fontSize:15, borderBottomWidth:1, color:"black", borderBottomColor:"black", textDecorationLine:"underline" }}>Kullanıcı Sözleşmesini </Text>
@@ -805,20 +820,30 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
   </Text>
 
   </ScrollView>
-  <Pressable onPress={()=> Sozlesme("onayla")}>
+  <Pressable onPress={()=> {
+    setIsSozlesmeOnay(true)
+    setSozlesmeModal(false)
+  }}>
   <Text style={{alignSelf:"flex-end", marginRight:10, color:"blue", fontSize:18, margin:15 }}>
     ONAYLA
   </Text>
   </Pressable>
 </View>
 </Modal>
-
-
-
-      
       
              <View style= {{flexDirection:"row", justifyContent:"space-between"}}>
-             <TouchableOpacity onPress={()=> navigation.navigate("SignUp0", {name: name, email: email, phoneNumber: phoneNumber, dogumTarih: dogumTarih})}>
+             <TouchableOpacity onPress={()=> navigation.navigate("SignUp0", 
+             {
+              name: name, 
+              email: email, 
+              phoneNumber: phoneNumber, 
+              dogumTarih: dogumTarih, 
+              password: password, 
+              againPassword: againPassword, 
+              cinsiyet:cinsiyet, 
+              isSozlesmeOnay:isSozlesmeOnay,
+              KHastalik: KHastalik
+            })}>
 
          <Text style={{borderRadius:20, paddingHorizontal:2, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10}}>
             
@@ -835,7 +860,15 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
          
 
           <TouchableOpacity onPress={() =>
-            createAccount(name, email, password, cinsiyet, avatarFirebase, phoneNumber, dogumTarih, isSozlesmeOnay)}> 
+          {
+              if(cinsiyet != "" & isPasswordValidation & isAgainPasswordValidation & isSozlesmeOnay){
+                createAccount(name, email, password, cinsiyet, avatarFirebase, phoneNumber, dogumTarih, KHastalik)
+              }else{
+                Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [{style:'cancel', text:"Tamam"}])
+              }
+              }
+          }
+            > 
          <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
              KAYIT OL
           
@@ -871,16 +904,6 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
     )
 
     }
-
-
-
-
-
-
-
-
-
-
 
 const styles= StyleSheet.create({
     container:{
