@@ -116,7 +116,6 @@ const Appointment = ({route}) => {
         setH_Id(snapshot.data().Id);
         setH_email(snapshot.data().email);
       }
-  
     })
     return () => {
       unmounted = true;
@@ -505,7 +504,10 @@ firebase.firestore().collection("D_user").doc(id).get().then((snapshot)=>{
   return (
     <Agenda
       items={items}
+     // removeClippedSubviews = {true}
+     // Etkinleştirilerek removeClippedSubviews, bir öğe görünümden kaybolduğunda bellek boşaltılır. Uzun ve karmaşık bir listeniz (yani bir kart listesi) olduğunda, her bir kartın DOM'si oldukça büyüyebilir, bu nedenle görünür olmadığında belleği boşaltmak en iyisidir.
       loadItemsForMonth={loadItems}
+      initialNumToRender={3}
       renderItem={renderItem}
       minDate={timeToString(date)}
       // minDate={'2022-05-08'} // YIL - AY - GÜN  -> GÜN VE AY TEK HANELİ İSE BAŞINA 0 KOY. 
