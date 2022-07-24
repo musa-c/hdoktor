@@ -458,7 +458,7 @@ const emailValidate = (email) =>{
            <DateTimePickerModal
         isVisible={isDatePickerVisible2}
         mode="time"
-        date={time2 == "Bitiş Saati" ? new Date(2022, 10, 10, 8, 0, 0, 0) : time2}
+        date={time2 == "Bitiş Saati" ? new Date(2022, 10, 10, 17, 0, 0, 0) : time2}
         onConfirm={handleConfirm2}
         onCancel={hideDatePicker2}
         locale="tr-TR"
