@@ -212,16 +212,37 @@ const SignUp0 = ({navigation, route}) => {
 
 
   const NextForm = (name, email, brans, time1, time2) =>{
+       
     if(name == "" || email == "" || brans == "" || time1 == "Başlangıç Saati" || time2 == "Bitiş Saati"){
       setError("Formu lütfen doldurunuz.")
-    }else{
-      setError("")
-      navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
-        cinsiyet: cinsiyet, avatar: avatar,
-        againPassword: againPassword
-      })
+    }
+   
+    
+    else{
+      var clock1 = moment(time1).locale("tr", trLocale).format('LT')
+      var clock2 = moment(time2).locale("tr", trLocale).format('LT')
+   
+      function parseTime(s) {
+        var c = s.split(':');
+        return parseInt(c[0]) * 60 + parseInt(c[1]);
+     }
+     var minutes = parseTime(clock2) - parseTime (clock1);
+   
+
+      if(minutes < 60){
+      setError("Çalışma saatiniz en az 1 saat olmalıdır.")
+      }
+      else{
+        setError("")
+        navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
+          cinsiyet: cinsiyet, avatar: avatar,
+          againPassword: againPassword
+        })
+      }
+    
     }
   }
+
 
 
   const NameValidate = (name) =>{
@@ -394,7 +415,7 @@ const emailValidate = (email) =>{
     <View style={{flexDirection:"row", justifyContent:"space-evenly", flex:0.9,marginTop:10, alignItems:"center"}}> 
         <TouchableOpacity onPress={showDatePicker}>
           <Text style={{marginLeft:10, color:"grey", fontSize:18, marginTop:5}}>Başlangıç</Text>
-          <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:2, height:50, paddingHorizontal:10, alignItems:"center"}}>
+          <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:0.8, height:50, paddingHorizontal:10, alignItems:"center"}}>
             {/* <Text>Başlangıç: </Text> */}
          <Text  style={{fontSize:18}}>
          
@@ -411,7 +432,7 @@ const emailValidate = (email) =>{
           <Ionicons name="remove-outline" size={18} style={{alignSelf:"center"}}/>
           <TouchableOpacity onPress={showDatePicker2}>
           <Text style={{marginLeft:10, color:"grey", fontSize:18, marginTop:5}}>Bitiş</Text>
-          <View style={{flexDirection:"row", borderBottomColor:"red",  borderBottomWidth:2, height:50,  paddingHorizontal:10, alignItems:"center"}}>
+          <View style={{flexDirection:"row", borderBottomColor:"red",  borderBottomWidth:0.8, height:50,  paddingHorizontal:10, alignItems:"center"}}>
          <Text style={{fontSize:18}}>
           
           
@@ -427,6 +448,7 @@ const emailValidate = (email) =>{
           <DateTimePickerModal
         isVisible={isDatePickerVisible}
         mode="time"
+        date={time1 == "Başlangıç Saati" ? new Date(2022, 10, 10, 8, 0, 0, 0) : time1}
         onConfirm={handleConfirm1}
         onCancel={hideDatePicker}
         locale="tr-TR"
@@ -436,6 +458,7 @@ const emailValidate = (email) =>{
            <DateTimePickerModal
         isVisible={isDatePickerVisible2}
         mode="time"
+        date={time2 == "Bitiş Saati" ? new Date(2022, 10, 10, 8, 0, 0, 0) : time2}
         onConfirm={handleConfirm2}
         onCancel={hideDatePicker2}
         locale="tr-TR"
@@ -539,7 +562,7 @@ const emailValidate = (email) =>{
         borderLeftWidth:0,
         borderRightWidth:0,
         borderColor:"#f44336",
-        borderBottomWidth:2,
+        borderBottomWidth:0.8,
         borderRadius:0,
         paddingLeft:10,
         fontSize:18,
