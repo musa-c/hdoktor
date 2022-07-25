@@ -23,13 +23,14 @@ const SignUp00 = ({navigation}) => {
 
   const [error, setError] = useState(""); 
   
- 
 
-  const createAccount = async (name, email, password, cinsiyet, avatar, phoneNumber, date, KHastalik) => {
+  const createAccount = async (name, email, password, cinsiyet, avatarFirebase, phoneNumber, date, KHastalik, avatarLocal) => {
+ console.log("avatarFirebase:", avatarFirebase)
+
       firebase
       .auth()
       .createUserWithEmailAndPassword(email, password).then((userCredential)=>{
-         firebase.storage().ref("avatars/H_avatars/").child(avatar == "" ? "DefaultHastaAvatar.png" : avatar).getDownloadURL().then((avatarUrl)=> {
+         firebase.storage().ref("avatars/H_avatars/").child(avatarFirebase == "" ? "DefaultHastaAvatar.png" : avatarFirebase).getDownloadURL().then((avatarUrl)=> {
             firebase.firestore().collection("H_user").doc(userCredential.user.uid).set({
                      name: name,
                      email:email.toLowerCase(),
@@ -88,7 +89,8 @@ const SignUp00 = ({navigation}) => {
           email:email,
           password:password,
           cinsiyet:cinsiyet,
-          avatar:avatar,
+          avatarLocal:avatarLocal,
+          avatarFirebase: avatarFirebase,
           phoneNumber:phoneNumber,
           dogumTarih:date,
           KHastalik:KHastalik,
@@ -107,9 +109,11 @@ const SignUp0 = ({navigation, route}) => {
 
   const password = route.params?.password;
   const againPassword = route.params?.againPassword;
-  const cinsiyet = route.params?.cinsiyet;
+  const cinsiyet = route.params?.cinsiyet ?? "";
   const isSozlesmeOnay = route.params?.isSozlesmeOnay;
-  const KHastalik = route.params?.KHastalik;
+  const KHastalik = route.params?.KHastalik ?? "";
+  const avatarLocal = route.params?.avatarLocal ?? "";
+  const avatarFirebase = route.params?.avatarFirebase ?? "";
 
   
 const NextForm = (name, email, dogumTarih, PhoneNumber) =>{
@@ -120,6 +124,8 @@ const NextForm = (name, email, dogumTarih, PhoneNumber) =>{
     {
       name: name, 
       email: email, 
+      avatarLocal: avatarLocal,
+      avatarFirebase: avatarFirebase,
       dogumTarih:dogumTarih, 
       phoneNumber: PhoneNumber, 
       password: password, 
@@ -443,9 +449,8 @@ let isPasswordValidation = false;
 
 
   
-
-const [avatarLocal, setAvatarLocal] = useState('');
-const [avatarFirebase, setAvatarFirebase] = useState('');
+const [avatarLocal, setAvatarLocal] = useState(route.params?.avatarLocal ?? "");
+const [avatarFirebase, setAvatarFirebase] = useState(route.params?.avatarFirebase ?? "");
 
 
 // This function is triggered when the "Select an image" button pressed
@@ -454,7 +459,8 @@ const showImagePicker = async () => {
   const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
   if (permissionResult.granted === false) {
-    alert("Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz!");
+    Alert.alert("Uyarı⚠️","Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz.", [{text:"Tamam", style:"cancel"}]);
+
     return;
   }
 
@@ -479,7 +485,8 @@ const openCamera = async () => {
   
 
   if (permissionResult.granted === false) {
-    alert("Bu uygulamanın kameranıza erişmesine izin vermeyi reddettiniz!");
+    Alert.alert("Uyarı⚠️","Bu uygulamanın kameranıza erişmesine izin vermeyi reddettiniz.", [{text:"Tamam", style:"cancel"}]);
+
   //   ImagePicker.requestCameraPermissionsAsync();
   return permissionResult;
   }
@@ -740,7 +747,6 @@ onPress={() => isCheckedKadın(true)}
            //   borderColor:"#f44336",
              // borderBottomWidth:2,
               borderRadius:0,
-              paddingLeft:10,
               fontSize:18,
             }}
             placeholder="Şifre"
@@ -836,6 +842,8 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
              {
               name: name, 
               email: email, 
+              avatarLocal: avatarLocal,
+              avatarFirebase: avatarFirebase,
               phoneNumber: phoneNumber, 
               dogumTarih: dogumTarih, 
               password: password, 
@@ -862,7 +870,7 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
           <TouchableOpacity onPress={() =>
           {
               if(cinsiyet != "" & isPasswordValidation & isAgainPasswordValidation & isSozlesmeOnay){
-                createAccount(name, email, password, cinsiyet, avatarFirebase, phoneNumber, dogumTarih, KHastalik)
+                createAccount(name, email, password, cinsiyet, avatarFirebase, phoneNumber, dogumTarih, KHastalik, avatarLocal)
               }else{
                 Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [{style:'cancel', text:"Tamam"}])
               }
