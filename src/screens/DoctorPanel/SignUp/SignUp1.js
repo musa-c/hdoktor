@@ -25,11 +25,6 @@ const SignUp1 =  ({navigation}) => {
     const [SozlesmeModal, setSozlesmeModal] = useState(false);
   
   
-    const Sozlesme = (param) =>{
-     
-    }
-  
-  
     const isCreateAccountInfo = () => {
       setTimeout(()=>setIsCreateAccount(true), Platform.OS === "ios" ? 3000 : 0)
       // setIsCreateAccount(true)
@@ -42,9 +37,16 @@ const SignUp1 =  ({navigation}) => {
   
     
     const errorMessage = (error) => {
-      navigation.navigate("DSignUp0", {CalisilanYer: CalisilanYer, password:password, cinsiyet:cinsiyet, avatar:avatar, error: error})
-      // navigation.navigate("SignUp0", {error: error})
-      // alert(error)
+      navigation.navigate("DSignUp0", {
+        CalisilanYer: CalisilanYer,
+        password:password, 
+        cinsiyet:cinsiyet, 
+        avatarLocal:AvatarImagePath, 
+        avatarFirebase: avatar,
+        error: error,
+        againPassword: password,
+        isSozlesmeOnay: true
+      })
     }
   
     
@@ -56,8 +58,8 @@ const SignUp1 =  ({navigation}) => {
     firebase
       .auth()
       .createUserWithEmailAndPassword(email, password).then((userCredential)=>{
-        firebase.storage().ref("avatars/D_avatars/").child(avatar).getDownloadURL().then((avatarUrl)=>{
-          // console.log(avatarUrl)
+        firebase.storage().ref("avatars/D_avatars/").child(avatar == "" ? "DefaultDoctorAvatar.png" : avatar).getDownloadURL().then((avatarUrl)=>{
+           console.log("avatarUrl", avatarUrl)
              firebase.firestore().collection("D_user").doc(userCredential.user.uid).set({
                       name: name,
                       email:email.toLowerCase(),
@@ -85,10 +87,7 @@ const SignUp1 =  ({navigation}) => {
   
             // isCreateAccountInfo()
             isCreateAccountInfo()
-  
-          
-  
-  
+            
       }).catch((error)=>{
         setIsLoading(false)
         const errorCode = error.code;
@@ -131,16 +130,18 @@ const SignUp1 =  ({navigation}) => {
     const time1 = route.params.time1;
     const time2 = route.params.time2;
    
-    // console.log(route.params.avatar)
+     //console.log(route.params?.avatar)
   
-    const [avatar, setavataruri] = useState("DefaultDoctorAvatar.png");
+    const [avatar, setavataruri] = useState(route.params?.avatarFirebase ?? "");
   const [CalisilanYer, SetCalisilanYer] = useState(route.params?.CalisilanYer ?? "");
   const [password, setPassword] = useState(route.params?.password ?? "");
   // console.log(AvatarImagePath)
   
   const [PhotosImagePath, setPhotosImagePath] = useState('');
-  const [AvatarImagePath, setAvatarImagePath] = useState(route.params?.avatar ?? "");
-  console.log(AvatarImagePath)
+  const [AvatarImagePath, setAvatarImagePath] = useState(route.params?.avatarLocal ?? "");
+
+  //console.log(route.params.avatar)
+ // console.log(AvatarImagePath)
   
   
   // This function is triggered when the "Select an image" button pressed
@@ -149,7 +150,7 @@ const SignUp1 =  ({navigation}) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
   
     if (permissionResult.granted === false) {
-      alert("Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz!");
+      Alert.alert("Uyarı⚠️","Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz", [{text:"Tamam", style:"cancel"}]);
       return;
     }
   
@@ -171,7 +172,8 @@ const SignUp1 =  ({navigation}) => {
     
   
     if (permissionResult.granted === false) {
-      alert("Bu uygulamanın kameranıza erişmesine izin vermeyi reddettiniz!");
+      Alert.alert("Uyarı⚠️","Bu uygulamanın kameranıza erişmesine izin vermeyi reddettiniz.", [{text:"Tamam", style:"cancel"}]);
+
     //   ImagePicker.requestCameraPermissionsAsync();
     return permissionResult;
     }
@@ -187,7 +189,7 @@ const SignUp1 =  ({navigation}) => {
       setAvatarImagePath(result.uri);
      const filename = result.uri.split('/').pop(); // '/' işareti gördüğünde split metotuya ayırır. Dizi döndürür. // pop() ile ayırdıklarıının en sonunu alır
       // console.log(result.uri.replace('file://', ''));
-      console.log(filename);
+     // console.log(filename);
       uploadAvatar(result.uri, filename);
       setavataruri(filename);
     }
@@ -201,7 +203,7 @@ const SignUp1 =  ({navigation}) => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
   
     if (permissionResult.granted === false) {
-      alert("Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz!");
+      Alert.alert("Uyarı⚠️","Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz", [{text:"Tamam", style:"cancel"}]);
       return;
     }
   
@@ -675,7 +677,8 @@ let isPasswordValidate = false;
                         password:password,
                         againPassword: againPassword,
                         cinsiyet: cinsiyet,
-                        avatar: AvatarImagePath,
+                        avatarLocal: AvatarImagePath,
+                        avatarFirebase: avatar,
                         isSozlesmeOnay: isSozlesmeOnay
                    })}>
   
