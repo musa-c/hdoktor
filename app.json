@@ -16,16 +16,32 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "HDOKTOR'un fotoğraflarınıza erişmesine izin verin",
+          "cameraPermission": "HDOKTOR'un kameranıza erişmesine izin verin"
+        }
+      ]
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "a"
+      "bundleIdentifier": "a",
+      "infoPlist": {
+        "NSCameraUsageDescription": "HDOKTOR, kullanıcının profil fotoğrafına bir fotoğraf koymasına izin vermek için kamerayı kullanır.",
+        "NSPhotoLibraryUsageDescription": "HDOKTOR, kullanıcının fotoğraflarını uygulamaya yüklemek için galerinize erişir.",
+        "CFBundleDevelopmentRegion":"tr"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
+
     },
     "web": {
       "favicon": "./assets/favicon.png"
