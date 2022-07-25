@@ -19,10 +19,11 @@ const SignUp0 = ({navigation, route}) => {
     const CalisilanYer = route.params?.CalisilanYer ?? ""
     const password = route.params?.password ?? ""
     const cinsiyet = route.params?.cinsiyet ?? ""
-    const avatar = route.params?.avatar ?? ""
+    const avatarLocal = route.params?.avatarLocal ?? ""
+    const avatarFirebase = route.params?.avatarFirebase ?? ""
     const againPassword = route.params?.againPassword ?? ""
     const isSozlesmeOnay = route.params?.isSozlesmeOnay ?? false
-   // const error = route.params?.error ?? ""
+    const errorFirebase = route.params?.error ?? ""
   
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
@@ -209,8 +210,8 @@ const SignUp0 = ({navigation, route}) => {
     setTime2(time2)
     hideDatePicker2();
   };
-  const [error, setError] = useState(route.params?.error ?? ""); 
-
+  const [error, setError] = useState(""); 
+//  console.log("error:", error)
 
   const NextForm = (name, email, brans, time1, time2) =>{
        
@@ -234,9 +235,19 @@ const SignUp0 = ({navigation, route}) => {
       }
       else{
           setError("")
-          navigation.navigate("DSignUp1", {name: name, email: email, brans:brans, time1: time1, time2: time2, CalisilanYer: CalisilanYer, password: password,
-            cinsiyet: cinsiyet, avatar: avatar,
-            againPassword: againPassword, isSozlesmeOnay: isSozlesmeOnay
+          navigation.navigate("DSignUp1", {
+            name: name, 
+            email: email, 
+            brans:brans, 
+            time1: time1, 
+            time2: time2, 
+            CalisilanYer: CalisilanYer, 
+            password: password,
+            cinsiyet: cinsiyet,
+            avatarLocal: avatarLocal,
+            avatarFirebase: avatarFirebase,
+            againPassword: againPassword, 
+            isSozlesmeOnay: isSozlesmeOnay
           })
       }
     
@@ -315,7 +326,7 @@ const emailValidate = (email) =>{
   <Image source={require("../../../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
   </View>
   
-  <Text style={{fontSize:18, fontWeight:"bold", color:"red", alignSelf:"center"}}>{error}</Text>
+  <Text style={{fontSize:18, fontWeight:"bold", color:"red", alignSelf:"center"}}>{errorFirebase == "" ? error : errorFirebase}</Text>
         
         <View style={{flex:2}}>
               <TextInput 
