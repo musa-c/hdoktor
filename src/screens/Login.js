@@ -6,8 +6,8 @@ import {FontAwesome} from "@expo/vector-icons"
 const Login = () => {
     const navigation = useNavigation();
     return (
-        <View style={{flex:1, justifyContent:"center", alignItems:"center", backgroundColor:"#fff"}}>
-            <View style={{flex:3, justifyContent:"center",}}>
+        <View style={{flex:1, justifyContent:"center", alignItems:"center", backgroundColor:"#fff", flexGrow:1}}>
+            <View style={{flex:3, justifyContent:"center"}}>
             <Image source={require("../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
             </View>
             <View style={{flex:4}}>
@@ -57,6 +57,7 @@ const styles= StyleSheet.create({
     },
     cont:{
         // backgroundColor:"#B71C1C",
+        //flexGrow:1,
         justifyContent:"center",
         borderRadius:25,
         marginVertical:10,
