@@ -70,23 +70,30 @@ const SignUp1 =  ({navigation}) => {
                       cinsiyet:cinsiyet,
                       avatar:avatarUrl,
                       Id:userCredential.user.uid,
-              })    
+              }).then(UserUpdate()).then(()=>{
+                setIsLoading(false)
+                isCreateAccountInfo()
+              }
+                )
   
             // console.log("userCredential: ", userCredential)
-            userCredential.user.updateProfile({
-              displayName: name,
-              photoURL:avatarUrl,
-            })
+            const UserUpdate = () =>{
+              userCredential.user.updateProfile({
+                displayName: name,
+                photoURL:avatarUrl,
+              })
+            }
+           
   
             // navigation.navigate("D_SignIn", {isCreateAccount: true})
             
             }).catch(()=>{
               alert("Profil fotoğrafı yüklenemedi. Lütfen daha sonra tekrar deneyin.");
             })   
-            setIsLoading(false)
+            //setIsLoading(false)
   
             // isCreateAccountInfo()
-            isCreateAccountInfo()
+           // isCreateAccountInfo()
             
       }).catch((error)=>{
         setIsLoading(false)
