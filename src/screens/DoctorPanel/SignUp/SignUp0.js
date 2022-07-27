@@ -1,5 +1,5 @@
 import React, {useState } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, LogBox } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, StatusBar, Image, LogBox, ScrollView } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
 import DropDownPicker from 'react-native-dropdown-picker';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -306,13 +306,19 @@ const emailValidate = (email) =>{
 
   
     return (
-      
+
+    
+<ScrollView
+       contentContainerStyle={{flexGrow:1, paddingTop:10}}
+       style={{flex:1, backgroundColor:"white"}}
+      >
 
         <KeyboardAwareScrollView
       behavior="padding"
       style={styles.container}
       contentContainerStyle={{flex:1}}
   >
+      
             
   
         <View style={styles.box}>
@@ -517,8 +523,8 @@ const emailValidate = (email) =>{
           </View>
           </View>
           </KeyboardAwareScrollView>
+          </ScrollView>
 
-  
   
     )
   }

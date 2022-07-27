@@ -281,11 +281,11 @@ const SignUp1 =  ({navigation}) => {
   
   const { height } = Dimensions.get("window");
   
-  const [screenHeight, setScreenHeight] = useState(height);
+  //const [screenHeight, setScreenHeight] = useState(height);
   
-  const onContentSizeChange = (contentWidth, contentHeight) => {
-    setScreenHeight(contentHeight);
-  };
+  // const onContentSizeChange = (contentWidth, contentHeight) => {
+  //   setScreenHeight(contentHeight);
+  // };
 
   const [ispasswordSee, setispasswordSee] = useState(true);
   const [isAgainPasswordSee, setAgainPasswordSee] = useState(true);
@@ -356,10 +356,16 @@ let isPasswordValidate = false;
     }
   }
 
-
-  const scrollEnabled = screenHeight > height-40
+  //const scrollEnabled = screenHeight > height-40
   
       return (
+        
+        <ScrollView
+        contentContainerStyle={{flexGrow:1, paddingTop:10}}
+        style={{flex:1, backgroundColor:"white"}}
+        //scrollEnabled={scrollEnabled}
+        //onContentSizeChange={onContentSizeChange}
+        >
 
         <KeyboardAwareScrollView
         behavior={Platform.OS === "ios" ? "padding" : "padding"}
@@ -367,12 +373,7 @@ let isPasswordValidate = false;
         contentContainerStyle={{flex:1}}
       >
       
-        <ScrollView
-        style={{flex:1,}}
-        contentContainerStyle={{flexGrow:1}}
-        scrollEnabled={scrollEnabled}
-        onContentSizeChange={onContentSizeChange}
-        >
+    
 
 <StatusBar 
         translucent 
@@ -573,23 +574,22 @@ let isPasswordValidate = false;
               
   
                
-               
-  
-  
+              
+ 
   <TextInput 
               style={styles.input}
               placeholder="Şifre"
               placeholderTextColor="grey"
               secureTextEntry={ispasswordSee}
-              underlineColor="#f44336"
               activeUnderlineColor='#f44336'
               outlineColor="white"
+              //onBlur={infoPasswordUpdate()} Odaklanma kesilince çağırılan callback
               left={passwordSee()}
               right={passwordValidate(password)}
               value={password}
               onChangeText={text => setPassword(text)}
-
               />
+              
   
   
                 <TextInput 
@@ -727,11 +727,11 @@ let isPasswordValidate = false;
           </View>
           </View>
          
-          </ScrollView>
 
           </KeyboardAwareScrollView>
 
   
+          </ScrollView>
   
   
   
