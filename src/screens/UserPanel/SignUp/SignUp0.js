@@ -236,9 +236,14 @@ const handleConfirm = (dogumTarih) => {
 };
 
   return (
+
+    <ScrollView
+    contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
+    style={{flex:1, backgroundColor:"white"}}
+   >
     
       <KeyboardAwareScrollView
-    behavior="padding"
+      behavior="padding"
     style={styles.container}
     contentContainerStyle={{flex:1}}
   >
@@ -297,8 +302,8 @@ const handleConfirm = (dogumTarih) => {
             onChangeText={text=> SetPhoneNumber(text)}
             />
 
-  <Text style={{fontSize:18, color:"grey", marginLeft:25, borderColor:"red", borderLeftWidth:5, paddingLeft:10}}>Doğum Tarihi</Text>
-  <View style={{flexDirection:"row", justifyContent:"space-evenly"}}> 
+  <Text style={{fontSize:18, color:"grey", marginLeft:25, borderColor:"red", borderLeftWidth:5, paddingLeft:10, marginTop:10}}>Doğum Tarihi</Text>
+  <View style={{flexDirection:"row", justifyContent:"space-evenly", marginTop:7}}> 
 
       <TouchableOpacity onPress={showDatePicker}>
         <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:0.8, height:50, paddingHorizontal:10, alignItems:"center"}}>
@@ -326,7 +331,7 @@ const handleConfirm = (dogumTarih) => {
            
 
       
-      <View style={{flexDirection:"row", justifyContent:"space-between"}}>
+      <View style={{flexDirection:"row", justifyContent:"space-between", marginTop:20,flex:1,}}>
 
       <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
            <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", marginTop:10}}>
@@ -361,7 +366,7 @@ const handleConfirm = (dogumTarih) => {
         </View>
         </View>
         </KeyboardAwareScrollView>
-
+        </ScrollView>
 
   )
 }
@@ -554,10 +559,9 @@ const toggleModal = () => {
     return (
      
       <ScrollView
-      style={[styles.container, {backgroundColor:"red"}]}
+      contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
+      style={{flex:1, backgroundColor:"white"}}
       
-      
-      contentContainerStyle={{flex:1}}
       >
 
       <KeyboardAwareScrollView
@@ -776,7 +780,7 @@ onPress={() => isCheckedKadın(true)}
             right={againPasswordValidate(againPassword)}
             />
 
-<View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", width:300, marginLeft:30, marginTop:10}}>
+<View style={{flexDirection:"row", alignItems:"center", justifyContent:"center", width:300, marginLeft:30, marginTop:10, flexGrow:1}}>
 {/* {console.log(SozlesmeText())} */}
 <CheckBox        
       containerStyle={{backgroundColor:"white", borderWidth:0, margin:0, padding:0 }}
@@ -837,7 +841,7 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
 </View>
 </Modal>
       
-             <View style= {{flexDirection:"row", justifyContent:"space-between"}}>
+             <View style= {{flexDirection:"row", justifyContent:"space-between", backgroundColor:"white", flex:1}}>
              <TouchableOpacity onPress={()=> navigation.navigate("SignUp0", 
              {
               name: name, 
@@ -932,6 +936,8 @@ const styles= StyleSheet.create({
         width:300,
         height:50,
         margin:15,
+        marginTop:20,
+        //flexGrow:0.07,
         // borderColor:"#f44336",
         // borderBottomWidth:2,
         // borderRadius:0,

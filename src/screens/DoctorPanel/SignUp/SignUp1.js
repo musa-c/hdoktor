@@ -361,7 +361,7 @@ let isPasswordValidate = false;
       return (
         
         <ScrollView
-        contentContainerStyle={{flexGrow:1, paddingTop:10}}
+        contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:15, alignItems:"center", justifyContent:"center", backgroundColor:"white"}}
         style={{flex:1, backgroundColor:"white"}}
         //scrollEnabled={scrollEnabled}
         //onContentSizeChange={onContentSizeChange}

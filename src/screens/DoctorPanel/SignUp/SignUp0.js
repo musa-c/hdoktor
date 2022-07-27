@@ -309,7 +309,7 @@ const emailValidate = (email) =>{
 
     
 <ScrollView
-       contentContainerStyle={{flexGrow:1, paddingTop:10}}
+       contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
        style={{flex:1, backgroundColor:"white"}}
       >
 
@@ -431,9 +431,9 @@ const emailValidate = (email) =>{
   
       />
     {/* {console.log(date.getMinutes)} */}
-    <Text style={{fontSize:18, color:"grey", marginLeft:18,  paddingLeft:10,}}>Çalışma Saatleri</Text>
+    <Text style={{fontSize:18, color:"grey", marginLeft:18,  paddingLeft:10, marginTop:5}}>Çalışma Saatleri</Text>
   
-    <View style={{flexDirection:"row", justifyContent:"space-evenly", flex:0.9,marginTop:10, alignItems:"center"}}> 
+    <View style={{flexDirection:"row", justifyContent:"space-evenly", flex:0.9,marginTop:6, alignItems:"center"}}> 
         <TouchableOpacity onPress={showDatePicker}>
           <Text style={{marginLeft:10, color:"grey", fontSize:18, marginTop:5}}>Başlangıç</Text>
           <View style={{flexDirection:"row", borderBottomColor:"red", borderBottomWidth:0.8, height:50, paddingHorizontal:10, alignItems:"center"}}>
