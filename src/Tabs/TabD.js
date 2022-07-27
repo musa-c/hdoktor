@@ -127,8 +127,8 @@ import DSignUp1 from "../screens/DoctorPanel/SignUp/SignUp1"
 const DSignUpScreen = () =>{
   return(
     <DSignUpStack.Navigator>
-      <DSignUpStack.Screen name="DSignUp0" component={DSignUp0} options={{animation:"slide_from_left", title:"Doktor Kayıt", headerLeft:false, headerShadowVisible:false,  headerTitleStyle:{paddingTop:10 }}}/>
-      <DSignUpStack.Screen name="DSignUp1" component={DSignUp1} options={{animation:"slide_from_left", title:"Doktor Kayıt", headerLeft: false, headerShadowVisible:false,    headerTitleStyle:{paddingTop:10}}}/>
+      <DSignUpStack.Screen name="DSignUp0" component={DSignUp0} options={{animation:"slide_from_left", title:"Doktor Kayıt", headerLeft:false,   headerTitleStyle:{paddingTop:10 }}}/>
+      <DSignUpStack.Screen name="DSignUp1" component={DSignUp1} options={{animation:"slide_from_left", title:"Doktor Kayıt", headerLeft: false,     headerTitleStyle:{paddingTop:10}}}/>
     </DSignUpStack.Navigator>
   )
 }
