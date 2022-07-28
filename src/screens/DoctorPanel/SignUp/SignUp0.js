@@ -307,17 +307,18 @@ const emailValidate = (email) =>{
   
     return (
 
-    
-<ScrollView
-       contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
-       style={{flex:1, backgroundColor:"white"}}
-      >
+
 
         <KeyboardAwareScrollView
       behavior="padding"
       style={styles.container}
       contentContainerStyle={{flex:1}}
   >
+        
+<ScrollView
+       contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
+       style={{backgroundColor:"white"}}
+      >
       
             
   
@@ -522,8 +523,8 @@ const emailValidate = (email) =>{
           </View>
           </View>
           </View>
-          </KeyboardAwareScrollView>
           </ScrollView>
+          </KeyboardAwareScrollView>
 
   
     )
