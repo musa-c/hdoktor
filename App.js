@@ -1,3 +1,4 @@
+import "./ignoreWarnings";
 import React, { Component } from 'react';
 import { StyleSheet} from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
@@ -5,7 +6,8 @@ import TabD from './src/Tabs/TabD';
 import TabU from './src/Tabs/TabU';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './src/screens/Login';
-import { LogBox } from 'react-native';
+import { LogBox, View } from 'react-native';
+import ImagePickerExample from "./ImagePickerExample";
 
 // firebase
 import firebase from "firebase/compat/app";
@@ -37,10 +39,18 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
 
-  LogBox.ignoreLogs(['Setting a timer for a long period of time'])
+  LogBox.ignoreLogs([
+    'Setting a timer for a long period of time',
+    "exported from 'deprecated-react-native-prop-types'.",
+    "ViewPropTypes will be removed",
+    "ColorPropType will be removed",
+  ])
   // LogBox.ignoreLogs(['Warning: Each', 'Warning: Failed']);
 
   return (
+    // <View style={style.HomeStyle}>
+    //   <ImagePickerExample />
+    // </View>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen
