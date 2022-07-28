@@ -14,6 +14,8 @@ import firebase from 'firebase/compat/app';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import moment from 'moment';
 import trLocale from "moment/locale/tr"
+import AnimatedLottieView from "lottie-react-native";
+
 
 
 const SingUpStack = createNativeStackNavigator();
@@ -22,16 +24,31 @@ const SingUpStack = createNativeStackNavigator();
 const SignUp00 = ({navigation}) => {
 
   const [error, setError] = useState(""); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCreateAccount, setIsCreateAccount] = useState(false);
+  const [CreateAccountUnEnabled, SetCreateAccountUnEnabled] = useState(false)
   
+  const isCreateAccountInfo = () => {
+    setIsCreateAccount(true)
+    console.log("fonksiyonda succes başladı.")
+    setTimeout(()=>{
+      setIsCreateAccount(false);
+      SetCreateAccountUnEnabled(false);
+      navigation.navigate("SignIn");
+    }, 3000)
+  }
+
 
   const createAccount = async (name, email, password, cinsiyet, avatarFirebase, phoneNumber, date, KHastalik, avatarLocal) => {
- console.log("avatarFirebase:", avatarFirebase)
+ //console.log("avatarFirebase:", avatarFirebase)
+ setIsLoading(true)
+ SetCreateAccountUnEnabled(true)
 
-      firebase
+      await firebase
       .auth()
-      .createUserWithEmailAndPassword(email, password).then((userCredential)=>{
-         firebase.storage().ref("avatars/H_avatars/").child(avatarFirebase == "" ? "DefaultHastaAvatar.png" : avatarFirebase).getDownloadURL().then((avatarUrl)=> {
-            firebase.firestore().collection("H_user").doc(userCredential.user.uid).set({
+      .createUserWithEmailAndPassword(email, password).then(async(userCredential)=>{
+        await firebase.storage().ref("avatars/H_avatars/").child(avatarFirebase == "" ? "DefaultHastaAvatar.png" : avatarFirebase).getDownloadURL().then(async(avatarUrl)=> {
+          await firebase.firestore().collection("H_user").doc(userCredential.user.uid).set({
                      name: name,
                      email:email.toLowerCase(),
                      cinsiyet:cinsiyet,
@@ -40,14 +57,23 @@ const SignUp00 = ({navigation}) => {
                      date:date,
                      phoneNumber:phoneNumber,
                      KHastalik: KHastalik
-             })
+             }).then(UserUpdate).then(()=>{
+              setIsLoading(false)
+              isCreateAccountInfo()
+             }).catch(
+              setIsLoading(false)
+             )
             //  console.log("userCredential: ", userCredential)
-             userCredential.user.updateProfile({
-               displayName: name,
-               photoURL:avatarUrl,
-             })
+            const UserUpdate = async () =>{
+              await userCredential.user.updateProfile({
+                displayName: name,
+                photoURL:avatarUrl,
+              })
+            }
+           
             })
       }).catch((error)=>{
+        setIsLoading(false)
         console.log("error:", error)
         const errorCode = error.code;
         switch (errorCode.substr(5)) {
@@ -237,10 +263,7 @@ const handleConfirm = (dogumTarih) => {
 
   return (
 
-    <ScrollView
-    contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
-    style={{flex:1, backgroundColor:"white"}}
-   >
+  
     
       <KeyboardAwareScrollView
       behavior="padding"
@@ -248,7 +271,13 @@ const handleConfirm = (dogumTarih) => {
     contentContainerStyle={{flex:1}}
   >
 
+<ScrollView
+    contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
+    style={{backgroundColor:"white"}}
+   >
+
       <View style={styles.box}>
+
           
       <StatusBar 
       barStyle="dark-content"
@@ -365,8 +394,8 @@ const handleConfirm = (dogumTarih) => {
         </View>
         </View>
         </View>
-        </KeyboardAwareScrollView>
         </ScrollView>
+        </KeyboardAwareScrollView>
 
   )
 }
@@ -557,12 +586,6 @@ const toggleModal = () => {
 };
 
     return (
-     
-      <ScrollView
-      contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
-      style={{flex:1, backgroundColor:"white"}}
-      
-      >
 
       <KeyboardAwareScrollView
       behavior={Platform.OS === "ios" ? "padding" : "padding"}
@@ -570,8 +593,58 @@ const toggleModal = () => {
       contentContainerStyle={{flex:1}}
       // contentContainerStyle={{justifyContent:"center", alignItems:"center"}}
     >
+       <ScrollView
+      contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:10}}
+      style={{ backgroundColor:"white"}}
+      
+      >
      
       <View style={styles.box}>
+
+      <Modal 
+        isVisible={isLoading} 
+        style={{ justifyContent:"flex-start"}}
+      animationIn="fadeIn"
+      animationOut="fadeOut"
+      animationInTiming={0}
+      animationOutTiming={0}
+        >
+          <View style={{flex:1,alignItems:"center", justifyContent:"flex-start", }}>
+                <AnimatedLottieView source={require("../../../rec/Animations/loading.json")} autoPlay={true}  />
+                {/* <Button title="kapat" onPress={toggleModal1} /> */}
+          </View>
+        </Modal>
+
+        <Modal 
+        isVisible={isCreateAccount} 
+        style={{ justifyContent:"flex-start"}}
+        hasBackdrop={false}
+      //   animationIn="fadeInRight"
+      animationIn="fadeIn"
+      animationOut="fadeOut"
+      animationInTiming={0}
+      animationOutTiming={0}
+       // swipeDirection="up"
+        //onSwipeComplete = {() =>   isCreateAccount(false) }
+        >
+          <View style={{flex:1,alignItems:"center", justifyContent:"flex-start"}}>
+              <View style={{width: '85%', backgroundColor: '#f5f5f5', borderRadius:8, justifyContent:"flex-start",alignItems:"center", padding:20, flexDirection:"row", shadowColor: "#000",
+  shadowOffset: {
+      width: 0,
+      height: 2,
+  },
+  shadowOpacity: 0.25,
+  shadowRadius: 3.84,
+  
+  elevation: 5,}}>
+              <View style={{padding:18}}>
+                <AnimatedLottieView source={require("../../../rec/Animations/createAccount-success.json")} autoPlay={true} loop={false} />
+                </View>
+            <Text style={{fontSize:22, color:"black", fontWeight:"700", marginLeft:9}}>Hesap oluşturuldu!</Text>
+            </View>
+            {/* <Button title="Hide modal" onPress={toggleModal} /> */}
+          </View>
+        </Modal>
       
        
 <View style={{alignItems:"center"}}>
@@ -870,22 +943,33 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
 
          </TouchableOpacity>
          
-
-          <TouchableOpacity onPress={() =>
-          {
-              if(cinsiyet != "" & isPasswordValidation & isAgainPasswordValidation & isSozlesmeOnay){
-                createAccount(name, email, password, cinsiyet, avatarFirebase, phoneNumber, dogumTarih, KHastalik, avatarLocal)
-              }else{
-                Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [{style:'cancel', text:"Tamam"}])
-              }
-              }
-          }
-            > 
-         <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
-             KAYIT OL
-          
-         </Text>
-         </TouchableOpacity>
+{!CreateAccountUnEnabled &&
+  <TouchableOpacity onPress={() =>
+    {
+        if(cinsiyet != "" & isPasswordValidation & isAgainPasswordValidation & isSozlesmeOnay){
+          createAccount(name, email, password, cinsiyet, avatarFirebase, phoneNumber, dogumTarih, KHastalik, avatarLocal)
+        }else{
+          Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [{style:'cancel', text:"Tamam"}])
+        }
+        }
+    }
+      > 
+   <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
+       KAYIT OL
+    
+   </Text>
+   </TouchableOpacity>
+}
+{
+  CreateAccountUnEnabled &&
+  <View>
+     <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"grey", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
+       KAYIT OL
+    
+   </Text>
+     </View>
+}
+        
          </View>
 
         </View>
@@ -895,8 +979,8 @@ Phasellus nec rhoncus urna. Sed id ex congue orci feugiat maximus. Nam scelerisq
         </View>
        
         </View>
-        </KeyboardAwareScrollView>
         </ScrollView>
+        </KeyboardAwareScrollView>
 
 
 

@@ -26,11 +26,19 @@ const SignUp1 =  ({navigation}) => {
   
   
     const isCreateAccountInfo = () => {
-      setTimeout(()=>setIsCreateAccount(true), Platform.OS === "ios" ? 3000 : 0)
+      // setTimeout(()=> setIsCreateAccount(true), Platform.OS === "ios" ? 3000 : 0)
+      setIsCreateAccount(true)
       // setIsCreateAccount(true)
+
+      // setTimeout(()=>{
+      //   setIsCreateAccount(false)
+      // }, Platform.OS === "ios" ? 6000 : 3000)
+
       setTimeout(()=>{
-        setIsCreateAccount(false)
-      }, Platform.OS === "ios" ? 6000 : 3000)
+        setIsCreateAccount(false);
+        SetCreateAccountUnEnabled(false);
+        navigation.navigate("D_SignIn");
+      }, 3000)
     } 
    
       // console.log(isCreateAccount)
@@ -49,18 +57,19 @@ const SignUp1 =  ({navigation}) => {
       })
     }
   
-    
+    const [CreateAccountUnEnabled, SetCreateAccountUnEnabled] = useState(false)
   
     const createAccount = async (name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar) => {
       
       setIsLoading(true)
+      SetCreateAccountUnEnabled(true)
   
-    firebase
+   await firebase
       .auth()
-      .createUserWithEmailAndPassword(email, password).then((userCredential)=>{
-        firebase.storage().ref("avatars/D_avatars/").child(avatar == "" ? "DefaultDoctorAvatar.png" : avatar).getDownloadURL().then((avatarUrl)=>{
+      .createUserWithEmailAndPassword(email, password).then(async(userCredential)=>{
+        await firebase.storage().ref("avatars/D_avatars/").child(avatar == "" ? "DefaultDoctorAvatar.png" : avatar).getDownloadURL().then(async(avatarUrl)=>{
            console.log("avatarUrl", avatarUrl)
-             firebase.firestore().collection("D_user").doc(userCredential.user.uid).set({
+           await firebase.firestore().collection("D_user").doc(userCredential.user.uid).set({
                       name: name,
                       email:email.toLowerCase(),
                       brans:brans,
@@ -70,15 +79,24 @@ const SignUp1 =  ({navigation}) => {
                       cinsiyet:cinsiyet,
                       avatar:avatarUrl,
                       Id:userCredential.user.uid,
-              }).then(UserUpdate()).then(()=>{
+              }).catch({
+                  // kaydedilen kullanıcı firestore'ya kaydedilmediği için sil kullanıcıyı.
+
+              })
+              .then(UserUpdate)
+              .then(()=>{
                 setIsLoading(false)
                 isCreateAccountInfo()
               }
+                ).catch(
+                setIsLoading(false)
+
+                  // userUpdate kaydedilmediği için sil kullanıcıyı.
                 )
   
             // console.log("userCredential: ", userCredential)
-            const UserUpdate = () =>{
-              userCredential.user.updateProfile({
+            const UserUpdate = async () =>{
+             await userCredential.user.updateProfile({
                 displayName: name,
                 photoURL:avatarUrl,
               })
@@ -87,7 +105,9 @@ const SignUp1 =  ({navigation}) => {
   
             // navigation.navigate("D_SignIn", {isCreateAccount: true})
             
-            }).catch(()=>{
+            }).catch((error)=>{
+              setIsLoading(false)
+              console.log(error)
               alert("Profil fotoğrafı yüklenemedi. Lütfen daha sonra tekrar deneyin.");
             })   
             //setIsLoading(false)
@@ -214,7 +234,11 @@ const SignUp1 =  ({navigation}) => {
       return;
     }
   
-    const result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, presentationStyle: 0});
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true, 
+      presentationStyle: 0,
+      quality: 1,
+    });
   
     // Explore the result
     // console.log(result);
@@ -367,18 +391,19 @@ let isPasswordValidate = false;
   
       return (
         
-        <ScrollView
-        contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:15, alignItems:"center", justifyContent:"center", backgroundColor:"white"}}
-        style={{flex:1, backgroundColor:"white"}}
-        //scrollEnabled={scrollEnabled}
-        //onContentSizeChange={onContentSizeChange}
-        >
+     
 
         <KeyboardAwareScrollView
         behavior={Platform.OS === "ios" ? "padding" : "padding"}
         style={styles.container}
         contentContainerStyle={{flex:1}}
       >
+           <ScrollView
+        contentContainerStyle={{flexGrow:1, paddingTop:15, paddingEnd:15, alignItems:"center", justifyContent:"center", backgroundColor:"white"}}
+        style={{backgroundColor:"white"}}
+        //scrollEnabled={scrollEnabled}
+        //onContentSizeChange={onContentSizeChange}
+        >
       
     
 
@@ -590,6 +615,7 @@ let isPasswordValidate = false;
               secureTextEntry={ispasswordSee}
               activeUnderlineColor='#f44336'
               outlineColor="white"
+              underlineColor="#f44336"
               //onBlur={infoPasswordUpdate()} Odaklanma kesilince çağırılan callback
               left={passwordSee()}
               right={passwordValidate(password)}
@@ -702,26 +728,36 @@ let isPasswordValidate = false;
   
            </TouchableOpacity>
            
-  
-            <TouchableOpacity onPress={() => 
-              {
-                if(isAgainPasswordValidate & isPasswordValidate & cinsiyet != "" & isSozlesmeOnay){
-                  createAccount(name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar)
+                  {!CreateAccountUnEnabled &&
+                    <TouchableOpacity  onPress={() => 
+                      {
+                        if(isAgainPasswordValidate & isPasswordValidate & cinsiyet != "" & isSozlesmeOnay){
+                            createAccount(name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar)
+                        }else{
+                          Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [
+                            {
+                              text: "Tamam",
+                              style: "cancel"
+                            }
+                          ])
+                        }
+                      }
+                      }> 
+                   <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
+                       KAYIT OL
+                   </Text>
+                   </TouchableOpacity>
+                  }
 
-                }else{
-                  Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [
-                    {
-                      text: "Tamam",
-                      style: "cancel"
-                    }
-                  ])
-                }
-              }
-              }> 
-           <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"#ba000d", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
-               KAYIT OL
-           </Text>
-           </TouchableOpacity>
+                  {
+                    CreateAccountUnEnabled &&
+                     <View> 
+                   <Text style={{borderRadius:20, paddingHorizontal:20, fontSize:20, color:"grey", paddingVertical:8, alignSelf:"flex-end", textAlign:"center", margin:10, backgroundColor:"#fff", fontWeight:"bold"}}>
+                       KAYIT OL
+                   </Text>
+                   </View>
+                  }
+          
   
            </View>
   
@@ -734,11 +770,11 @@ let isPasswordValidate = false;
           </View>
           </View>
          
+          </ScrollView>
 
           </KeyboardAwareScrollView>
 
   
-          </ScrollView>
   
   
   
