@@ -44,16 +44,33 @@ const SignUp00 = ({navigation}) => {
  setIsLoading(true)
  SetCreateAccountUnEnabled(true)
 
+ 
+ const errorMessage = (error) =>{
+  navigation.navigate("SignUp0", {
+    name:name,
+    email:email,
+    password:password,
+    cinsiyet:cinsiyet,
+    avatarLocal:avatarLocal,
+    avatarFirebase: avatarFirebase,
+    phoneNumber:phoneNumber,
+    dogumTarih:date,
+    KHastalik:KHastalik,
+    againPassword: password,
+    isSozlesmeOnay: true
+  });
+  setError(error)
+}
+
       await firebase
       .auth()
       .createUserWithEmailAndPassword(email, password).then(async(userCredential)=>{
-        await firebase.storage().ref("avatars/H_avatars/").child(avatarFirebase == "" ? "DefaultHastaAvatar.png" : avatarFirebase).getDownloadURL().then(async(avatarUrl)=> {
           await firebase.firestore().collection("H_user").doc(userCredential.user.uid).set({
                      name: name,
                      email:email.toLowerCase(),
                      cinsiyet:cinsiyet,
                      Id:userCredential.user.uid,
-                     avatar: avatarUrl,
+                     //avatar: avatarUrl,
                      date:date,
                      phoneNumber:phoneNumber,
                      KHastalik: KHastalik
@@ -67,13 +84,14 @@ const SignUp00 = ({navigation}) => {
             const UserUpdate = async () =>{
               await userCredential.user.updateProfile({
                 displayName: name,
-                photoURL:avatarUrl,
+                //photoURL:avatarUrl,
               })
             }
            
-            })
+          
       }).catch((error)=>{
         setIsLoading(false)
+      SetCreateAccountUnEnabled(false)
         console.log("error:", error)
         const errorCode = error.code;
         switch (errorCode.substr(5)) {
@@ -109,22 +127,6 @@ const SignUp00 = ({navigation}) => {
       })
     
 
-      const errorMessage = (error) =>{
-        navigation.navigate("SignUp0", {
-          name:name,
-          email:email,
-          password:password,
-          cinsiyet:cinsiyet,
-          avatarLocal:avatarLocal,
-          avatarFirebase: avatarFirebase,
-          phoneNumber:phoneNumber,
-          dogumTarih:date,
-          KHastalik:KHastalik,
-          againPassword: password,
-          isSozlesmeOnay: true
-        });
-        setError(error)
-      }
       
 
 
@@ -488,66 +490,7 @@ const [avatarFirebase, setAvatarFirebase] = useState(route.params?.avatarFirebas
 
 
 // This function is triggered when the "Select an image" button pressed
-const showImagePicker = async () => {
-  // Ask the user for the permission to access the media library 
-  const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-  if (permissionResult.granted === false) {
-    Alert.alert("Uyarı⚠️","Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz.", [{text:"Tamam", style:"cancel"}]);
-
-    return;
-  }
-
-  const result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, presentationStyle: 0});
-
-  // Explore the result
-  console.log(result);
-
-  if (!result.cancelled) {
-    setAvatarLocal(result.uri);
-    const filename = result.uri.split("/").pop();
-    console.log(filename);
-    uploadAvatar(result.uri, filename);
-    setAvatarFirebase(filename);
-  }
-}
-
-// This function is triggered when the "Open camera" button pressed
-const openCamera = async () => {
-  // Ask the user for the permission to access the camera
-  const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-  
-
-  if (permissionResult.granted === false) {
-    Alert.alert("Uyarı⚠️","Bu uygulamanın kameranıza erişmesine izin vermeyi reddettiniz.", [{text:"Tamam", style:"cancel"}]);
-
-  //   ImagePicker.requestCameraPermissionsAsync();
-  return permissionResult;
-  }
-
-  const result = await ImagePicker.launchCameraAsync({allowsEditing: true, presentationStyle: 0});
-  // allowsEditing: kırpma işlemi yapılsın mı?
-  // aspect: 
-
-  // Explore the result
-  console.log(result);
-
-  if (!result.cancelled) {
-    setAvatarLocal(result.uri);
-    const filename = result.uri.split("/").pop();
-    console.log(filename);
-    uploadAvatar(result.uri, filename);
-    setAvatarFirebase(filename);
-  }
-}
-
-const uploadAvatar = async (uri, imageName)  => {
-  const response = await fetch(uri);
-  const blob = await response.blob();
-
-  var ref = await firebase.storage().ref("avatars/H_avatars").child(imageName);
-  return ref.put(blob);
-}
 
 const [checkedE, setCheckedE] = useState(route.params?.cinsiyet == "Erkek" ?  true : false);
 const [checkedK, setCheckedK] = useState(route.params?.cinsiyet == "Kadın" ? true : false);
@@ -655,81 +598,10 @@ const toggleModal = () => {
         
          
 
-{
-avatarLocal == '' 
-
-? 
-
-<Avatar
-
-size={130}
-rounded
-onPress={toggleModal}
-source= {require("../../../rec/Avatars/DefaultHastaAvatar.png")}
-> 
-
-<Avatar.Accessory  size={27}   onPress={toggleModal} />
-</Avatar>
-
-:
-<Avatar
-source={{ uri: avatarLocal }}
-size={130}
-rounded
-onPress={toggleModal}
->
-  <Avatar.Accessory  size={27}   onPress={toggleModal} />
-</Avatar>
-
-}
-
-
-          {/* --- Modal --- */}
-          <Modal isVisible={isModalVisible}
-    style={{margin:0, justifyContent:"flex-end"}}
-    swipeDirection="down"
-  onBackdropPress = { ( )  =>  setModalVisible ( false ) } 
-    onSwipeComplete = { ( )  =>  setModalVisible ( false ) }
-  //   swipeDirection="down"
-  //   swipeDirection="left"
-    >
-      <View style={{height: Dimensions.get('screen').height / 3.5, backgroundColor:"#fff", borderTopLeftRadius:20, borderTopRightRadius:20}}>
-      
-          <View style={{width:70, height:6, backgroundColor:"grey", alignSelf:"center", borderRadius:10, marginTop:12, position:"absolute"}}></View>
-          <Ionicons name="close-outline" color="grey" size={30} onPress={toggleModal} style={{alignSelf:"flex-end", marginRight:5}}/>
-         
-          <View style={{ justifyContent:"space-evenly", flex:1, backgroundColor:"white"}}>
-        <Text style={{fontSize:25, fontWeight:"bold", alignSelf:"center"}}>Fotoğraf Yükle</Text>
-          <TouchableOpacity
-          style={{backgroundColor:"#d2302f", width:300, height:50, alignSelf:"center", alignItems:"center", justifyContent:"center", borderRadius:25}}
-          onPress={showImagePicker}
-          >
-              <Text style={{fontSize:20,color:"white", fontWeight:"600"}}>Galerimden seç</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-          style={{backgroundColor:"#d2302f", width:300, height:50, alignSelf:"center", alignItems:"center", justifyContent:"center", borderRadius:25}}
-          onPress={openCamera}
-          >
-              <Text style={{fontSize:20, color:"white", fontWeight:"600"}}>Fotoğraf çek</Text>
-          </TouchableOpacity>
-          </View>
-      </View>
-    </Modal>
-                {/* --- Modal --- */}
-
+        <View style={{justifyContent:"center", alignItems:"center", flex:1}}>
+<Image source={require("../../../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
+</View>
           
-{/* 
-<Image 
-                  style={{width:100, height:100, borderRadius:100, backgroundColor:"red", zIndex:1}}
-                  source={require("./src/photo.jpg")} 
-                  />
-                  <Avatar.Accessory size={25} style={{zIndex:2}}/> */}
-
-
-
-
-
-
               </View>
             
               <View style={{flex:2}}>

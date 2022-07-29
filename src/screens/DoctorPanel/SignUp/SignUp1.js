@@ -2,38 +2,28 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, StatusBar, ScrollView, Image,  Platform, Dimensions, Pressable, Alert } from 'react-native'
 import {Ionicons} from "@expo/vector-icons";
 import { useRoute } from '@react-navigation/native';
-import { Avatar } from 'react-native-elements';
 import { CheckBox } from 'react-native-elements';
 import { TextInput } from "react-native-paper";
 import Modal from "react-native-modal";
-import * as ImagePicker from 'expo-image-picker';
 import firebase from 'firebase/compat/app';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import AnimatedLottieView from "lottie-react-native";
+import LoadingAnimation from '../../../components/Animations/LoadingAnimation';
+import CreateAccountSucces from '../../../components/Animations/CreateAccountSucces';
+
 
 
 const SignUp1 =  ({navigation}) => {
-  const route = useRoute()
-  const [cinsiyet, setCinsiyet] = useState(route.params?.cinsiyet ?? "");
-
- 
+    const route = useRoute()
+    const [cinsiyet, setCinsiyet] = useState(route.params?.cinsiyet ?? "");
     const [isLoading, setIsLoading] = useState(false);
-  
     const [isCreateAccount, setIsCreateAccount] = useState(false);
-    
     const [isSozlesmeOnay, setIsSozlesmeOnay] = useState(route.params?.isSozlesmeOnay ?? false);
     const [SozlesmeModal, setSozlesmeModal] = useState(false);
   
   
     const isCreateAccountInfo = () => {
-      // setTimeout(()=> setIsCreateAccount(true), Platform.OS === "ios" ? 3000 : 0)
       setIsCreateAccount(true)
-      // setIsCreateAccount(true)
-
-      // setTimeout(()=>{
-      //   setIsCreateAccount(false)
-      // }, Platform.OS === "ios" ? 6000 : 3000)
-
       setTimeout(()=>{
         setIsCreateAccount(false);
         SetCreateAccountUnEnabled(false);
@@ -41,16 +31,11 @@ const SignUp1 =  ({navigation}) => {
       }, 3000)
     } 
    
-      // console.log(isCreateAccount)
-  
-    
     const errorMessage = (error) => {
       navigation.navigate("DSignUp0", {
         CalisilanYer: CalisilanYer,
         password:password, 
         cinsiyet:cinsiyet, 
-        avatarLocal:AvatarImagePath, 
-        avatarFirebase: avatar,
         error: error,
         againPassword: password,
         isSozlesmeOnay: true
@@ -59,7 +44,7 @@ const SignUp1 =  ({navigation}) => {
   
     const [CreateAccountUnEnabled, SetCreateAccountUnEnabled] = useState(false)
   
-    const createAccount = async (name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar) => {
+    const createAccount = async (name, email, password, brans, CalisilanYer, time1,time2, cinsiyet) => {
       
       setIsLoading(true)
       SetCreateAccountUnEnabled(true)
@@ -67,8 +52,6 @@ const SignUp1 =  ({navigation}) => {
    await firebase
       .auth()
       .createUserWithEmailAndPassword(email, password).then(async(userCredential)=>{
-        await firebase.storage().ref("avatars/D_avatars/").child(avatar == "" ? "DefaultDoctorAvatar.png" : avatar).getDownloadURL().then(async(avatarUrl)=>{
-           console.log("avatarUrl", avatarUrl)
            await firebase.firestore().collection("D_user").doc(userCredential.user.uid).set({
                       name: name,
                       email:email.toLowerCase(),
@@ -77,7 +60,6 @@ const SignUp1 =  ({navigation}) => {
                       time1: time1,
                       time2: time2,
                       cinsiyet:cinsiyet,
-                      avatar:avatarUrl,
                       Id:userCredential.user.uid,
               }).catch({
                   // kaydedilen kullanıcı firestore'ya kaydedilmediği için sil kullanıcıyı.
@@ -94,26 +76,11 @@ const SignUp1 =  ({navigation}) => {
                   // userUpdate kaydedilmediği için sil kullanıcıyı.
                 )
   
-            // console.log("userCredential: ", userCredential)
             const UserUpdate = async () =>{
              await userCredential.user.updateProfile({
                 displayName: name,
-                photoURL:avatarUrl,
               })
             }
-           
-  
-            // navigation.navigate("D_SignIn", {isCreateAccount: true})
-            
-            }).catch((error)=>{
-              setIsLoading(false)
-              console.log(error)
-              alert("Profil fotoğrafı yüklenemedi. Lütfen daha sonra tekrar deneyin.");
-            })   
-            //setIsLoading(false)
-  
-            // isCreateAccountInfo()
-           // isCreateAccountInfo()
             
       }).catch((error)=>{
         setIsLoading(false)
@@ -122,13 +89,11 @@ const SignUp1 =  ({navigation}) => {
           case 'ERROR_EMAIL_ALREADY_IN_USE':
           case 'account-exists-with-different-credential':
           case 'email-already-in-use':
-            // alert('Bu E-mail kullanılıyor.');
             errorMessage('Bu E-mail kullanılıyor.')
             
             break;
           case 'ERROR_WRONG_PASSWORD':
           case 'wrong-password':
-          //   alert('Yanlış e-posta/şifre kombinasyonu.');
           errorMessage('Yanlış e-posta/şifre kombinasyonu.')
   
           break;
@@ -141,140 +106,25 @@ const SignUp1 =  ({navigation}) => {
           errorMessage('Email adresi geçersiz.')
             break;                    
           default:
-            // console.log(errorCode) // auth/weak-password' zayıf şifre de var.
             Alert.alert("Hata❗", "Kayıt başarısız. Lütfen tekrar deneyin.", [{text:"Tamam", style:"cancel"}])
             break;
         }
       });
-      // firebase önündeki await'i sildin sadece!
   }
   
    
     const name = route.params.name;
     const email = route.params.email;
     const brans = route.params.brans;
-    // console.log("name: ",name, " email: ", email);
     const time1 = route.params.time1;
     const time2 = route.params.time2;
-   
-     //console.log(route.params?.avatar)
-  
-    const [avatar, setavataruri] = useState(route.params?.avatarFirebase ?? "");
+
   const [CalisilanYer, SetCalisilanYer] = useState(route.params?.CalisilanYer ?? "");
-  const [password, setPassword] = useState(route.params?.password ?? "");
-  // console.log(AvatarImagePath)
+  const [password, setPassword]         = useState(route.params?.password ?? "");
   
-  const [PhotosImagePath, setPhotosImagePath] = useState('');
-  const [AvatarImagePath, setAvatarImagePath] = useState(route.params?.avatarLocal ?? "");
 
-  //console.log(route.params.avatar)
- // console.log(AvatarImagePath)
-  
-  
-  // This function is triggered when the "Select an image" button pressed
-  const AvatarShowImagePicker = async () => {
-    // Ask the user for the permission to access the media library 
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  
-    if (permissionResult.granted === false) {
-      Alert.alert("Uyarı⚠️","Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz", [{text:"Tamam", style:"cancel"}]);
-      return;
-    }
-  
-    const result = await ImagePicker.launchImageLibraryAsync({allowsEditing: true, presentationStyle: 0});
-  
-    if (!result.cancelled) {
-      setAvatarImagePath(result.uri);
-     
-      const filename = result.uri.split('/').pop();
-      uploadAvatar(result.uri, filename);
-      setavataruri(filename);
-    }
-  }
-  
-  // This function is triggered when the "Open camera" button pressed
-  const openCameraAvatar = async () => {
-    // Ask the user for the permission to access the camera
-    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-    
-  
-    if (permissionResult.granted === false) {
-      Alert.alert("Uyarı⚠️","Bu uygulamanın kameranıza erişmesine izin vermeyi reddettiniz.", [{text:"Tamam", style:"cancel"}]);
 
-    //   ImagePicker.requestCameraPermissionsAsync();
-    return permissionResult;
-    }
   
-    const result = await ImagePicker.launchCameraAsync({allowsEditing: true, mediaTypes:ImagePicker.MediaTypeOptions.Images, presentationStyle: 0});
-    // allowsEditing: kırpma işlemi yapılsın mı?
-    // aspect: 
-  
-    // Explore the result
-    // console.log(result);
-  
-    if (!result.cancelled) {
-      setAvatarImagePath(result.uri);
-     const filename = result.uri.split('/').pop(); // '/' işareti gördüğünde split metotuya ayırır. Dizi döndürür. // pop() ile ayırdıklarıının en sonunu alır
-      // console.log(result.uri.replace('file://', ''));
-     // console.log(filename);
-      uploadAvatar(result.uri, filename);
-      setavataruri(filename);
-    }
-  
-    
-  }
-  
-  
-  const PhotosShowImagePicker = async () => {
-    // Ask the user for the permission to access the media library 
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  
-    if (permissionResult.granted === false) {
-      Alert.alert("Uyarı⚠️","Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz", [{text:"Tamam", style:"cancel"}]);
-      return;
-    }
-  
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true, 
-      presentationStyle: 0,
-      quality: 1,
-    });
-  
-    // Explore the result
-    // console.log(result);
-  
-    if (!result.cancelled) {
-      setPhotosImagePath(result.uri);
-      uploadPhotos(result.uri, "test-image");
-      
-      // console.log(result.uri);
-    }
-  }
-  
-  const uploadAvatar = async (uri, imageName) => {
-    
-  
-    const response = await fetch(uri);
-    const blob = await response.blob();
-  
-    var ref = await firebase.storage().ref("avatars/D_avatars").child(imageName);
-    return ref.put(blob);
-  
-  }
-  
-  
-  
-  const uploadPhotos = async (uri, imageName) => {
-  
-    const response = await fetch(uri);
-    const blob = await response.blob();
-  
-    var ref = firebase.storage().ref().child("photos/", imageName);
-    return ref.put(blob);
-  
-    const uploadTask = storageRef().put(blob);
-  
-  }
   
   
   const [checkedE, setCheckedE] = useState(route.params?.cinsiyet == "Erkek" ?  true : false);
@@ -416,51 +266,11 @@ let isPasswordValidate = false;
   
      <View style={styles.box}>
   
-     
-  
-       
-     <Modal 
-        isVisible={isLoading} 
-        style={{ justifyContent:"flex-start"}}
-      animationIn="fadeIn"
-      animationOut="fadeOut"
-      
-        >
-          <View style={{flex:1,alignItems:"center", justifyContent:"flex-start", }}>
-                <AnimatedLottieView source={require("../../../rec/Animations/loading.json")} autoPlay={true}  />
-                {/* <Button title="kapat" onPress={toggleModal1} /> */}
-          </View>
-        </Modal>
-        <Modal 
-        isVisible={isCreateAccount} 
-        style={{ justifyContent:"flex-start"}}
-        hasBackdrop={false}
-      //   animationIn="fadeInRight"
-      animationIn="fadeIn"
-      animationOut="fadeOut"
-      animationInTiming={600}
-      animationOutTiming={600}
-        swipeDirection="up"
-        onSwipeComplete = {() =>   isCreateAccount(false) }
-        >
-          <View style={{flex:1,alignItems:"center", justifyContent:"flex-start"}}>
-              <View style={{width: '85%', backgroundColor: '#f5f5f5', borderRadius:8, justifyContent:"flex-start",alignItems:"center", padding:20, flexDirection:"row", shadowColor: "#000",
-  shadowOffset: {
-      width: 0,
-      height: 2,
-  },
-  shadowOpacity: 0.25,
-  shadowRadius: 3.84,
-  
-  elevation: 5,}}>
-              <View style={{padding:18}}>
-                <AnimatedLottieView source={require("../../../rec/Animations/createAccount-success.json")} autoPlay={true} loop={false} />
-                </View>
-            <Text style={{fontSize:22, color:"black", fontWeight:"700", marginLeft:9}}>Hesap oluşturuldu!</Text>
-            </View>
-            {/* <Button title="Hide modal" onPress={toggleModal} /> */}
-          </View>
-        </Modal>
+  {/* ANİMATİON */}
+
+        <LoadingAnimation isLoading={isLoading}/>
+      <CreateAccountSucces isCreateAccount={isCreateAccount} />
+
   
     
   <View style={{alignItems:"center" }}>
@@ -472,71 +282,11 @@ let isPasswordValidate = false;
            
   
   {
-  AvatarImagePath == ""   
-  
-  ? 
-  
-  <Avatar
-  
-  size={130}
-  rounded
-  onPress={toggleModal}
-  source= {require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
-  > 
-  
-  <Avatar.Accessory  size={27}   onPress={toggleModal} />
-  </Avatar>
-  
-  :
-  <Avatar
-  source={{ uri: AvatarImagePath }}
-  size={130}
-  rounded
-  onPress={toggleModal}
-  >
-    <Avatar.Accessory  size={27}   onPress={toggleModal} />
-  </Avatar>
-  
+         
+         <Image source={require("../../../rec/Logos/hdoktor-logo-dikeyImageSize.png")} />
+         
   }
-  
-  
-            {/* --- Modal --- */}
-            <Modal isVisible={isModalVisible}
-      style={{margin:0, justifyContent:"flex-end"}}
-      swipeDirection="down"
-    onBackdropPress = { ( )  =>  setModalVisible ( false ) } 
-      onSwipeComplete = { ( )  =>  setModalVisible ( false ) }
-    //   swipeDirection="down"
-    //   swipeDirection="left"
-      >
-        <View style={{height: Dimensions.get('screen').height / 3.5, backgroundColor:"#fff", borderTopLeftRadius:20, borderTopRightRadius:20}}>
-        
-            <View style={{width:70, height:6, backgroundColor:"grey", alignSelf:"center", borderRadius:10, marginTop:12, position:"absolute"}}></View>
-            <Ionicons name="close-outline" color="grey" size={30} onPress={toggleModal} style={{alignSelf:"flex-end", marginRight:5}}/>
-           
-            <View style={{ justifyContent:"space-evenly", flex:1, backgroundColor:"white"}}>
-          <Text style={{fontSize:25, fontWeight:"bold", alignSelf:"center"}}>Fotoğraf Yükle</Text>
-            <TouchableOpacity
-            style={{backgroundColor:"#d2302f", width:300, height:50, alignSelf:"center", alignItems:"center", justifyContent:"center", borderRadius:25}}
-            onPress={AvatarShowImagePicker}
-            >
-                <Text style={{fontSize:20,color:"white", fontWeight:"600"}}>Galerimden seç</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-            style={{backgroundColor:"#d2302f", width:300, height:50, alignSelf:"center", alignItems:"center", justifyContent:"center", borderRadius:25}}
-            onPress={openCameraAvatar}
-            >
-                <Text style={{fontSize:20, color:"white", fontWeight:"600"}}>Fotoğraf çek</Text>
-            </TouchableOpacity>
-            </View>
-        </View>
-      </Modal>
-                  {/* --- Modal --- */}
-  
-          
-  
-  
-  
+
   
                 </View>
               
@@ -577,36 +327,6 @@ let isPasswordValidate = false;
               activeOutlineColor="red"
               //right={NameValidate(name)}
               />
-  
-              
-  <TouchableOpacity onPress={PhotosShowImagePicker}>
-              <View style={[styles.input, {justifyContent:"space-between", alignItems:"center", flexDirection:"row",
-              borderBottomColor:"red", borderBottomWidth:1  
-                
-                }]}>
-                <Text style={{color:"grey", fontSize:18}}>Fotoğraflarını ekle</Text>
-                <Ionicons name="images-outline" size={20} />
-              </View>
-              </TouchableOpacity>
-  
-              {
-  
-  PhotosImagePath !== '' && 
-          <View style={{width:50, height:50, flexDirection:"row"}}>
-          
-          <Image
-            source={{ uri: PhotosImagePath }}
-            style={styles.image}
-          />
-            
-          </View>
-  
-        }
-  
-              
-  
-               
-              
  
   <TextInput 
               style={styles.input}
@@ -702,7 +422,7 @@ let isPasswordValidate = false;
   </Modal>
   
   
-               <View style= {{flexDirection:"row", justifyContent:"space-between"}}>
+               <View style= {{flexDirection:"row", justifyContent:"space-between", marginTop:20,flex:1,}}>
                <TouchableOpacity onPress={()=> navigation.navigate(
                    "DSignUp0",
                    {
@@ -710,8 +430,6 @@ let isPasswordValidate = false;
                         password:password,
                         againPassword: againPassword,
                         cinsiyet: cinsiyet,
-                        avatarLocal: AvatarImagePath,
-                        avatarFirebase: avatar,
                         isSozlesmeOnay: isSozlesmeOnay
                    })}>
   
@@ -732,7 +450,7 @@ let isPasswordValidate = false;
                     <TouchableOpacity  onPress={() => 
                       {
                         if(isAgainPasswordValidate & isPasswordValidate & cinsiyet != "" & isSozlesmeOnay){
-                            createAccount(name, email, password, brans, CalisilanYer, time1,time2, cinsiyet, avatar)
+                            createAccount(name, email, password, brans, CalisilanYer, time1,time2, cinsiyet)
                         }else{
                           Alert.alert("Hata❗", "Lütfen formu doldurunuz.", [
                             {
