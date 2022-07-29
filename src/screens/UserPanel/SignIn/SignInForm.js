@@ -2,18 +2,21 @@ import React, {useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import firebase from "firebase/compat/app";
 import { useNavigation } from "@react-navigation/native";
+import LoadingAnimation from "../../../components/Animations/LoadingAnimation";
 
 const Form = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const navigation = useNavigation();
+    const [loading, SetLoading] = useState(false)
 
     const [errroMessage, setErrorMessage] = useState("");
 
     const [H_userID, setH_userId] = useState();
 
-    const signIn = async () => {
-      
+    const signIn = async () => {  
+      SetLoading(true)
+
             await firebase.auth().signInWithEmailAndPassword(email, password).then(()=>{
                  firebase.firestore().collection("H_user").get().then((querySnapshot) => {
                     const H_userId = []; 
@@ -22,13 +25,12 @@ const Form = () => {
                     });
                     setH_userId(H_userId)
                 }).then(()=>{
-
-
                   firebase.firestore().collection("H_user").where("email", "==", email.toLowerCase()).get().then((snapshot)=>{
-                    // console.log(snapshot.);
                    if(!(snapshot.empty)){
+                    SetLoading(false)
                     navigation.navigate("TabU");
                    }else{
+                    SetLoading(false)
                     Alert.alert(
                         "Hatalı Giriş",
                         "Hatalı kullanıcı girişi!",
@@ -48,6 +50,7 @@ const Form = () => {
             
                 });
             }).catch((error)=> {
+              SetLoading(false)
                 const errorCode = error.code;
                 switch (errorCode.substr(5)) {
                     case 'ERROR_EMAIL_ALREADY_IN_USE':
@@ -100,6 +103,9 @@ const Form = () => {
          {errroMessage == "Yanlış e-posta/şifre kombinasyonu." || "Email adresi geçersiz." || 'Bu e-posta ile kullanıcı bulunamadı.'? 
         <Text style={{color:"red", fontSize:17, fontWeight:"bold"}}>{""+ errroMessage}</Text> 
      : ""}
+
+     <LoadingAnimation isLoading={loading}/>
+     
             <TextInput style={style.inputBox}
                 placeholder="E-mail"
                 placeholderTextColor="#fff"

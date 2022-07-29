@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert } from "react-native";
 import firebase from "firebase/compat/app";
 import { useNavigation } from "@react-navigation/native";
+import LoadingAnimation from "../../../components/Animations/LoadingAnimation";
 
 const Form = () => {
     const [email, setEmail] = useState("");
@@ -12,8 +13,10 @@ const Form = () => {
 
     const [found, setFound] = useState();
     const [D_userID, setD_userID] = useState([]);
+    const [loading, setLoading] = useState(false)
 
     const signIn = async () => {
+      setLoading(true)
            await firebase.auth().signInWithEmailAndPassword(email, password).then(()=>{
                 firebase.firestore().collection("D_user").get().then((querySnapshot) => {
                     const D_userId = [];
@@ -27,8 +30,10 @@ const Form = () => {
                     firebase.firestore().collection("D_user").where("email", "==", email.toLowerCase()).get().then((snapshot)=>{
                         // console.log(snapshot.);
                        if(!(snapshot.empty)){
+                        setLoading(false)
                         navigation.navigate("TabD");
                        }else{
+                        setLoading(false)
                         Alert.alert(
                             "Hatalı Giriş",
                             "Hatalı kullanıcı girişi!",
@@ -49,6 +54,7 @@ const Form = () => {
                 }); 
              
             }).catch((error)=>{
+              setLoading(false)
                 const errorCode = error.code;
                 switch (errorCode.substr(5)) {
                     case 'ERROR_EMAIL_ALREADY_IN_USE':
@@ -105,6 +111,8 @@ const Form = () => {
 
         <Text style={{color:"red", fontSize:17, fontWeight:"bold"}}>{""+ errroMessage}</Text> 
      : ""}
+
+      <LoadingAnimation isLoading={loading}/>
             <TextInput style={style.inputBox}
                 placeholder="E-mail"
                 placeholderTextColor="#fff"
