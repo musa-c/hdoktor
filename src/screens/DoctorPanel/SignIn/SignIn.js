@@ -12,7 +12,6 @@ const SignIn = ({route}) => {
 
     return (
         <View style={{flex:1, backgroundColor:"#fff"}}>
-
             <LogoLogin />
             <Form type="Giriş Yap"/>
 
