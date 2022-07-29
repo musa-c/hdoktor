@@ -42,13 +42,13 @@ const PatientConfirmation = ({navigation}) => {
 
                   if (!unmounted) {
                     firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").onSnapshot((snapshot)=>{
-                      setD_Name(snapshot.data().name);
-                      setD_Email(snapshot.data().email);
-                      setD_Id(snapshot.data().Id);
-                      setAlan(snapshot.data().brans);
-                      setCalisilanYer(snapshot.data().CalisilanYer);
-                      setIletisimSaat1(snapshot.data().time1);
-                      setIletisimSaat2(snapshot.data().time2);
+                      setD_Name(snapshot.data()?.name ?? "");
+                      setD_Email(snapshot.data()?.email ?? "");
+                      setD_Id(snapshot.data()?.Id ?? "");
+                      setAlan(snapshot.data()?.brans ?? "");
+                      setCalisilanYer(snapshot.data()?.CalisilanYer ?? "");
+                      setIletisimSaat1(snapshot.data()?.time1 ?? "");
+                      setIletisimSaat2(snapshot.data()?.time2 ?? "");
                       setD_Avatar(snapshot.data()?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea")
                       
                   })
