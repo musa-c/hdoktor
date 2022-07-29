@@ -7,7 +7,7 @@ import TabU from './src/Tabs/TabU';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './src/screens/Login';
 import { LogBox, View } from 'react-native';
-import ImagePickerExample from "./ImagePickerExample";
+import ImagePickerExample1 from "./ImagePickerExample1";
 
 // firebase
 import firebase from "firebase/compat/app";
@@ -49,7 +49,7 @@ export default function App() {
 
   return (
     // <View style={style.HomeStyle}>
-    //   <ImagePickerExample />
+    //   <ImagePickerExample1 />
     // </View>
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
