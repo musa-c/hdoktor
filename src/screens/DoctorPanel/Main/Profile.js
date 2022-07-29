@@ -24,11 +24,11 @@ const Profile = ({navigation}) => {
         const user = firebase.auth().currentUser;
         if (!unmounted) {
         firebase.firestore().collection("D_user").doc(user.uid).onSnapshot((snapshot)=>{
-            setName(snapshot.data().name);
-            setBrans(snapshot.data().brans);
-            setCalisilanYer(snapshot.data().CalisilanYer);
-            setTime1(snapshot.data().time1.toDate());
-            setTime2(snapshot.data().time2.toDate());
+            setName(snapshot.data()?.name ?? "");
+            setBrans(snapshot.data()?.brans ?? "");
+            setCalisilanYer(snapshot.data()?.CalisilanYer ?? "");
+            setTime1(snapshot.data()?.time1.toDate() ?? "");
+            setTime2(snapshot.data()?.time2.toDate() ?? "");
             setAvatar(snapshot.data()?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea");
             
             
