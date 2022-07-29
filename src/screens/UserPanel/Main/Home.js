@@ -7,6 +7,7 @@ import Ad from '../../../components/Ad/Ad';
 import firebase from "firebase/compat/app";
 import { Avatar } from "react-native-elements";
 import Separator from '../../../components/Separator';
+import ListEmptyComponent from '../../../components/ListEmptyComponent';
 
 
 function HomeU(props) {
@@ -38,6 +39,8 @@ function HomeU(props) {
     <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
     <Ad />
     <FlatList
+    contentContainerStyle={{flex:1}}
+    ListEmptyComponent={<ListEmptyComponent text = "Doktor Bulunmamakta"/>}
     data={users}
     renderItem={(element) =>
         (
@@ -61,7 +64,7 @@ function HomeU(props) {
 <Avatar
 size={95}
 // rounded
-source={{uri: element?.item?.avatar ?? ""}}
+source={{uri: element.item?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"}}
 avatarStyle={styles.imageStyle}
 activeOpacity={0.7}
 rounded

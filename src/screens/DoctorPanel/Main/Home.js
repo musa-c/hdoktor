@@ -7,6 +7,7 @@ import Ad from "../../../components/Ad/Ad"
 import firebase from "firebase/compat/app";
 import { Avatar } from "react-native-elements";
 import Separator from '../../../components/Separator';
+import ListEmptyComponent from '../../../components/ListEmptyComponent';
 
 
 function HomeD(props) {
@@ -19,9 +20,9 @@ function HomeD(props) {
 
   useEffect(()=>{
     let unmounted = false;
-    firebase.firestore().collection("D_user").onSnapshot((querySnapshot)=>{
+     firebase.firestore().collection("D_user").onSnapshot((querySnapshot)=>{
       const users = [];
-      querySnapshot.forEach(documentSnapshot =>{
+    querySnapshot.forEach(documentSnapshot =>{
         users.push({
           ...documentSnapshot.data(),
           key: documentSnapshot.id,
@@ -44,7 +45,12 @@ function HomeD(props) {
     };
   }, []);
 
- 
+
+  const isEmpty = () =>{
+   users.forEach((user)=>{
+  return users.length == 1 & user.key == myId
+})
+  } 
 
 
   const navigation = useNavigation();
@@ -52,28 +58,37 @@ function HomeD(props) {
     <View style={{flex:1, backgroundColor:"white"}}>
     <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
     <Ad />
-    
-    <FlatList
+
+ {
+  isEmpty
+   ?
+  <ListEmptyComponent text={"Doktor Bulunmamakta"} /> 
+  :
+<FlatList
     data={users}
+    ListEmptyComponent={<ListEmptyComponent text={"Doktor Bulunmamakta"}/>}
+    contentContainerStyle={{flex:1}}
     renderItem={(element) => (
        
       <> 
-      { (!(element.item.key == myId)) &&
-         <TouchableOpacity onPress={() =>navigation.navigate("MoreDoctorInfo", {doctorId: element.item.key})}>
-    <View style={styles.cont}>
-    <View style={styles.card}>
-
-      <View style={styles.cardImage}>
-     
-      
       {
-         element.item.avatar == "" ?
-         <Avatar
-  size={95}
-  source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
-  avatarStyle={styles.imageStyle}
-  activeOpacity={0.7}
-  rounded
+
+        (!(element.item.key == myId)) &&
+        <TouchableOpacity onPress={() =>navigation.navigate("MoreDoctorInfo", {doctorId: element.item.key})}>
+   <View style={styles.cont}>
+   <View style={styles.card}>
+
+     <View style={styles.cardImage}>
+    
+     
+     {
+        element.item.avatar == "" ?
+        <Avatar
+ size={95}
+ source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+ avatarStyle={styles.imageStyle}
+ activeOpacity={0.7}
+ rounded
 />
 :
 
@@ -85,46 +100,52 @@ avatarStyle={styles.imageStyle}
 activeOpacity={0.7}
 />
 
-       }
+      }
 
 
+     
+ </View>
+ <View style={styles.CardInfo}>
+ <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold",}}>
+     {element.item.name}
+ </Text>
+ <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
+ <Icon name="stethoscope" size={22} color="#B71C1C"  /> 
+     &nbsp;&nbsp;{element.item.Alan}
+ 
+ </Text>
+ <Text style={{color:"black", fontSize:19, paddingStart:5}}>
+ <Icon name="h-square" size={22} color="#B71C1C"  />
+    &nbsp;&nbsp;{element.item.CalisilanYer}
+ </Text>
+ <View style={{marginHorizontal:5, marginTop:5}}>
+   
+ </View>
+ <View style={{marginHorizontal:5, marginTop:5, alignItems:"flex-end"}}>
+ <Text style={{color:"grey", fontSize:15, fontStyle:"italic"}}>
+   Daha fazla bilgi al
+ </Text>
+ 
+ 
+ </View>
+ </View>
       
+           
   </View>
-  <View style={styles.CardInfo}>
-  <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold",}}>
-      {element.item.name}
-  </Text>
-  <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
-  <Icon name="stethoscope" size={22} color="#B71C1C"  /> 
-      &nbsp;&nbsp;{element.item.Alan}
-  
-  </Text>
-  <Text style={{color:"black", fontSize:19, paddingStart:5}}>
-  <Icon name="h-square" size={22} color="#B71C1C"  />
-     &nbsp;&nbsp;{element.item.CalisilanYer}
-  </Text>
-  <View style={{marginHorizontal:5, marginTop:5}}>
-    
-  </View>
-  <View style={{marginHorizontal:5, marginTop:5, alignItems:"flex-end"}}>
-  <Text style={{color:"grey", fontSize:15, fontStyle:"italic"}}>
-    Daha fazla bilgi al
-  </Text>
-  
-  
-  </View>
-  </View>
-       
-            
-   </View>
-   <Separator />
+  <Separator />
 
-    </View>
-    </TouchableOpacity>
+   </View>
+   </TouchableOpacity>
+      
     }
+     
+   
     </>
        )}
        />
+ }
+    
+    
 
 </View>
 
