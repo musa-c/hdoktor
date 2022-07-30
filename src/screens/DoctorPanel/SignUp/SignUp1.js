@@ -61,6 +61,7 @@ const SignUp1 =  ({navigation}) => {
                       time2: time2,
                       cinsiyet:cinsiyet,
                       Id:userCredential.user.uid,
+                      avatar: ""
               }).catch({
                   // kaydedilen kullanıcı firestore'ya kaydedilmediği için sil kullanıcıyı.
 
@@ -72,7 +73,6 @@ const SignUp1 =  ({navigation}) => {
               }
                 ).catch(
                 setIsLoading(false)
-
                   // userUpdate kaydedilmediği için sil kullanıcıyı.
                 )
   

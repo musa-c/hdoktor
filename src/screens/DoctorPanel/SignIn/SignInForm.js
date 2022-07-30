@@ -31,9 +31,13 @@ const Form = () => {
                         // console.log(snapshot.);
                        if(!(snapshot.empty)){
                         setLoading(false)
+                        setEmail("")
+                        setPassword("")
+                        setErrorMessage("")
                         navigation.navigate("TabD");
                        }else{
                         setLoading(false)
+                        setErrorMessage("")
                         Alert.alert(
                             "Hatalı Giriş",
                             "Hatalı kullanıcı girişi!",
