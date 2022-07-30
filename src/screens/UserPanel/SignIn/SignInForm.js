@@ -28,9 +28,13 @@ const Form = () => {
                   firebase.firestore().collection("H_user").where("email", "==", email.toLowerCase()).get().then((snapshot)=>{
                    if(!(snapshot.empty)){
                     SetLoading(false)
+                    setEmail("")
+                    setPassword("")
+                    setErrorMessage("")
                     navigation.navigate("TabU");
                    }else{
                     SetLoading(false)
+                    setErrorMessage("")
                     Alert.alert(
                         "Hatalı Giriş",
                         "Hatalı kullanıcı girişi!",
