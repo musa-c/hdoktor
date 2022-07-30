@@ -12,11 +12,14 @@ import ListEmptyComponent from '../../../components/ListEmptyComponent';
 
 function HomeU(props) {
   const [users, setUsers] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
 
   useEffect(()=>{
     let unmounted = false;
-
-   firebase.firestore().collection("D_user").onSnapshot((querySnapshot)=>{
+    setRefreshing(true)
+    firebase.firestore().collection("D_user").onSnapshot((querySnapshot)=>{
       const users = [];
       querySnapshot.forEach(documentSnapshot =>{
         users.push({
@@ -26,12 +29,13 @@ function HomeU(props) {
       })
       if (!unmounted) {
         setUsers(users)
+        setRefreshing(false)
       }
     })
     return () => {
       unmounted = true;
     };
-  }, []);
+  }, [refresh]);
 
   const navigation = useNavigation();
   return (
@@ -39,8 +43,13 @@ function HomeU(props) {
     <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
     <Ad />
     <FlatList
-    contentContainerStyle={{flex:1}}
-    ListEmptyComponent={<ListEmptyComponent text = "Doktor Bulunmamakta"/>}
+    contentContainerStyle={{flexGrow:1}}
+    refreshing={refreshing}
+    onRefresh={()=>{
+      setRefresh(!refresh)
+      setRefreshing(true)
+    }}
+    ListEmptyComponent={<ListEmptyComponent text = "Doktor Bulunmamakta" refreshing={refreshing}/>}
     data={users}
     renderItem={(element) =>
         (
@@ -64,7 +73,7 @@ function HomeU(props) {
 <Avatar
 size={95}
 // rounded
-source={{uri: element.item?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"}}
+source={{uri: element.item.avatar}}
 avatarStyle={styles.imageStyle}
 activeOpacity={0.7}
 rounded

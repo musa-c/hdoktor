@@ -16,11 +16,16 @@ function HomeD(props) {
   // const user = firebase.auth().currentUser;
   // console.log(user.displayName, user.photoURL)
   const [myId, setMyId] = useState();
+  const [refresh, setRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
   
 
   useEffect(()=>{
     let unmounted = false;
-     firebase.firestore().collection("D_user").onSnapshot((querySnapshot)=>{
+    setRefreshing(true)
+    const myuser = firebase.auth().currentUser;
+     firebase.firestore().collection("D_user").where("Id", "!=", myuser.uid).onSnapshot((querySnapshot)=>{
       const users = [];
     querySnapshot.forEach(documentSnapshot =>{
         users.push({
@@ -28,29 +33,33 @@ function HomeD(props) {
           key: documentSnapshot.id,
         })
       })
-      const myuser = firebase.auth().currentUser;
       if (!unmounted) {
         setUsers(users)
         setMyId(myuser.uid)
+        setRefreshing(false)
     }
 
     
   const a =  firebase.auth().currentUser.metadata.creationTime
 
-  console.log(a);
+  //console.log(a);
       
     })
     return () => {
       unmounted = true;
     };
-  }, []);
+  }, [refresh]);
 
+  
 
-  const isEmpty = () =>{
-   users.forEach((user)=>{
-  return users.length == 1 & user.key == myId
-})
-  } 
+//   const isEmpty = () =>{
+//    users.forEach((user)=>{
+//     console.log(user.key)
+//   return users.length == 1 & user.key == myId
+// })
+//   } 
+
+  //console.log(users)
 
 
   const navigation = useNavigation();
@@ -59,28 +68,25 @@ function HomeD(props) {
     <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
     <Ad />
 
- {
-  isEmpty
-   ?
-  <ListEmptyComponent text={"Doktor Bulunmamakta"} /> 
-  :
+ 
 <FlatList
     data={users}
-    ListEmptyComponent={<ListEmptyComponent text={"Doktor Bulunmamakta"}/>}
-    contentContainerStyle={{flex:1}}
+    ListEmptyComponent={<ListEmptyComponent text={"Doktor Bulunmamakta"} refreshing={refreshing}/>}
+    contentContainerStyle={{flexGrow:1}}
+    refreshing = {refreshing}
+    onRefresh={() => {
+      setRefresh(!refresh)
+      setRefreshing(true)
+    }
+    }
     renderItem={(element) => (
        
-      <> 
-      {
-
-        (!(element.item.key == myId)) &&
+      <View> 
         <TouchableOpacity onPress={() =>navigation.navigate("MoreDoctorInfo", {doctorId: element.item.key})}>
    <View style={styles.cont}>
    <View style={styles.card}>
 
      <View style={styles.cardImage}>
-    
-     
      {
         element.item.avatar == "" ?
         <Avatar
@@ -111,7 +117,7 @@ activeOpacity={0.7}
  </Text>
  <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
  <Icon name="stethoscope" size={22} color="#B71C1C"  /> 
-     &nbsp;&nbsp;{element.item.Alan}
+     &nbsp;&nbsp;{element.item.brans}
  
  </Text>
  <Text style={{color:"black", fontSize:19, paddingStart:5}}>
@@ -136,17 +142,9 @@ activeOpacity={0.7}
 
    </View>
    </TouchableOpacity>
-      
-    }
-     
-   
-    </>
+    </View>
        )}
        />
- }
-    
-    
-
 </View>
 
                 
