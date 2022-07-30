@@ -13,8 +13,8 @@ const CreateAccountSucces = ({isCreateAccount}) => {
     //   animationIn="fadeInRight"
     animationIn="fadeIn"
     animationOut="fadeOut"
-    animationInTiming={600}
-    animationOutTiming={600}
+    animationInTiming={300}
+    //animationOutTiming={0}
     >
       <View style={{flex:1,alignItems:"center", justifyContent:"flex-start"}}>
           <View style={{width: '85%', backgroundColor: '#f5f5f5', borderRadius:8, justifyContent:"flex-start",alignItems:"center", padding:20, flexDirection:"row", shadowColor: "#000",

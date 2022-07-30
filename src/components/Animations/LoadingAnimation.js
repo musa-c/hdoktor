@@ -11,6 +11,8 @@ const LoadingAnimation = ({isLoading}) => {
     style={{ justifyContent:"flex-start"}}
   animationIn="fadeIn"
   animationOut="fadeOut"
+  animationInTiming={0}
+  animationOutTiming={300}
     >
       <View style={{flex:1,alignItems:"center", justifyContent:"flex-start", }}>
             <AnimatedLottieView source={require("../../rec/Animations/loading.json")} autoPlay={true}  />
