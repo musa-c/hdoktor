@@ -5,11 +5,18 @@ import IconFeather from 'react-native-vector-icons/Feather';
 import Header from '../../../components/Header/Header';
 
 import { useNavigation } from '@react-navigation/native';
+import ListEmptyComponent from '../../../components/ListEmptyComponent';
+import Icon from 'react-native-vector-icons/FontAwesome';
+
 
 const MyDoctor = ({route}) => {
     const [DrUsers, setDrUsers] = useState([]);
+    const [refresh, setRefresh] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+
     useEffect(()=>{
         let unmounted = false;
+        setRefreshing(true)
         firebase.auth().onAuthStateChanged((user)=>{
             if (user) {
                 // alert("Null Değilim")
@@ -23,6 +30,7 @@ const MyDoctor = ({route}) => {
                     })
                     if (!unmounted) {
                         setDrUsers(DrUsers);
+                        setRefreshing(false)
                     }
       
                     
@@ -37,7 +45,7 @@ const MyDoctor = ({route}) => {
             unmounted = true;
           };
   
-      }, []);
+      }, [refresh]);
 
 
       const navigation = useNavigation();
@@ -51,24 +59,39 @@ const MyDoctor = ({route}) => {
             <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
             <FlatList 
             data = {DrUsers}
-            renderItem = {(element)=>
+            refreshing={refreshing}
+            contentContainerStyle={{flexGrow:1}}
+            onRefresh={()=>{
+                setRefresh(!refresh)
+                setRefreshing(true)
+            }}
+            ListEmptyComponent={<ListEmptyComponent text=" Randevulu doktorunuz bulunmamakta." refreshing={refreshing} />}
+            renderItem = {element=>
                 // console.log(element)
                 (
-                
                <View style={{flex:1, backgroundColor:"#fff"}}>        
-               <View style={styles.DenemeCont}>
+               <View style={styles.cont}>
                <View style={styles.card}>
                    <View style={styles.cardImage}>
                    <Image style={styles.imageStyle}
                        source={{uri: element.item?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"}}></Image>
                    </View>
                    <View style={styles.CardInfo}>
-                   <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold",}}>
+                   <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold"}}>
                       {element.item.name}
                    </Text>
-                   <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
-                      {element.item.email}
+                   <Text style={{color:"black", fontSize:19, paddingStart:5, marginBottom:5}}>
+                  <Icon name="stethoscope" size={22} color="#B71C1C"  /> 
+                     &nbsp;&nbsp;{element.item.alan}
                    </Text>
+
+                   <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
+                  <Icon name="h-square" size={22} color="#B71C1C"  /> 
+                     &nbsp;&nbsp;{element.item.calisilanYer}
+                   </Text>
+
+
+
                    </View>
                    <View style={styles.cardIcon}>
                        <TouchableOpacity>
@@ -177,7 +200,7 @@ const styles = StyleSheet.create({
           },
       
       
-          DenemeCont:{
+          cont:{
               flex:1,
               // justifyContent:"flex-start", // varsayılan(flex-direction: column) olarak dikey hizalama
               // alignItems:"center", // varsayılan olarak yatay hizalama 
@@ -186,7 +209,7 @@ const styles = StyleSheet.create({
            flexDirection:"row",
            marginTop:10,
            backgroundColor:"#fff",
-        
+           paddingVertical:10,
            marginVertical:7,
            borderRadius: 10,
            shadowColor: "#000",

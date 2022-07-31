@@ -1,28 +1,27 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, TextInput, } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, TextInput, Alert, } from 'react-native'
 import firebase from "firebase/compat/app";
 import Header from "../../../components/Header/Header";
 import IconFeather from 'react-native-vector-icons/Feather';
 import Modal from "react-native-modal";
 import {Ionicons} from "@expo/vector-icons"
+import ListEmptyComponent from "../../../components/ListEmptyComponent"
+import { Button } from 'react-native-paper';
 
 
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
 
 const MyPatients = (props) => {
-
-    
-//     LogBox.ignoreLogs(([
-//     'VirtualizedLists should never be nested', // TODO: Remove when fixed
-//   ]))
-
     const navigation = useNavigation();
-
     const [users, setUsers] = useState([]);
+    const [refresh, setRefresh] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+  
   
     useEffect(()=>{
         let unmounted = false;
+        setRefreshing(true)
         firebase.auth().onAuthStateChanged((doctor)=>{
             if(doctor){
                 firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").collection("Hastalarım").onSnapshot((querySnapshot)=>{
@@ -36,6 +35,7 @@ const MyPatients = (props) => {
                     })
                     if (!unmounted) {
                         setUsers(users);
+                        setRefreshing(false)
                     }
                     
                   })
@@ -45,7 +45,7 @@ const MyPatients = (props) => {
             unmounted = true;
           };
   
-      }, []);
+      }, [refresh]);
 
 
     //   console.log(users)
@@ -84,20 +84,26 @@ const MyPatients = (props) => {
         })
             // console.log("note:", note);
     }
-    
+    const [loading, setLoading] = useState(false)
     const setNotes = (id) =>{
         if(change == true) {
+            setLoading(true)
+            // !(/^\s*$/.test(changenote))
+            // sadece boşluk olup olmadığı kontrol edildi regexte.
             firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(id).set({
                 note: changenote
             }, {merge:true}).then(()=>{
                 setModalVisible(!isModalVisible)
                 setChange(false)
+                setLoading(false)
+            }).catch(()=>{
+                Alert.alert("Hata❗", "Lütfen tekrar deneyiniz.", [{text:"Tamam", style:"cancel"}])
+                setLoading(false)
             })
         }else{
             setModalVisible(!isModalVisible)
         }
     }
-    // console.log(hastaId);
 
     const [isModalVisible, setModalVisible] = useState(false);
 
@@ -120,8 +126,8 @@ const MyPatients = (props) => {
               // onSwipeComplete = {() => setModalVisible(false)}
               
                 >
-                  <View style={{backgroundColor:"#fff", borderRadius:15, width: Dimensions.get("screen").width/1.1}}>            
-                      <Ionicons name="close-outline" color="grey" size={30} onPress={toggleModal} style={{alignSelf:"flex-end", marginRight:10, marginTop:5}}/>
+                  <View style={{backgroundColor:"#fff", borderRadius:15, width: Dimensions.get("screen").width/1.1}}>     
+                      <Ionicons name="close-outline" color="grey" size={30} onPress={()=> {toggleModal(), setchangeNote(note)}} style={{alignSelf:"flex-end", marginRight:10, marginTop:5}}/>
                      <Text style={{fontSize:30, position:"absolute", fontWeight:"700", marginLeft:10, marginTop:5}}>Notlarım</Text>
                   
                   <View style={{marginHorizontal:10, marginBottom:10,minHeight:200}}>
@@ -130,17 +136,26 @@ const MyPatients = (props) => {
                  style={{fontSize:18, paddingVertical:10, flex:1}}
                  multiline
                  textAlignVertical='top'
+                 //maxLength={500}
               //    value={note}
                  defaultValue={note}
                 //  value={changenote}
                  numberOfLines={10}
-                 keyboardAppearance="dark"
                  keyboardType='default'
                  onChangeText={(text) => {
                         setchangeNote(text)
                         setChange(true)
                     }}
                  />
+                 </View>
+                 <View style={{alignItems:"center", marginVertical:20}}>
+                 <Button
+                 mode="contained"
+                 loading = {loading}
+                 onPress = {() => setNotes(hastaId)}
+                 disabled = {loading}
+                 style={{borderRadius:20, padding:5, backgroundColor:"#B71C1C"}}
+                 >KAYDET</Button>
                  </View>
                   </View>
                 </Modal>
@@ -150,8 +165,14 @@ const MyPatients = (props) => {
                  {/* <ScrollView> */}
                  <FlatList 
                  data = {users}
-    //              ListHeaderComponent={ContentThatGoesAboveTheFlatList}
-    //   ListFooterComponent={ContentThatGoesBelowTheFlatList}
+                contentContainerStyle={{flexGrow:1}}
+                 onRefresh={() => {
+                    setRefresh(!refresh)
+                    setRefreshing(true)
+                  }
+                  }
+                 refreshing = {refreshing}
+                 ListEmptyComponent={<ListEmptyComponent text = "Hastanız bulunmamakta." refreshing={refreshing} />}
                  renderItem = {(element)=> 
                     (  
                  
@@ -170,16 +191,16 @@ const MyPatients = (props) => {
                         </View>
                         <View style={styles.CardInfo}>
                         <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold",}}>
-                            Name: {element.item.name}
+                            {element.item.name}
                         </Text>
                         {/* <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
                            Cinsiyet: {element.item.cinsiyet}
                         </Text> */}
                           <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
-                           Randevu Tarihi/Saati 
+                           Randevu Tarihi / Saati 
                         </Text>
                         <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
-                          {element.item.RandevuTarih}, {element.item.RandevuSaat}
+                          {element.item.RandevuTarih} / {element.item.RandevuSaat}
                         </Text>
 
                         {/* <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
