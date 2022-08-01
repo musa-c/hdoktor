@@ -71,7 +71,7 @@ function HomeD(props) {
  
 <FlatList
     data={users}
-    ListEmptyComponent={<ListEmptyComponent text={"Doktor Bulunmamakta"} refreshing={refreshing}/>}
+    ListEmptyComponent={<ListEmptyComponent text={"Doktor Bulunmamakta."} refreshing={refreshing}/>}
     contentContainerStyle={{flexGrow:1}}
     refreshing = {refreshing}
     onRefresh={() => {
