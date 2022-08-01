@@ -9,6 +9,8 @@ import { Avatar } from "react-native-elements";
 
 import moment from "moment";
 import trLocale from "moment/locale/tr"
+import ListEmptyComponent from '../../../components/ListEmptyComponent';
+import LoadingButton from '../../../components/Buttons/LoadingButton';
 
 const PatientConfirmation = ({navigation}) => {
 
@@ -21,11 +23,18 @@ const PatientConfirmation = ({navigation}) => {
     const [DIletisimSaat1, setIletisimSaat1] = useState("");
     const [DIletisimSaat2, setIletisimSaat2] = useState("");
     const [DAvatar, setD_Avatar] = useState("");
+    const [refresh, setRefresh] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+    const [loadingPlus, setLoadingPlus] = useState(false)
+    const [loadingMinus, setloadingMinus] = useState(false)
+
+
 
     useEffect(()=>{
         let unmounted = false;
-        firebase.auth().onAuthStateChanged((doctor)=>{
-            if (doctor) {
+        setRefreshing(true)
+      firebase.auth().onAuthStateChanged((doctor)=>{
+            if  (doctor) {
                 firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").collection("GorusmeTalep").onSnapshot((querySnapshot)=>{
                     const users = [];
                     querySnapshot.forEach(documentSnapshot =>{
@@ -34,14 +43,16 @@ const PatientConfirmation = ({navigation}) => {
                         key: documentSnapshot.id,
                       })
                     })
+                    
                     if (!unmounted) {
                         SetUsers(users);
+                        setRefreshing(false)
                     }
                     
                   })
 
+                firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").onSnapshot((snapshot)=>{
                   if (!unmounted) {
-                    firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").onSnapshot((snapshot)=>{
                       setD_Name(snapshot.data()?.name ?? "");
                       setD_Email(snapshot.data()?.email ?? "");
                       setD_Id(snapshot.data()?.Id ?? "");
@@ -49,40 +60,67 @@ const PatientConfirmation = ({navigation}) => {
                       setCalisilanYer(snapshot.data()?.CalisilanYer ?? "");
                       setIletisimSaat1(snapshot.data()?.time1 ?? "");
                       setIletisimSaat2(snapshot.data()?.time2 ?? "");
-                      setD_Avatar(snapshot.data()?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea")
-                      
-                  })
+                      setD_Avatar(snapshot.data()?.avatar ?? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea")        
               }
+            })
 
-            }
-                
-                  
+
+            }                     
          
         })
         return () => {
             unmounted = true;
           };
   
-      }, []);
-
+      }, [refresh]);
 
     
     const HastaKabul =  (name, cinsiyet, KHastalik, DocumentId, H_ID, email, RandevuSaat, RandevuTarih, Havatar) => {
+        setLoadingPlus(true)
+        firebase.firestore().collection("H_user").doc(H_ID).collection("Doktorlarım").where("Id", "==", DId).get().then((snapshot)=>{
+            console.log(snapshot.empty)
+            if  (snapshot.empty){
+                // doc yoksa
+                
+             firebase.firestore().collection("H_user").doc(H_ID).collection("Doktorlarım").add({
+                    name: DName,
+                    email: DEmail,
+                    brans: DAlan,
+                   // RandevuTarih: [RandevuTarih, RandevuSaat],
+                   // RandevuSaat: [RandevuSaat],
+                    calisilanYer: DCalisilanYer,
+                    iletisimSaat1: DIletisimSaat1,
+                    iletisimSaat2: DIletisimSaat2,
+                    Id: DId,
+            }).then((docRef)=>{
+              //  console.log(docRef.id)
+            firebase.firestore().collection("H_user").doc(H_ID).collection("Doktorlarım").doc(docRef.id).collection("RandevuTarih").add({
+                RandevuSaat: RandevuSaat,
+                RandevuTarih: RandevuTarih
+            }).catch(()=>{
+                console.log("hata")
+            })
 
-
-        firebase.firestore().collection("H_user").doc(H_ID).collection("Doktorlarım").doc().set({
-                name: DName,
-                email: DEmail,
-                alan: DAlan,
-                calisilanYer: DCalisilanYer,
-                iletisimSaat1: DIletisimSaat1,
-                iletisimSaat2: DIletisimSaat2,
-                Id: DId,
+            })
+            }else{
+                // doc varsa
+        
+                    snapshot.forEach((querySnapshot)=>{
+                        firebase.firestore().collection("H_user").doc(H_ID).collection("Doktorlarım").doc(querySnapshot.id).collection("RandevuTarih").add({
+                         //   RandevuTarih: firebase.firestore.FieldValue.arrayUnion(RandevuTarih, RandevuSaat),
+                         //   RandevuSaat: firebase.firestore.FieldValue.arrayUnion(RandevuSaat),
+                            RandevuTarih:RandevuTarih,
+                            RandevuSaat:RandevuSaat
+                        })
+                    })
+            
+            }
         })
+      
 
     var now = new Date();
 
-        firebase.firestore().collection("H_user").doc(H_ID).collection("Bildirimlerim").doc().set({
+        firebase.firestore().collection("H_user").doc(H_ID).collection("Bildirimlerim").add({
             Doktor: DName,
             RandevuTarih: RandevuTarih,
             RandevuSaat: RandevuSaat,
@@ -91,29 +129,67 @@ const PatientConfirmation = ({navigation}) => {
         })
 
         var user = firebase.auth().currentUser;
-                    firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc().set({
-                            name: name,
-                            cinsiyet:cinsiyet,
-                            // KHastalik:KHastalik,
-                            Id: H_ID,
-                            email: email,
-                            RandevuSaat: RandevuSaat,
-                            RandevuTarih: RandevuTarih,
-                            avatar: Havatar
+        firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").where("Id", "==",  H_ID).get().then((snapshot)=>{
+            console.log(snapshot.empty)
+            if(snapshot.empty){
+                // doc yoksa
+                    firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").add({
+                        name: name,
+                        cinsiyet:cinsiyet,
+                        // KHastalik:KHastalik,
+                        Id: H_ID,
+                        email: email,
+                       // RandevuSaat: [RandevuSaat],
+                      //  RandevuTarih: [RandevuTarih, RandevuSaat],
+                        avatar: Havatar
+                }).then((docRef)=>{
+                    firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(docRef.id).collection("RandevuTarih").add({
+                        RandevuTarih: RandevuTarih,
+                        RandevuSaat: RandevuSaat
                     })
 
-                    firebase.firestore().collection("Chats").doc().set({
+                }).catch(()=>{
+                    console.log("HATA")
+                })
+            } else{
+                // doc varsa
+                if(!snapshot.empty){
+                    snapshot.forEach((querySnapshot)=>{
+                        firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(querySnapshot.id).collection("RandevuTarih").add({
+                            RandevuTarih: RandevuTarih,
+                            RandevuSaat: RandevuSaat
+                        })
+                    })
+                }
+             
+            }
+        })
+
+                 
+            // firebase.firestore().collection("Chats").where("users", "array-contains")
+            // VAR İSE CHAT'E EKLEME!
+            firebase.firestore().collection("Chats").where("users", "in", [[email, DEmail]]).get().then((snapshot)=>{
+             //   console.log(snapshot.empty)
+               console.log("chat:", snapshot.empty)
+                if(snapshot.empty){
+                    // doc yoksa
+                    firebase.firestore().collection("Chats").add({
                         users: [email, DEmail],
                         names: [name, DName],
                         messages: [],
                         avatar: [Havatar, DAvatar]
                         
                     }) 
+                } 
+            })
+
+            setLoadingPlus(false)
                     firebase.firestore().collection("D_user").doc(user?.uid ?? "").collection("GorusmeTalep").doc(DocumentId).delete();
             
         }
 
         const HastaRed = (DocumentId) => {
+            setloadingMinus(true)
             firebase.auth().onAuthStateChanged((doctor)=>{
                 if (doctor) {
                     firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").collection("GorusmeTalep").doc(DocumentId).delete();
@@ -127,6 +203,8 @@ const PatientConfirmation = ({navigation}) => {
                     })
                 }
             })
+            setloadingMinus(false)
+
         }
 
     return (
@@ -134,6 +212,13 @@ const PatientConfirmation = ({navigation}) => {
                  <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
                  <FlatList 
                  data = {users}
+                 refreshing={refreshing}
+                 contentContainerStyle={{flexGrow:1}}
+                 onRefresh={()=>{
+                    setRefresh(!refresh)
+                    setRefreshing(true)
+                 }}
+                 ListEmptyComponent={<ListEmptyComponent text="Randevu Talebi bulunmamakta." refreshing={refreshing}/> }
                  renderItem = {(element)=>(
                     <View style={{flex:1, backgroundColor:"#fff"}}>        
                     <View style={styles.DenemeCont}>
@@ -160,26 +245,27 @@ const PatientConfirmation = ({navigation}) => {
                         {/* <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
                            Cinsiyet: {element.item.cinsiyet}
                         </Text> */}
-                        <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
-                        {/* <Icon name="h-square" size={22} color="#B71C1C"  /> */}
-                           Kronik Hastalık: {element.item.KHastalik}
-                           {/* Kronik Hastalık: &nbsp;&nbsp; {element.item.GorusmeTalep.id} */}
-                        </Text>
+                        {
+                         element.item.KHastalik != "" &&    
+                         <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
+                         {/* <Icon name="h-square" size={22} color="#B71C1C"  /> */}
+                           Kronik Hastalık: &nbsp;&nbsp; {element.item.KHastalik}
+                            {/* Kronik Hastalık: &nbsp;&nbsp; {element.item.GorusmeTalep.id} */}
+                         </Text>
+                        }
+                       
 
                         <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
                            Randevu Tarih/Saat <Text> </Text>
                         </Text>
                         <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
                         {element.item.RandevuTarih}, {element.item.RandevuSaat}
-                        </Text>
-
-                      
+                        </Text>                      
 
                         </View>
                         <View style={styles.cardIcon}>
-                            <TouchableOpacity 
-                            onPress={()=> 
-                            HastaKabul(
+                           <LoadingButton 
+                           onPress={()=> HastaKabul(
                                 element.item.name, 
                                 element.item.cinsiyet, 
                                 element.item.KHastalik,
@@ -189,13 +275,15 @@ const PatientConfirmation = ({navigation}) => {
                                 element.item.RandevuSaat,
                                 element.item.RandevuTarih,
                                 element.item.avatar
-
-                                        )}>
-                           <IconFeather name="plus" size={25} color="#B71C1C" /> 
-                           </TouchableOpacity>
-                           <TouchableOpacity>
-                            <IconFeather name="minus" size={25} color="#B71C1C" onPress={()=> HastaRed(element.item.key)}/> 
-                            </TouchableOpacity>
+                           )}
+                           icon="plus-box"
+                           loading={loadingPlus}
+                           /> 
+                            <LoadingButton 
+                            icon ="minus-box" 
+                            onPress={()=>  
+                            HastaRed(element.item.key)} 
+                            loading={loadingMinus}/>
                         </View>
                    </View>
                     </View>
@@ -296,6 +384,8 @@ const styles = StyleSheet.create({
          flexDirection:"row",
          marginTop:10,
          backgroundColor:"#fff",
+         paddingVertical:20,
+         paddingHorizontal:5,
       
          marginVertical:7,
          borderRadius: 10,
@@ -325,7 +415,7 @@ const styles = StyleSheet.create({
         CardInfo:{
             flex:7,
             // backgroundColor:"black",
-            padding:5
+            padding:10
         },
         cardIcon:{
             flex:1.5,
