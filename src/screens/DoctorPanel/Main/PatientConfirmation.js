@@ -96,7 +96,8 @@ const PatientConfirmation = ({navigation}) => {
               //  console.log(docRef.id)
             firebase.firestore().collection("H_user").doc(H_ID).collection("Doktorlarım").doc(docRef.id).collection("RandevuTarih").add({
                 RandevuSaat: RandevuSaat,
-                RandevuTarih: RandevuTarih
+                RandevuTarih: RandevuTarih,
+                Id: DId
             }).catch(()=>{
                 console.log("hata")
             })
@@ -110,7 +111,8 @@ const PatientConfirmation = ({navigation}) => {
                          //   RandevuTarih: firebase.firestore.FieldValue.arrayUnion(RandevuTarih, RandevuSaat),
                          //   RandevuSaat: firebase.firestore.FieldValue.arrayUnion(RandevuSaat),
                             RandevuTarih:RandevuTarih,
-                            RandevuSaat:RandevuSaat
+                            RandevuSaat:RandevuSaat,
+                            Id: DId
                         })
                     })
             
@@ -139,11 +141,13 @@ const PatientConfirmation = ({navigation}) => {
                         // KHastalik:KHastalik,
                         Id: H_ID,
                         email: email,
-                       // RandevuSaat: [RandevuSaat],
-                      //  RandevuTarih: [RandevuTarih, RandevuSaat],
+                        randevuCount:1,
+                        RandevuSaat: RandevuSaat,
+                        RandevuTarih: RandevuTarih,
                         avatar: Havatar
                 }).then((docRef)=>{
                     firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(docRef.id).collection("RandevuTarih").add({
+                        Id: H_ID,
                         RandevuTarih: RandevuTarih,
                         RandevuSaat: RandevuSaat
                     })
@@ -157,7 +161,12 @@ const PatientConfirmation = ({navigation}) => {
                     snapshot.forEach((querySnapshot)=>{
                         firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(querySnapshot.id).collection("RandevuTarih").add({
                             RandevuTarih: RandevuTarih,
-                            RandevuSaat: RandevuSaat
+                            RandevuSaat: RandevuSaat,
+                            Id: H_ID,
+                        }).then(()=>{
+                           firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(querySnapshot.id).collection("RandevuTarih").onSnapshot((query)=>{
+                            firebase.firestore().collection("D_user").doc(user.uid).collection("Hastalarım").doc(querySnapshot.id).update({randevuCount: query.docs.length})
+                           })
                         })
                     })
                 }
