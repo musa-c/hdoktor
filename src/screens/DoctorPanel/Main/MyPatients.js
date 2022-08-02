@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, TextInput, Alert, } from 'react-native'
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Dimensions, TextInput, Alert, Pressable, } from 'react-native'
 import firebase from "firebase/compat/app";
 import Header from "../../../components/Header/Header";
 import IconFeather from 'react-native-vector-icons/Feather';
@@ -11,13 +11,15 @@ import { Button } from 'react-native-paper';
 
 import { useNavigation } from '@react-navigation/native';
 import { Avatar } from 'react-native-elements';
+import ModalCard from '../../../components/ModalCard';
+import LoadingButton from '../../../components/Buttons/LoadingButton';
 
 const MyPatients = (props) => {
     const navigation = useNavigation();
     const [users, setUsers] = useState([]);
     const [refresh, setRefresh] = useState(false);
     const [refreshing, setRefreshing] = useState(false);
-  
+    const [RandevuDate, setRandevuDate] = useState([]);
   
     useEffect(()=>{
         let unmounted = false;
@@ -26,17 +28,29 @@ const MyPatients = (props) => {
             if(doctor){
                 firebase.firestore().collection("D_user").doc(doctor?.uid ?? "").collection("Hastalarım").onSnapshot((querySnapshot)=>{
                     const users = [];
+                    const RandevuDate = [];
                     querySnapshot.forEach(documentSnapshot =>{
                       users.push({
                         ...documentSnapshot.data(),
                         key: documentSnapshot.id,
-                        
                       })
+
+                    
+                  firebase.firestore().collection("D_user").doc(doctor.uid).collection("Hastalarım").doc(documentSnapshot.id).collection("RandevuTarih").onSnapshot((snapshot)=>{   
+                    snapshot.forEach((docSnapshot)=>{
+                        RandevuDate.push({...docSnapshot.data()})
+                    })
+                  })
+                  // Tüm hastların ranveutarihlerini çektiğimiz içi n id ile hasta id'yi match'lememiz gerekiyor.
+                  
+                 
                     })
                     if (!unmounted) {
                         setUsers(users);
+                        setRandevuDate(RandevuDate);
                         setRefreshing(false)
                     }
+
                     
                   })
             }
@@ -47,10 +61,10 @@ const MyPatients = (props) => {
   
       }, [refresh]);
 
-
     //   console.log(users)
+//console.log(users)
 
-      
+
 
       const user = firebase.auth().currentUser;
  
@@ -74,6 +88,7 @@ const MyPatients = (props) => {
     const [hastaId, setHastaId] = useState();
     const [changenote, setchangeNote] = useState("");
     const [change, setChange] = useState(false);
+
 
     const getNotes = (id) => {
         setHastaId(id);
@@ -110,8 +125,12 @@ const MyPatients = (props) => {
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
       };
-     
+
     
+                const [modalCardVisible, setmodalCardVisible] = useState(false)
+                const [Hid,setHid] = useState("")
+                const [huserName,sethuserName] = useState("")
+
     return (
         <View style={styles.ViewStyle}>
             
@@ -159,6 +178,7 @@ const MyPatients = (props) => {
                  </View>
                   </View>
                 </Modal>
+
                             {/* --- Modal --- */}
 
                  <Header onPressChats={()=> navigation.navigate("ChatsScreen", {screen:"Chats"})} onPressNotifications={()=> navigation.navigate("Notifications")}/>
@@ -176,8 +196,24 @@ const MyPatients = (props) => {
                  renderItem = {(element)=> 
                     (  
                  
-                    <View style={{flex:1, backgroundColor:"#fff"}}>      
-                      
+                        
+
+                    <View style={{flex:1, backgroundColor:"#fff"}}>    
+     
+<ModalCard 
+                            isVisible={modalCardVisible}
+                             onBackdropPress={()=> setmodalCardVisible(false)}
+                             Hid = {Hid}
+                             RandevuDate = {RandevuDate}
+                             huserName = {huserName}
+                             />
+
+            {
+                
+
+            }
+  
+
                     <View style={styles.DenemeCont}>
                     <View style={styles.card}>
                         <View style={styles.cardImage}>
@@ -193,42 +229,80 @@ const MyPatients = (props) => {
                         <Text style={{color:"black", fontSize:17, paddingStart:5, fontWeight:"bold",}}>
                             {element.item.name}
                         </Text>
+                        
+                        
+
                         {/* <Text style={{color:"black", fontSize:19, paddingStart:5,}}>
                            Cinsiyet: {element.item.cinsiyet}
                         </Text> */}
-                          <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
-                           Randevu Tarihi / Saati 
-                        </Text>
-                        <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
-                          {element.item.RandevuTarih} / {element.item.RandevuSaat}
-                        </Text>
+                        {
+                            element.item.randevuCount == 1 
+                            ?
+                            <View>
+                                <Text>{element.item.RandevuSaat}</Text>
+                                <Text>{element.item.RandevuTarih}</Text>
+                            </View>
 
-                        {/* <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
-                           Kronik Hastalık: &nbsp;&nbsp; {element.item.KHastalik}
-                        </Text> */}
+                        :
+                        <Pressable onPress={()=> {
+                            setHid(element.item.Id)
+                            sethuserName(element.item.name)
+                            setmodalCardVisible(true)
+                        } 
+                             
+                        }>
+
+          
+                        <View style={{backgroundColor:"red"}}>
+                      <Text style={{color:"black", fontSize:19, paddingStart:5, marginTop:5}}>
+                       Randevu Tarihihleri için tıkla
+                    </Text>
+                    </View>
+                    </Pressable>
+                        
+                        }
+                     
+                       
+                        
+
+
+                        
+
+
                         
 
                      
                         </View>
                         <View style={styles.cardIcon}>
-                            <TouchableOpacity>
+
+                            {/* <TouchableOpacity>
                            <IconFeather name="mail" size={35} color="#B71C1C" onPress={()=>
-                           ChatId(element.item.email)
-                        }
-                          /> 
-                           </TouchableOpacity>
-                           <TouchableOpacity onPress={()=> getNotes(element.item.key)}>
+                           ChatId(element.item.email)}/> 
+                           </TouchableOpacity> */}
+
+                            <LoadingButton icon={"message-outline"}  onPress={()=> ChatId(element.item.email)}/>
+
+
+                           {/* <TouchableOpacity onPress={()=> getNotes(element.item.key)}>
                             <IconFeather name="edit-2" size={35} color="#B71C1C" /> 
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
+                            
+                            <LoadingButton icon={"pencil-box-outline"}  onPress={()=> getNotes(element.item.key)}/>
+
+
+                           
+                            <LoadingButton icon={"minus-box-outline"}  />
+
+                           
             
         
                         </View>
                             
                    </View>
+
                     </View>
 
         
-                    
                 </View>
             
                  )}
