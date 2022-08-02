@@ -11,10 +11,11 @@ const LoadingButton = ({icon ,loading, onPress, text}) => {
                  mode="text"
                  loading = {loading}
                  onPress = {onPress}
-                 contentStyle={{height:40}}
+                 contentStyle = {{justifyContent:"center", alignItems:"center", marginVertical:2}}
                  icon = {icon}
+                 color = {"white"}
                  disabled = {loading}
-                 labelStyle={{fontSize:45, color:"#B71C1C"}}
+                 labelStyle={{fontSize:40, color:"#B71C1C", alignItems:"baseline"}}
                  >{text}</Button>
     </View>
   )
