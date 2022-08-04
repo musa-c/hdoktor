@@ -2,13 +2,13 @@ import { View, Text, Dimensions, ScrollView, FlatList } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import Modal from "react-native-modal";
 
-const ModalCard = ({isVisible, onBackdropPress, Hid, RandevuDate}) => {
+const ModalCard = ({isVisible, onBackdropPress, id, RandevuDate, username}) => {
 const [randevu, setRandevu] = useState([]);
 useEffect(()=>{
   let unmounted = false;
   const randevu = []
   RandevuDate.map(element => {
-    if(element.Id == Hid){
+    if(element.Id == id){
       randevu.push(element)
     }
   });
@@ -43,6 +43,7 @@ useEffect(()=>{
     renderItem={(element) => 
     (
         <View style={{margin:10, alignItems:"center" }}>
+          <Text>{username}</Text>
                   <Text>Randevu Tarihi: {element.item.RandevuSaat}</Text>
                   <Text>Randevu Saati: {element.item.RandevuTarih}</Text>
         </View>
