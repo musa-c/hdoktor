@@ -10,14 +10,17 @@ import { useNavigation } from "@react-navigation/native";
 import ModalCard from "../../../components/ModalCard";
 import MyDoctorPatientsCard from "../../../components/Card/MyDoctorPatientsCard";
 import NoteModal from "../../../components/Modals/NoteModal";
+//import isModalVisibleSingle from "../../../components/Modals/isModalVisibleSingle";
 
 const MyPatients = (props) => {
+  // console.log("props:", props.isModalVisible);
   const navigation = useNavigation();
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [RandevuDate, setRandevuDate] = useState([]);
-
+  const [modalCardVisible, setmodalCardVisible] = useState();
+  console.log("modalCardVisible:", modalCardVisible);
   useEffect(() => {
     let unmounted = false;
     setRefreshing(true);
@@ -26,31 +29,33 @@ const MyPatients = (props) => {
         firebase
           .firestore()
           .collection("D_user")
-          .doc(doctor?.uid ?? "")
+          .doc(doctor.uid)
           .collection("Hastalarım")
           .onSnapshot((querySnapshot) => {
             const users = [];
             const RandevuDate = [];
-            querySnapshot.forEach((documentSnapshot) => {
-              users.push({
-                ...documentSnapshot.data(),
-                key: documentSnapshot.id,
-              });
-
-              firebase
-                .firestore()
-                .collection("D_user")
-                .doc(doctor.uid)
-                .collection("Hastalarım")
-                .doc(documentSnapshot.id)
-                .collection("RandevuTarih")
-                .onSnapshot((snapshot) => {
-                  snapshot.forEach((docSnapshot) => {
-                    RandevuDate.push({ ...docSnapshot.data() });
-                  });
+            if (!querySnapshot.empty) {
+              querySnapshot.forEach((documentSnapshot) => {
+                users.push({
+                  ...documentSnapshot.data(),
+                  key: documentSnapshot.id,
                 });
-              // Tüm hastların ranveutarihlerini çektiğimiz içi n id ile hasta id'yi match'lememiz gerekiyor.
-            });
+
+                firebase
+                  .firestore()
+                  .collection("D_user")
+                  .doc(doctor.uid)
+                  .collection("Hastalarım")
+                  .doc(documentSnapshot.id)
+                  .collection("RandevuTarih")
+                  .onSnapshot((snapshot) => {
+                    snapshot.forEach((docSnapshot) => {
+                      RandevuDate.push({ ...docSnapshot.data() });
+                    });
+                  });
+                // Tüm hastların ranveutarihlerini çektiğimiz içi n id ile hasta id'yi match'lememiz gerekiyor.
+              });
+            }
             if (!unmounted) {
               setUsers(users);
               setRandevuDate(RandevuDate);
@@ -227,13 +232,12 @@ const MyPatients = (props) => {
     setModalVisible(!isModalVisible);
   };
 
-  const [modalCardVisible, setmodalCardVisible] = useState(false);
   const [Hid, setHid] = useState("");
   const [HDocId, setHDocId] = useState("");
   const [huserName, sethuserName] = useState("");
   const [HEmail, setHEmail] = useState("");
 
-  console.log(huserName);
+  // console.log(huserName);
 
   return (
     <View style={styles.ViewStyle}>
@@ -286,6 +290,7 @@ const MyPatients = (props) => {
               username={huserName}
               HDocId={HDocId}
               HEmail={HEmail}
+              onModalHide={() => setmodalCardVisible(false)}
             />
 
             <MyDoctorPatientsCard
@@ -302,11 +307,12 @@ const MyPatients = (props) => {
               RandevuSaat={element.item.RandevuSaat}
               RandevuTarih={element.item.RandevuTarih}
               onPressRandevuModal={() => {
+                console.log("bas");
                 setHid(element.item.Id);
                 sethuserName(element.item.name);
                 setHDocId(element.item.key);
                 setHEmail(element.item.email);
-                setmodalCardVisible(true);
+                setmodalCardVisible(!modalCardVisible);
               }}
               onPressChatId={() => ChatId(element.item.email)}
               onPressGetNotes={() => getNotes(element.item.key)}
