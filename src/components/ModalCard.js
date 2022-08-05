@@ -21,15 +21,15 @@ const ModalCard = ({
   username,
   HDocId,
   HEmail,
+  onModalHide,
 }) => {
-  //console.log(HDocId);
-  const [isVisibleModal, setIsVisibleModal] = useState(isVisible);
+  const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [randevu, setRandevu] = useState([]);
   const [refresh, setRefresh] = useState(false);
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
-      setIsVisibleModal(isVisible);
+      setIsVisibleModal(isVisible == undefined ? false : isVisible);
     }
     const randevu = [];
     RandevuDate.map((element) => {
@@ -48,8 +48,16 @@ const ModalCard = ({
   }, [isVisible, refresh]);
 
   const user = firebase.auth().currentUser;
+  const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+  const [RandevuSaat, setRandevuSaat] = useState();
+  const [RandevuTarih, setRandevuTarih] = useState();
 
-  const PatientRemove = (RandevuSaat, RandevuTarih) => {
+  const PatientRemove = async (RandevuSaat, RandevuTarih) => {
+    setRandevuSaat(RandevuSaat);
+    setRandevuTarih(RandevuTarih);
+    setDisabled(true);
+    setLoading(true);
     firebase
       .firestore()
       .collection("D_user")
@@ -72,206 +80,238 @@ const ModalCard = ({
                 .collection("Hastalarım")
                 .doc(HDocId)
                 .collection("RandevuTarih")
-                .onSnapshot((doc) => {
-                  if (doc.docs.length == 0) {
-                    doc.forEach((docdelete) => {
-                      docdelete.ref
-                        .delete()
-                        .then(() => {
-                          firebase
-                            .firestore()
-                            .collection("D_user")
-                            .doc(user.uid)
-                            .collection("Hastalarım")
-                            .doc(HDocId)
-                            .delete();
-                          firebase
-                            .firestore()
-                            .collection("H_user")
-                            .where("email", "==", HEmail)
-                            .onSnapshot((docsnap) => {
-                              docsnap.forEach((docsnap2) => {
-                                firebase
-                                  .firestore()
-                                  .collection("H_user")
-                                  .doc(docsnap2.id)
-                                  .collection("Doktorlarım")
-                                  .where("email", "==", user.email)
-                                  .get()
-                                  .then((snapfor) => {
-                                    snapfor.forEach((snapfordelete) => {
-                                      snapfordelete.ref
-                                        .delete()
-                                        .then(() => {
-                                          firebase
-                                            .firestore()
-                                            .collection("H_user")
-                                            .doc(docsnap2.id)
-                                            .collection("Doktorlarım")
-                                            .doc(snapfordelete.id)
-                                            .delete();
-
-                                          console.log("doktor silindi");
-                                        })
-                                        .catch(() => {
-                                          console.log("doktor silinemedi");
-                                        });
-                                    });
-                                  });
-                              });
-                            });
-                          setRefresh(!refresh);
-                          setIsVisibleModal(false);
-                          console.log("hasta silindi");
-                        })
-                        .catch(() => {
-                          console.log("hasta silinemedi");
-                        });
-                    });
-                  } else if (doc.docs.length == 1) {
-                    doc.forEach((singleDoc) => {
-                      firebase
-                        .firestore()
-                        .collection("D_user")
-                        .doc(user.uid)
-                        .collection("Hastalarım")
-                        .doc(HDocId)
-                        .update({
-                          RandevuSaat: singleDoc.data().RandevuSaat,
-                          RandevuTarih: singleDoc.data().RandevuTarih,
-                        })
-                        .then(() => {
-                          setRefresh(!refresh);
-                          console.log("başarılı update HASTALARIM");
-                        })
-                        .catch(() => {
-                          console.log("başarsızı update HASTALARIM");
-                        });
-                      firebase
-                        .firestore()
-                        .collection("H_user")
-                        .where("email", "==", HEmail)
-                        .get()
-                        .then((singledocWhere) => {
-                          singledocWhere.forEach((singledocFor) => {
-                            firebase
-                              .firestore()
-                              .collection("H_user")
-                              .doc(singledocFor.id)
-                              .collection("Doktorlarım")
-                              .where("email", "==", user.email)
-                              .get()
-                              .then((singledocWhere2) => {
-                                singledocWhere2.forEach((singledocFor2) => {
-                                  firebase
-                                    .firestore()
-                                    .collection("H_user")
-                                    .doc(singledocFor.id)
-                                    .collection("Doktorlarım")
-                                    .doc(singledocFor2.id)
-                                    .update({
-                                      RandevuSaat: singleDoc.data().RandevuSaat,
-                                      RandevuTarih:
-                                        singleDoc.data().RandevuTarih,
-                                    })
-                                    .then(() => {
-                                      console.log(
-                                        "başarılı DOKTORRLAIM Collection update"
-                                      );
-                                    })
-                                    .catch(() => {
-                                      console.log(
-                                        "başarısız DOKTORRLAIM Collection update"
-                                      );
-                                    });
-                                });
-                              });
-                          });
-                        });
-                    });
-                  }
-
+                .onSnapshot((docd) => {
                   firebase
                     .firestore()
                     .collection("D_user")
                     .doc(user.uid)
                     .collection("Hastalarım")
                     .doc(HDocId)
-                    .update({ randevuCount: doc.docs.length });
-                });
-
-              firebase
-                .firestore()
-                .collection("H_user")
-                .where("email", "==", HEmail)
-                .get()
-                .then((query) => {
-                  query.forEach((snapQuery) => {
-                    firebase
-                      .firestore()
-                      .collection("H_user")
-                      .doc(snapQuery.id)
-                      .collection("Doktorlarım")
-                      .where("email", "==", user.email)
-                      .get()
-                      .then((query2) => {
-                        query2.forEach((snapQuery2) => {
-                          firebase
-                            .firestore()
-                            .collection("H_user")
-                            .doc(snapQuery.id)
-                            .collection("Doktorlarım")
-                            .doc(snapQuery2.id)
-                            .collection("RandevuTarih")
-                            .where("RandevuSaat", "==", RandevuSaat)
-                            .where("RandevuTarih", "==", RandevuTarih)
-                            .get()
-                            .then((snapshot2) => {
-                              snapshot2.forEach((doc2) => {
-                                doc2.ref
-                                  .delete()
-                                  .then(() => {
-                                    console.log(
-                                      "doktor başarılı randevu silindi"
-                                    );
-                                    firebase
-                                      .firestore()
-                                      .collection("H_user")
-                                      .doc(snapQuery.id)
-                                      .collection("Doktorlarım")
-                                      .doc(snapQuery2.id)
-                                      .collection("RandevuTarih")
-                                      .onSnapshot((doc3) => {
+                    .update({ randevuCount: docd.docs.length });
+                  firebase
+                    .firestore()
+                    .collection("H_user")
+                    .where("email", "==", HEmail)
+                    .get()
+                    .then((query) => {
+                      query.forEach((snapQuery) => {
+                        firebase
+                          .firestore()
+                          .collection("H_user")
+                          .doc(snapQuery.id)
+                          .collection("Doktorlarım")
+                          .where("email", "==", user.email)
+                          .get()
+                          .then((query2) => {
+                            query2.forEach((snapQuery2) => {
+                              firebase
+                                .firestore()
+                                .collection("H_user")
+                                .doc(snapQuery.id)
+                                .collection("Doktorlarım")
+                                .doc(snapQuery2.id)
+                                .collection("RandevuTarih")
+                                .where("RandevuSaat", "==", RandevuSaat)
+                                .where("RandevuTarih", "==", RandevuTarih)
+                                .get()
+                                .then((snapshot2) => {
+                                  snapshot2.forEach((doc2) => {
+                                    doc2.ref
+                                      .delete()
+                                      .then(() => {
+                                        console.log(
+                                          "doktor başarılı randevu silindi"
+                                        );
                                         firebase
                                           .firestore()
                                           .collection("H_user")
                                           .doc(snapQuery.id)
                                           .collection("Doktorlarım")
                                           .doc(snapQuery2.id)
-                                          .update({
-                                            randevuCount: doc3.docs.length,
+                                          .collection("RandevuTarih")
+                                          .onSnapshot((doc3) => {
+                                            firebase
+                                              .firestore()
+                                              .collection("H_user")
+                                              .doc(snapQuery.id)
+                                              .collection("Doktorlarım")
+                                              .doc(snapQuery2.id)
+                                              .update({
+                                                randevuCount: doc3.docs.length,
+                                              });
                                           });
+                                        setLoading(false);
+                                        setDisabled(false);
+                                        if (docd.docs.length != 1) {
+                                          setRefresh(!refresh);
+                                        }
+                                      })
+                                      .catch(() => {
+                                        console.log(
+                                          "doktor başarısız randevu silindi"
+                                        );
+                                        setLoading(false);
+                                        setDisabled(false);
                                       });
-                                  })
-                                  .catch(() => {
-                                    console.log(
-                                      "doktor başarısız randevu silindi"
-                                    );
                                   });
-                              });
+                                });
                             });
-                        });
+                          })
+                          .catch(() => {
+                            console.log("olmadı3");
+                            setLoading(false);
+                            setDisabled(false);
+                          });
                       });
-                  });
-                });
-              console.log("başarılı silme");
+                    })
+                    .catch(() => {
+                      console.log("olmadı2");
+                      setLoading(false);
+                      setDisabled(false);
+                    });
+                  //console.log("başarılı silme");
 
-              setRefresh(!refresh);
+                  //setRefresh(!refresh);
+
+                  // firebase
+                  //   .firestore()
+                  //   .collection("D_user")
+                  //   .doc(user.uid)
+                  //   .collection("Hastalarım")
+                  //   .doc(HDocId)
+                  //   .collection("RandevuTarih")
+                  //   .onSnapshot((docx) => {
+                  if (docd.docs.length == 0) {
+                    //setIsVisibleModal(false);
+                    // firebase
+                    //   .firestore()
+                    //   .collection("D_user")
+                    //   .doc(user.uid)
+                    //   .collection("Hastalarım")
+                    //   .doc(HDocId)
+                    //   .delete();
+                    //.then(() => {
+                    // console.log("hastlarım silinme başarılı");
+                    // firebase
+                    //   .firestore()
+                    //   .collection("H_user")
+                    //   .where("email", "==", HEmail)
+                    //   .onSnapshot((docsnap) => {
+                    //     docsnap.forEach((docsnap2) => {
+                    //       firebase
+                    //         .firestore()
+                    //         .collection("H_user")
+                    //         .doc(docsnap2.id)
+                    //         .collection("Doktorlarım")
+                    //         .where("email", "==", user.email)
+                    //         .get()
+                    //         .then((snapfor) => {
+                    //           snapfor.forEach((snapfordelete) => {
+                    //             snapfordelete.ref
+                    //               .delete()
+                    //               .then(() => {
+                    //                 console.log("IDDD:", snapfordelete.id);
+                    //                 // firebase
+                    //                 //   .firestore()
+                    //                 //   .collection("H_user")
+                    //                 //   .doc(docsnap2.id)
+                    //                 //   .collection("Doktorlarım")
+                    //                 //   .doc(snapfordelete.id)
+                    //                 //   .delete();
+                    //                 console.log("doktor silindi");
+                    //               })
+                    //               .catch(() => {
+                    //                 console.log("doktor silinemedi");
+                    //               });
+                    //           });
+                    //         });
+                    //     });
+                    //   });
+                    //setRefresh(!refresh);
+                    //setIsVisibleModal(false);
+                    // console.log("hasta silindi");
+                    //  })
+                    //.catch(() => {
+                    // console.log("hastlarım silinme başarısız");
+                    //});
+                  } else if (docd.docs.length == 1) {
+                    setIsVisibleModal(false);
+                    // docd.forEach((singleDoc) => {
+                    //   firebase
+                    //     .firestore()
+                    //     .collection("D_user")
+                    //     .doc(user.uid)
+                    //     .collection("Hastalarım")
+                    //     .doc(HDocId)
+                    //     .update({
+                    //       RandevuSaat: singleDoc.data().RandevuSaat,
+                    //       RandevuTarih: singleDoc.data().RandevuTarih,
+                    //     })
+                    //     .then(() => {
+                    //       setRefresh(!refresh);
+                    //       console.log("başarılı update HASTALARIM");
+                    //     })
+                    //     .catch(() => {
+                    //       console.log("başarsızı update HASTALARIM");
+                    //     });
+                    //   firebase
+                    //     .firestore()
+                    //     .collection("H_user")
+                    //     .where("email", "==", HEmail)
+                    //     .get()
+                    //     .then((singledocWhere) => {
+                    //       singledocWhere.forEach((singledocFor) => {
+                    //         firebase
+                    //           .firestore()
+                    //           .collection("H_user")
+                    //           .doc(singledocFor.id)
+                    //           .collection("Doktorlarım")
+                    //           .where("email", "==", user.email)
+                    //           .get()
+                    //           .then((singledocWhere2) => {
+                    //             singledocWhere2.forEach((singledocFor2) => {
+                    //               firebase
+                    //                 .firestore()
+                    //                 .collection("H_user")
+                    //                 .doc(singledocFor.id)
+                    //                 .collection("Doktorlarım")
+                    //                 .doc(singledocFor2.id)
+                    //                 .update({
+                    //                   RandevuSaat: singleDoc.data().RandevuSaat,
+                    //                   RandevuTarih:
+                    //                     singleDoc.data().RandevuTarih,
+                    //                 })
+                    //                 .then(() => {
+                    //                   console.log(
+                    //                     "başarılı DOKTORRLAIM Collection update"
+                    //                   );
+                    //                 })
+                    //                 .catch(() => {
+                    //                   console.log(
+                    //                     "başarısız DOKTORRLAIM Collection update"
+                    //                   );
+                    //                 });
+                    //             });
+                    //           });
+                    //       });
+                    //     });
+                    // });
+                  }
+                });
+
+              // });
             })
             .catch(() => {
               console.log("başarısız silme");
+              setLoading(false);
+              setDisabled(false);
             });
         });
+      })
+      .catch(() => {
+        console.log("olmadı");
+        setLoading(false);
+        setDisabled(false);
       });
   };
 
@@ -284,6 +324,7 @@ const ModalCard = ({
       animationOut="fadeOut"
       animationInTiming={0}
       animationOutTiming={300}
+      onModalHide={onModalHide}
     >
       <View
         style={{
@@ -336,11 +377,23 @@ const ModalCard = ({
                     PatientRemove(
                       element.item.RandevuSaat,
                       element.item.RandevuTarih
+                      //setLoading(true)
                     );
                   }}
                   FontStyle={{ fontSize: 15 }}
+                  loading={
+                    (element.item.RandevuSaat == RandevuSaat) &
+                    (element.item.RandevuTarih == RandevuTarih)
+                      ? loading
+                      : false
+                  }
+                  disabled={disabled}
                   mode={"outlined"}
                   text="Kaldır"
+                  key={{
+                    Saat: element.item.RandevuSaat,
+                    Tarih: element.item.RandevuTarih,
+                  }}
                 />
               </View>
               <Separator />
