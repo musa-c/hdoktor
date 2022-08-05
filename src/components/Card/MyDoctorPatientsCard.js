@@ -19,6 +19,7 @@ const MyDoctorPatientsCard = ({
   onPressGetNotes,
   onPressRandevuModal,
   user,
+  PatientRemoveIconPress,
 }) => {
   return (
     <View style={styles.cont}>
@@ -52,9 +53,13 @@ const MyDoctorPatientsCard = ({
               />
             </View>
           ) : (
-            <TouchableOpacity onPress={onPressRandevuModal}>
-              <MultiRandevuButton randevuCount={randevuCount} />
-            </TouchableOpacity>
+            <>
+              {randevuCount != 0 ? (
+                <TouchableOpacity onPress={onPressRandevuModal}>
+                  <MultiRandevuButton randevuCount={randevuCount} />
+                </TouchableOpacity>
+              ) : null}
+            </>
           )}
         </View>
         <View style={styles.cardIcon}>
@@ -83,7 +88,13 @@ const MyDoctorPatientsCard = ({
             />
           ) : null}
 
-          <LoadingButton icon={"minus-box-outline"} size={40} />
+          {randevuCount == 1 ? (
+            <LoadingButton
+              icon={"minus-box-outline"}
+              size={40}
+              onPress={PatientRemoveIconPress}
+            />
+          ) : null}
         </View>
       </View>
     </View>
