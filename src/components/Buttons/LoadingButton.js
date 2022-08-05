@@ -2,7 +2,15 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { Button } from "react-native-paper";
 
-const LoadingButton = ({ icon, loading, onPress, text, FontStyle, mode }) => {
+const LoadingButton = ({
+  icon,
+  loading,
+  onPress,
+  text,
+  FontStyle,
+  mode,
+  disabled,
+}) => {
   // console.log(fontSize);
   return (
     <View>
@@ -22,7 +30,7 @@ const LoadingButton = ({ icon, loading, onPress, text, FontStyle, mode }) => {
         style={{ alignSelf: "baseline" }}
         icon={icon}
         color={"white"}
-        disabled={loading}
+        disabled={disabled}
         labelStyle={[styles.labelStyle, FontStyle]}
       >
         {text}
