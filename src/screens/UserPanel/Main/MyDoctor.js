@@ -79,6 +79,24 @@ const MyDoctor = ({ route }) => {
     };
   }, [refresh]);
 
+  const user = firebase.auth().currentUser;
+
+  const ChatId = (email) => {
+    firebase
+      .firestore()
+      .collection("Chats")
+      .where("users", "in", [[user.email, email]])
+      .get()
+      .then((docs) => {
+        docs.forEach((doc) => {
+          navigation.navigate("ChatsScreen", {
+            screen: "Chat",
+            params: { id: doc.id },
+          });
+        });
+      });
+  };
+
   const navigation = useNavigation();
 
   const [modalCardVisible, setmodalCardVisible] = useState(false);
@@ -136,15 +154,7 @@ const MyDoctor = ({ route }) => {
                 setDuserName(element.item.name);
                 setmodalCardVisible(true);
               }}
-              onPressChatId={() =>
-                navigation.navigate("ChatsScreen", {
-                  screen: "Chat",
-                  params: {
-                    DId: element.item.Id,
-                    DocId: element.item.key,
-                  },
-                })
-              }
+              onPressChatId={() => ChatId(element.item.email)}
               user={"hasta"}
             />
           </View>
