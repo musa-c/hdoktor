@@ -1,12 +1,14 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import React from "react";
 import { Button } from "react-native-paper";
 
-const LoadingButton = ({ icon, loading, onPress, text }) => {
+const LoadingButton = ({ icon, loading, onPress, text, FontStyle, mode }) => {
+  // console.log(fontSize);
   return (
     <View>
       <Button
-        mode="text"
+        mode={mode}
+        // mode={"text"}
         loading={loading}
         onPress={onPress}
         contentStyle={{
@@ -15,21 +17,30 @@ const LoadingButton = ({ icon, loading, onPress, text }) => {
           //          backgroundColor: "red",
           alignSelf: "center",
           marginVertical: 2,
+          padding: 0,
         }}
         style={{ alignSelf: "baseline" }}
         icon={icon}
         color={"white"}
         disabled={loading}
-        labelStyle={{
-          fontSize: 40,
-          color: "#B71C1C",
-          alignItems: "baseline",
-        }}
+        labelStyle={[styles.labelStyle, FontStyle]}
       >
         {text}
       </Button>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  labelStyle: {
+    fontSize: 40,
+    fontWeight: "bold",
+    color: "#B71C1C",
+    alignItems: "baseline",
+  },
+});
+// LoadingButton.defaultProps = {
+//   fontsize: 40,
+// };
 
 export default LoadingButton;
