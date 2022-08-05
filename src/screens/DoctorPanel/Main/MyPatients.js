@@ -67,6 +67,7 @@ const MyPatients = (props) => {
   const user = firebase.auth().currentUser;
 
   const ChatId = (email) => {
+    // [[hastaEmail, doctorEmail]]
     firebase
       .firestore()
       .collection("Chats")
@@ -80,6 +81,93 @@ const MyPatients = (props) => {
           });
         });
       });
+  };
+
+  const PatientRemove = (id, email) => {
+    firebase
+      .firestore()
+      .collection("D_user")
+      .doc(user.uid)
+      .collection("Hastalarım")
+      .doc(id)
+      .collection("RandevuTarih")
+      .get()
+      .then((get) => {
+        get.forEach((getFor) => {
+          console.log("getFor:", getFor.id);
+          getFor.ref.delete().then(() => {
+            firebase
+              .firestore()
+              .collection("D_user")
+              .doc(user.uid)
+              .collection("Hastalarım")
+              .doc(id)
+              .delete()
+              .then(() => {
+                console.log("Hasta single randevu silme başarılı");
+                firebase
+                  .firestore()
+                  .collection("H_user")
+                  .where("email", "==", email)
+                  .get()
+                  .then((snapshot) => {
+                    snapshot.forEach((snaps) => {
+                      console.log("snaps.id:", snaps.id);
+                      firebase
+                        .firestore()
+                        .collection("H_user")
+                        .doc(snaps.id)
+                        .collection("Doktorlarım")
+                        .where("email", "==", user.email)
+                        .get()
+                        .then((snapshotD) => {
+                          snapshotD.forEach((snapshotDFor) => {
+                            firebase
+                              .firestore()
+                              .collection("H_user")
+                              .doc(snaps.id)
+                              .collection("Doktorlarım")
+                              .doc(snapshotDFor.id)
+                              .collection("RandevuTarih")
+                              .get()
+                              .then((getH) => {
+                                getH.forEach((getForH) => {
+                                  getForH.ref
+                                    .delete()
+                                    .then(() => {
+                                      firebase
+                                        .firestore()
+                                        .collection("H_user")
+                                        .doc(snaps.id)
+                                        .collection("Doktorlarım")
+                                        .doc(snapshotDFor.id)
+                                        .delete()
+                                        .then(() => {
+                                          console.log(
+                                            "doctor single randevu silme başarılı"
+                                          );
+                                        });
+                                    })
+                                    .catch(() => {
+                                      console.log(
+                                        "doctor single randevu silme başarısız"
+                                      );
+                                    });
+                                });
+                              });
+                          });
+                        });
+                    });
+                  });
+              })
+              .catch(() => {
+                console.log("hasta single randevu silme başarısız");
+              });
+          });
+        });
+      });
+
+    //  firebase.firestore(user.uid).collection("Hastalarım").doc(id).collection("RandevuTarih")
   };
 
   const [note, setNote] = useState("");
@@ -141,7 +229,11 @@ const MyPatients = (props) => {
 
   const [modalCardVisible, setmodalCardVisible] = useState(false);
   const [Hid, setHid] = useState("");
+  const [HDocId, setHDocId] = useState("");
   const [huserName, sethuserName] = useState("");
+  const [HEmail, setHEmail] = useState("");
+
+  console.log(huserName);
 
   return (
     <View style={styles.ViewStyle}>
@@ -191,7 +283,9 @@ const MyPatients = (props) => {
               onBackdropPress={() => setmodalCardVisible(false)}
               id={Hid}
               RandevuDate={RandevuDate}
-              userName={huserName}
+              username={huserName}
+              HDocId={HDocId}
+              HEmail={HEmail}
             />
 
             <MyDoctorPatientsCard
@@ -210,10 +304,15 @@ const MyPatients = (props) => {
               onPressRandevuModal={() => {
                 setHid(element.item.Id);
                 sethuserName(element.item.name);
+                setHDocId(element.item.key);
+                setHEmail(element.item.email);
                 setmodalCardVisible(true);
               }}
               onPressChatId={() => ChatId(element.item.email)}
               onPressGetNotes={() => getNotes(element.item.key)}
+              PatientRemoveIconPress={() =>
+                PatientRemove(element.item.key, element.item.email)
+              }
             />
           </View>
         )}
