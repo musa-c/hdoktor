@@ -96,19 +96,27 @@ const SignUp00 = ({ navigation }) => {
             phoneNumber: phoneNumber,
             KHastalik: KHastalik,
           })
-          .then(UserUpdate)
+          .catch({
+            // kaydedilen kullanıcı firestore'ya kaydedilmediği için sil kullanıcıyı.
+          })
+          .then(() => {
+            userCredential.user.updateProfile({
+              displayName: name,
+            });
+          })
           .then(() => {
             setIsLoading(false);
             isCreateAccountInfo();
           })
           .catch(setIsLoading(false));
         //  console.log("userCredential: ", userCredential)
-        const UserUpdate = async () => {
-          await userCredential.user.updateProfile({
-            displayName: name,
-            //photoURL:avatarUrl,
-          });
-        };
+        //const UserUpdate = async () => {
+        console.log("geldi");
+        //await
+        //photoURL:avatarUrl,
+        // }
+        // );
+        // };
       })
       .catch((error) => {
         setIsLoading(false);
@@ -383,7 +391,7 @@ const SignUp00 = ({ navigation }) => {
 
                 <TextInput
                   style={styles.input}
-                  placeholder="+90"
+                  placeholder="5XXXXXXXXX"
                   placeholderTextColor="grey"
                   underlineColor="#f44336"
                   activeUnderlineColor="#f44336"
