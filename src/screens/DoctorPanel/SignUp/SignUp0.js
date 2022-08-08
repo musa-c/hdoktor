@@ -350,8 +350,13 @@ const SignUp0 = ({ navigation, route }) => {
       contentContainerStyle={{ flex: 1 }}
     >
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingTop: 15, paddingEnd: 10 }}
-        style={{ backgroundColor: "white" }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingTop: 15,
+          paddingEnd: 10,
+          backgroundColor: "blue",
+        }}
+        style={{ backgroundColor: "blue" }}
       >
         <View style={styles.box}>
           <StatusBar barStyle="dark-content" backgroundColor="white" />
