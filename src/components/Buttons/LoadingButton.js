@@ -10,6 +10,8 @@ const LoadingButton = ({
   FontStyle,
   mode,
   disabled,
+  color,
+  style,
 }) => {
   // console.log(fontSize);
   return (
@@ -27,9 +29,9 @@ const LoadingButton = ({
           marginVertical: 2,
           padding: 0,
         }}
-        style={{ alignSelf: "baseline" }}
+        style={[styles.cont, style]}
         icon={icon}
-        color={"white"}
+        color={color}
         disabled={disabled}
         labelStyle={[styles.labelStyle, FontStyle]}
       >
@@ -45,6 +47,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#B71C1C",
     alignItems: "baseline",
+  },
+  cont: {
+    alignSelf: "baseline",
   },
 });
 // LoadingButton.defaultProps = {
