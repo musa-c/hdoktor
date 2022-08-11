@@ -37,6 +37,15 @@ const ProfileUpdateModal = ({
   const [cinsiyet, setCinsiyet] = useState("");
 
   const isCheckedErkek = () => {
+    if (value == "Erkek") {
+      if (Validation) {
+        setValidation(false);
+      }
+    } else {
+      if (!Validate) {
+        setValidation(true);
+      }
+    }
     if (checkedE == true) {
       setCheckedE(false);
       setCinsiyet("");
@@ -47,21 +56,33 @@ const ProfileUpdateModal = ({
     }
   };
   const isCheckedKadın = () => {
+    if (value == "Kadın") {
+      if (Validation) {
+        setValidation(false);
+      }
+    } else {
+      if (!Validate) {
+        setValidation(true);
+      }
+    }
     if (checkedK == true) {
       setCheckedK(false);
       setCinsiyet("");
     } else {
       setCheckedK(true);
       setCinsiyet("Kadın");
+      setValidation(true);
       setCheckedE(false);
     }
   };
 
   const handleConfirm = (dogumTarih) => {
     setdogumTarih(moment(dogumTarih).locale("tr", trLocale).format("l"));
+    Validate(topInfo, moment(dogumTarih).locale("tr", trLocale).format("l"));
     hideDatePicker();
   };
   const hideDatePicker = () => {
+    //setValidation(false);
     setDatePickerVisibility(false);
   };
   const showDatePicker = () => {
@@ -69,13 +90,19 @@ const ProfileUpdateModal = ({
   };
 
   //console.log(topInfo);
-  let Validation = false;
+  const [Validation, setValidation] = useState(false);
+
   const Validate = (topInfo, updateValue) => {
+    console.log("topInfo:", topInfo);
+    console.log("updateValue:", updateValue);
+
     switch (topInfo) {
       case "İsim":
         if (updateValue != "") {
           if (updateValue.length > 1) {
-            Validation = true;
+            if (!Validation) {
+              setValidation(true);
+            }
             return (
               <TextInput.Icon
                 name="check-circle-outline"
@@ -84,6 +111,9 @@ const ProfileUpdateModal = ({
               />
             );
           } else {
+            if (Validation) {
+              setValidation(false);
+            }
             return (
               <TextInput.Icon
                 name="close-circle-outline"
@@ -101,7 +131,9 @@ const ProfileUpdateModal = ({
               updateValue.toLowerCase()
             )
           ) {
-            Validation = true;
+            if (!Validation) {
+              setValidation(true);
+            }
             return (
               <TextInput.Icon
                 name="check-circle-outline"
@@ -110,6 +142,9 @@ const ProfileUpdateModal = ({
               />
             );
           } else {
+            if (Validation) {
+              setValidation(false);
+            }
             return (
               <TextInput.Icon
                 name="close-circle-outline"
@@ -127,7 +162,9 @@ const ProfileUpdateModal = ({
               updateValue
             )
           ) {
-            Validation = true;
+            if (!Validation) {
+              setValidation(true);
+            }
             return (
               <TextInput.Icon
                 name="check-circle-outline"
@@ -136,6 +173,9 @@ const ProfileUpdateModal = ({
               />
             );
           } else {
+            if (Validation) {
+              setValidation(false);
+            }
             return (
               <TextInput.Icon
                 name="close-circle-outline"
@@ -147,6 +187,19 @@ const ProfileUpdateModal = ({
         }
         break;
       case "Yaş":
+        // 13> büyük olma zorunluluğu getir!
+        console.log(Validation);
+        console.log("value:", value);
+        if (updateValue != value) {
+          if (!Validation) {
+            setValidation(true);
+          }
+        } else {
+          if (Validation) {
+            setValidation(false);
+          }
+        }
+
         break;
       case "Cinsiyet":
         break;
@@ -154,23 +207,168 @@ const ProfileUpdateModal = ({
         break;
     }
   };
-
   const [update, setUpdate] = useState(false);
 
+  const user = firebase.auth().currentUser;
+
   const nameUpdate = (id, UpdateName) => {
+    setLoading(true);
+    firebase
+      .auth()
+      .currentUser.updateProfile({ displayName: UpdateName })
+      .then(() => {
+        firebase
+          .firestore()
+          .collection("H_user")
+          .doc(id)
+          .update({ name: UpdateName })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("H_user")
+              .doc(id)
+              .collection("Doktorlarım")
+              .onSnapshot((snapshot) => {
+                if (!snapshot.empty) {
+                  snapshot.forEach((query) => {
+                    firebase
+                      .firestore()
+                      .collection("D_user")
+                      .doc(query.data().Id)
+                      .collection("Hastalarım")
+                      .where("email", "==", user.email)
+                      .get()
+                      .then((snapshot1) => {
+                        snapshot1.forEach((snapshot1For) => {
+                          snapshot1For.ref.update({ name: UpdateName });
+                        });
+                      });
+
+                    // D_user -> Bildirimler'e hastanın emailini ekle.
+                    // firebase.firestore().collection("D_user").doc(query.data().Id).collection("Bildirimlerim").where("email", "==", user.email).onSnapshot((snapshot2)=>{
+                    //   snapshot2.forEach((snapshot2For)=>{
+                    //     snapshot2For.ref.update({name: UpdateName})
+                    //   })
+                    // })
+                  });
+                }
+              });
+
+            firebase
+              .firestore()
+              .collection("Chats")
+              .where("users", "array-contains", user.email)
+              .get()
+              .then((snasp) => {
+                snasp.forEach((snapsFor) => {
+                  firebase
+                    .firestore()
+                    .collection("Chats")
+                    .doc(snapsFor.id)
+                    .update({ names: [UpdateName, snapsFor.data().names[1]] })
+                    .then(() => {
+                      setUpdate(true);
+                      setTimeout(() => {
+                        setUpdate(false);
+                        setLoading(false);
+                        toggleModal();
+                      }, 3000);
+                    });
+                });
+              });
+          });
+      })
+      .catch((e) => setUpdate(false));
+  };
+
+  const phoneNumberUpdate = (id, updatePhoneNumber) => {
+    setLoading(true);
     firebase
       .firestore()
       .collection("H_user")
       .doc(id)
-      .update({ name: UpdateName })
+      .update({ phoneNumber: updatePhoneNumber })
       .then(() => {
         setUpdate(true);
         setTimeout(() => {
           setUpdate(false);
+          setValidation(false);
+          setLoading(false);
           toggleModal();
         }, 3000);
-      })
-      .catch((e) => setUpdate(false));
+        // H_user -> Doktorlarım kısmına phoneNumber Ekle !!!
+        // firebase
+        //   .firestore()
+        //   .collection("H_user")
+        //   .doc(id)
+        //   .collection("Doktorlarım")
+        //   .onSnapshot((snaps) => {
+        //     if (!snaps.empty) {
+        //       snaps.forEach((query) => {
+        //         firebase
+        //           .firestore()
+        //           .collection("D_user")
+        //           .doc(query.data().Id)
+        //           .collection("Hastalarım")
+        //           .where("email", "==", user.email)
+        //           .get()
+        //           .then((snapshot1) => {
+        //             snapshot1.forEach((snapshot1For) => {
+        //               snapshot1For.ref
+        //                 .update({ phoneNumber: updatePhoneNumber })
+        //                 .then(() => {
+        //                   setUpdate(true);
+        //                   setTimeout(() => {
+        //                     setUpdate(false);
+        //                     setLoading(false);
+        //                     toggleModal();
+        //                   }, 3000);
+        //                 })
+        //                 .catch(() => {
+        //                   setUpdate(false);
+        //                 });
+        //             });
+        //           });
+        //       });
+        //     }
+        //   });
+      });
+  };
+
+  const dateUpdate = (id, UpdateDate) => {
+    setLoading(true);
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(id)
+      .update({ date: UpdateDate })
+      .then(() => {
+        setUpdate(true);
+        setTimeout(() => {
+          setUpdate(false);
+          setValidation(false);
+          setLoading(false);
+          toggleModal();
+        }, 3000);
+      });
+  };
+
+  const genderUpdate = (id, genderUpdate) => {
+    // SIKINTI VAR !! GÜNCELLENİYOR FAFKAT MODAL DA VARSAYILAN DİSPLAY OLMASI LAZIM !!!
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(id)
+      .update({ cinsiyet: genderUpdate })
+      .then(() => {
+        setUpdate(true);
+        setTimeout(() => {
+          setUpdate(false);
+          setValidation(false);
+          setLoading(false);
+          toggleModal();
+        }, 3000);
+      });
   };
 
   const [loading, setLoading] = useState(false);
@@ -182,11 +380,14 @@ const ProfileUpdateModal = ({
         break;
       case "E-mail":
         break;
-      case "Telefon  Numarası":
+      case "Telefon Numarası":
+        phoneNumberUpdate(id, updateValue);
         break;
       case "Yaş":
+        dateUpdate(id, updateValue);
         break;
       case "Cinsiyet":
+        genderUpdate(id, updateValue);
         break;
       default:
         break;
@@ -213,6 +414,7 @@ const ProfileUpdateModal = ({
         setdogumTarih("");
         setCheckedE(false);
         setCheckedK(false);
+        setValidation(false);
       }}
       onModalShow={() => {
         if (value == "Erkek") {
@@ -306,6 +508,7 @@ const ProfileUpdateModal = ({
               style={{
                 flexDirection: "row",
                 justifyContent: "space-evenly",
+                marginVertical: 5,
               }}
             >
               <CheckBox
@@ -318,8 +521,6 @@ const ProfileUpdateModal = ({
                   backgroundColor: "rgba(52, 52, 52, 0.0)",
                   borderWidth: 0,
                   borderRadius: 0,
-                  borderBottomWidth: 0.8,
-                  borderColor: "#f44336",
                 }}
                 checked={checkedE}
                 checkedColor="#ba000d"
@@ -335,8 +536,6 @@ const ProfileUpdateModal = ({
                   backgroundColor: "rgba(52, 52, 52, 0.0)",
                   borderWidth: 0,
                   borderRadius: 0,
-                  borderBottomWidth: 0.8,
-                  borderColor: "#f44336",
                 }}
                 checked={checkedK}
                 checkedColor="#ba000d"
@@ -349,12 +548,18 @@ const ProfileUpdateModal = ({
             <LoadingButton
               text="Güncelle"
               loading={loading}
-              disabled={loading}
+              disabled={!Validation ? true : loading}
               mode="contained"
               color="#B71C1C"
               onPress={() => {
                 if (Validation) {
-                  Update(topInfo, updateValue), setUpdateValue("");
+                  if (topInfo == "Yaş") {
+                    Update(topInfo, dogumTarih);
+                  } else if (topInfo == "Cinsiyet") {
+                    Update(topInfo, cinsiyet);
+                  } else {
+                    Update(topInfo, updateValue), setUpdateValue("");
+                  }
                 }
               }}
               style={{ borderRadius: 20 }}
