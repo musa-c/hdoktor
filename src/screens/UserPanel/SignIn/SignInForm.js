@@ -23,7 +23,6 @@ const Form = () => {
 
   const signIn = async () => {
     SetLoading(true);
-
     await firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
@@ -53,16 +52,33 @@ const Form = () => {
                   setErrorMessage("");
                   navigation.navigate("TabU");
                 } else {
-                  SetLoading(false);
-                  setErrorMessage("");
-                  Alert.alert("Hatalı Giriş", "Hatalı kullanıcı girişi!", [
-                    {
-                      text: "Tekrar Dene",
-                      //   onPress: () => console.log("Cancel Pressed"),
-                      style: "destructive",
-                    },
-                    // { text: "OK", onPress: () => console.log("OK Pressed") }
-                  ]);
+                  firebase
+                    .firestore()
+                    .collection("H_user")
+                    .where("Id", "==", firebase.auth().currentUser.uid)
+                    .onSnapshot((snaps) => {
+                      if (!snaps.empty) {
+                        // Kullanıcı eğer emaili değiştip mail kutusuna gelen linki tıklayıp eski emaili dönerse gerekli veritabanı işlemleri uygulamanacak!
+                        alert("oldu gibi");
+                        SetLoading(false);
+                        setErrorMessage("");
+                      } else {
+                        SetLoading(false);
+                        setErrorMessage("");
+                        Alert.alert(
+                          "Hatalı Giriş",
+                          "Hatalı kullanıcı girişi!",
+                          [
+                            {
+                              text: "Tekrar Dene",
+                              //   onPress: () => console.log("Cancel Pressed"),
+                              style: "destructive",
+                            },
+                            // { text: "OK", onPress: () => console.log("OK Pressed") }
+                          ]
+                        );
+                      }
+                    });
                 }
               });
           });
