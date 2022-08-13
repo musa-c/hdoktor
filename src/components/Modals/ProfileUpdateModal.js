@@ -35,44 +35,56 @@ const ProfileUpdateModal = ({
   const [checkedE, setCheckedE] = useState(value == "Erkek" ? true : false);
   const [checkedK, setCheckedK] = useState(value == "Kadın" ? true : false);
   const [cinsiyet, setCinsiyet] = useState("");
-
+  const [password, setPassword] = useState("");
+  const [isPasswordSee, setispasswordSee] = useState(true);
   const isCheckedErkek = () => {
     if (value == "Erkek") {
       if (Validation) {
         setValidation(false);
-      }
-    } else {
-      if (!Validate) {
-        setValidation(true);
+      } else {
+        if (!Validate) {
+          setValidation(true);
+        }
       }
     }
     if (checkedE == true) {
       setCheckedE(false);
       setCinsiyet("");
+      if (value == "Erkek") {
+        setValidation(false);
+      }
     } else {
       setCheckedE(true);
       setCinsiyet("Erkek");
       setCheckedK(false);
+      if (value != "Erkek") {
+        setValidation(true);
+      }
     }
   };
   const isCheckedKadın = () => {
     if (value == "Kadın") {
       if (Validation) {
         setValidation(false);
-      }
-    } else {
-      if (!Validate) {
-        setValidation(true);
+      } else {
+        if (!Validate) {
+          setValidation(true);
+        }
       }
     }
     if (checkedK == true) {
       setCheckedK(false);
       setCinsiyet("");
+      if (value == "Kadın") {
+        setValidation(false);
+      }
     } else {
       setCheckedK(true);
       setCinsiyet("Kadın");
-      setValidation(true);
       setCheckedE(false);
+      if (value != "Kadın") {
+        setValidation(true);
+      }
     }
   };
 
@@ -82,7 +94,7 @@ const ProfileUpdateModal = ({
     hideDatePicker();
   };
   const hideDatePicker = () => {
-    //setValidation(false);
+    setValidation(false);
     setDatePickerVisibility(false);
   };
   const showDatePicker = () => {
@@ -126,21 +138,34 @@ const ProfileUpdateModal = ({
         break;
       case "E-mail":
         if (updateValue != "") {
-          if (
-            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
-              updateValue.toLowerCase()
-            )
-          ) {
-            if (!Validation) {
-              setValidation(true);
+          if (value != updateValue.toLowerCase()) {
+            if (
+              /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(
+                updateValue.toLowerCase()
+              )
+            ) {
+              if (!Validation) {
+                setValidation(true);
+              }
+              return (
+                <TextInput.Icon
+                  name="check-circle-outline"
+                  forceTextInputFocus={false}
+                  color={"green"}
+                />
+              );
+            } else {
+              if (Validation) {
+                setValidation(false);
+              }
+              return (
+                <TextInput.Icon
+                  name="close-circle-outline"
+                  forceTextInputFocus={false}
+                  color={"#f44336"}
+                />
+              );
             }
-            return (
-              <TextInput.Icon
-                name="check-circle-outline"
-                forceTextInputFocus={false}
-                color={"green"}
-              />
-            );
           } else {
             if (Validation) {
               setValidation(false);
@@ -354,7 +379,6 @@ const ProfileUpdateModal = ({
   };
 
   const genderUpdate = (id, genderUpdate) => {
-    // SIKINTI VAR !! GÜNCELLENİYOR FAFKAT MODAL DA VARSAYILAN DİSPLAY OLMASI LAZIM !!!
     firebase
       .firestore()
       .collection("H_user")
@@ -369,6 +393,64 @@ const ProfileUpdateModal = ({
           toggleModal();
         }, 3000);
       });
+
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(id)
+      .collection("Doktorlarım")
+      .onSnapshot((snaps) => {
+        snaps.forEach((snapsFor) => {
+          firebase
+            .firestore()
+            .collection("D_user")
+            .doc(snapsFor.data().Id)
+            .collection("Hastalarım")
+            .where("email", "==", user.email)
+            .get()
+            .then((snapsW) => {
+              snapsW.forEach((snapsWFor) => {
+                snapsWFor.ref.update({ cinsiyet: genderUpdate });
+              });
+            });
+        });
+      });
+  };
+
+  //const [UpdadeTextInput, setUpdadeTextInput] = useState(false);
+
+  const reauthenticate = (password) => {
+    var cred = firebase.auth.EmailAuthProvider.credential(user.email, password);
+    return user.reauthenticateWithCredential(cred);
+  };
+
+  const EmailUpdate = (id, emailUpdate) => {
+    reauthenticate(password).then(() => {
+      user.updateEmail(emailUpdate).then(() => {
+        firebase
+          .firestore()
+          .collection("H_user")
+          .doc(id)
+          .update({ email: emailUpdate.toLowerCase() })
+          .then(() => {
+            setUpdate(true);
+            setTimeout(() => {
+              setUpdate(false);
+              setValidation(false);
+              setLoading(false);
+              toggleModal();
+            }, 3000);
+          });
+      });
+    });
+  };
+
+  const PasswordUpdate = (updatePassword) => {
+    reauthenticate(password).then(() => {
+      user.updatePassword(updatePassword).then(() => {
+        alert("Şifre güncellendi!");
+      });
+    });
   };
 
   const [loading, setLoading] = useState(false);
@@ -379,6 +461,7 @@ const ProfileUpdateModal = ({
         nameUpdate(id, updateValue);
         break;
       case "E-mail":
+        EmailUpdate(id, updateValue);
         break;
       case "Telefon Numarası":
         phoneNumberUpdate(id, updateValue);
@@ -393,6 +476,28 @@ const ProfileUpdateModal = ({
         break;
     }
   };
+  console.log("authEmail:", user.email);
+  const passwordSee = () => {
+    if (!isPasswordSee) {
+      return (
+        <TextInput.Icon
+          name="eye-outline"
+          forceTextInputFocus={false}
+          onPress={() => setispasswordSee(!isPasswordSee)}
+        />
+      );
+    } else {
+      return (
+        <TextInput.Icon
+          name="eye-off-outline"
+          forceTextInputFocus={false}
+          onPress={() => setispasswordSee(!isPasswordSee)}
+        />
+      );
+    }
+  };
+
+  console.log(isPasswordSee);
 
   const LeftComponent = (topInfo) => {
     if (topInfo == "Telefon Numarası") {
@@ -415,6 +520,9 @@ const ProfileUpdateModal = ({
         setCheckedE(false);
         setCheckedK(false);
         setValidation(false);
+        setispasswordSee(true);
+        setPassword("");
+        //setUpdadeTextInput(false);
       }}
       onModalShow={() => {
         if (value == "Erkek") {
@@ -461,9 +569,7 @@ const ProfileUpdateModal = ({
               {infoTitle}
             </Text>
           </View>
-          {topInfo == "İsim" ||
-          topInfo == "E-mail" ||
-          topInfo == "Telefon Numarası" ? (
+          {topInfo == "İsim" || topInfo == "Telefon Numarası" ? (
             <TextInput
               style={styles.textInput}
               value={updateValue}
@@ -478,6 +584,40 @@ const ProfileUpdateModal = ({
               mode="outlined"
               label={placeHolderModal}
             ></TextInput>
+          ) : topInfo == "E-mail" ? (
+            <View>
+              <TextInput
+                style={styles.textInput}
+                value={password}
+                onChangeText={(text) => setPassword(text)}
+                activeOutlineColor="#B71C1C"
+                outlineColor="white"
+                secureTextEntry={isPasswordSee}
+                right={passwordSee()}
+                //disabled={UpdadeTextInput}
+                //right={Validate(topInfo, updateValue)}
+                // underlineColor="red"
+                //placeholderTextColor="#fff"
+                theme={{ roundness: 10 }}
+                mode="outlined"
+                label={"Şifre"}
+              ></TextInput>
+
+              <TextInput
+                style={styles.textInput}
+                value={updateValue}
+                onChangeText={(text) => setUpdateValue(text)}
+                activeOutlineColor="#B71C1C"
+                outlineColor="white"
+                right={Validate(topInfo, updateValue)}
+                left={LeftComponent(topInfo)}
+                // underlineColor="red"
+                //placeholderTextColor="#fff"
+                theme={{ roundness: 10 }}
+                mode="outlined"
+                label={placeHolderModal}
+              ></TextInput>
+            </View>
           ) : topInfo == "Yaş" ? (
             <TouchableOpacity onPress={showDatePicker}>
               <View
@@ -546,7 +686,7 @@ const ProfileUpdateModal = ({
 
           <View style={styles.buttonCont}>
             <LoadingButton
-              text="Güncelle"
+              text={"Güncelle"}
               loading={loading}
               disabled={!Validation ? true : loading}
               mode="contained"
@@ -555,6 +695,8 @@ const ProfileUpdateModal = ({
                 if (Validation) {
                   if (topInfo == "Yaş") {
                     Update(topInfo, dogumTarih);
+                  } else if (topInfo == "E-mail") {
+                    Update(topInfo, updateValue);
                   } else if (topInfo == "Cinsiyet") {
                     Update(topInfo, cinsiyet);
                   } else {
