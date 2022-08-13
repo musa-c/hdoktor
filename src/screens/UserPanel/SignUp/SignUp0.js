@@ -18,7 +18,7 @@ import { useRoute } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Avatar } from "react-native-elements";
 import { CheckBox } from "react-native-elements";
-import { TextInput } from "react-native-paper";
+import { TextInput, HelperText } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Modal from "react-native-modal";
 import * as ImagePicker from "expo-image-picker";
@@ -290,6 +290,10 @@ const SignUp00 = ({ navigation }) => {
       }
     };
 
+    const PhoneLeftComponent = () => {
+      return <TextInput.Affix text="+90 " textStyle={{ fontSize: 20 }} />;
+    };
+
     const DateValidate = () => {
       // refex if else
 
@@ -365,7 +369,7 @@ const SignUp00 = ({ navigation }) => {
               <View style={{ flex: 2 }}>
                 <TextInput
                   style={styles.input}
-                  placeholder="İsim"
+                  label="İsim"
                   placeholderTextColor="grey"
                   value={name}
                   onChangeText={(text) => setName(text)}
@@ -379,6 +383,7 @@ const SignUp00 = ({ navigation }) => {
                 <TextInput
                   style={styles.input}
                   placeholder="E-mail"
+                  label="E-mail"
                   placeholderTextColor="grey"
                   underlineColor="#f44336"
                   activeUnderlineColor="#f44336"
@@ -391,13 +396,14 @@ const SignUp00 = ({ navigation }) => {
 
                 <TextInput
                   style={styles.input}
-                  placeholder="5XXXXXXXXX"
+                  label="5XX XXX XX XX"
                   placeholderTextColor="grey"
                   underlineColor="#f44336"
                   activeUnderlineColor="#f44336"
                   outlineColor="white"
                   keyboardType="number-pad"
                   right={PhoneNumberValidate(PhoneNumber)}
+                  left={PhoneLeftComponent()}
                   value={PhoneNumber}
                   onChangeText={(text) => SetPhoneNumber(text)}
                 />
@@ -904,7 +910,7 @@ const SignUp00 = ({ navigation }) => {
                   <TextInput
                     style={{
                       width: 300,
-                      height: 50,
+                      height: 60,
                       // margin:15,
                       backgroundColor: "white",
                       marginTop: 0,
@@ -916,7 +922,7 @@ const SignUp00 = ({ navigation }) => {
                       borderRadius: 0,
                       fontSize: 18,
                     }}
-                    placeholder="Şifre"
+                    label="Şifre"
                     placeholderTextColor="grey"
                     secureTextEntry={ispasswordSee}
                     underlineColor="#f44336"
@@ -927,10 +933,34 @@ const SignUp00 = ({ navigation }) => {
                     value={password}
                     onChangeText={(text) => setPassword(text)}
                   />
+                  {password == ""
+                    ? false
+                    : !isPasswordValidation && (
+                        <HelperText
+                          type="info"
+                          visible={
+                            password == "" ? false : !isPasswordValidation
+                          }
+                          style={{
+                            color: "#f44336",
+                            textAlign: "justify",
+                            //backgroundColor: "red",
+                            width: 300,
+                            alignSelf: "center",
+                          }}
+                        >
+                          <Ionicons name="alert-circle-outline" />
+                          &nbsp; Şifre, Minimum 8 maksimum 32 karakter
+                          olmalıdır. En az; 1 harf, 1 rakam içermelidir. Boşluk
+                          içermemeli. Özel karakterler kullanılabilir:
+                          "@$!%*#?&^_-"
+                        </HelperText>
+                      )}
 
                   <TextInput
                     style={styles.input}
-                    placeholder="Tekrar Şifre"
+                    mode="Flat"
+                    label="Tekrar Şifre"
                     placeholderTextColor="grey"
                     secureTextEntry={isAgainPasswordSee}
                     left={againPasswordSee()}
@@ -1233,7 +1263,6 @@ const SignUp00 = ({ navigation }) => {
       </KeyboardAwareScrollView>
     );
   };
-
   return (
     <SingUpStack.Navigator>
       <SingUpStack.Screen
@@ -1269,7 +1298,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 300,
-    height: 50,
+    height: 60,
     margin: 15,
     marginTop: 20,
     //flexGrow:0.07,
@@ -1279,7 +1308,7 @@ const styles = StyleSheet.create({
     // paddingLeft:10,
     fontSize: 18,
     backgroundColor: "white",
-    // backgroundColor:"red"
+    // backgroundColor: "red",
   },
   image: {
     width: 50,
