@@ -15,7 +15,6 @@ import trLocale from "moment/locale/tr";
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
 import LoadingButton from "../Buttons/LoadingButton";
-import UpdateUserName from "../../db/UpdateUserName";
 import firebase from "firebase/compat/app";
 import SuccesModal from "./SuccesModal";
 
