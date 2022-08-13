@@ -10,7 +10,6 @@ import { useNavigation } from "@react-navigation/native";
 import ModalCard from "../../../components/ModalCard";
 import MyDoctorPatientsCard from "../../../components/Card/MyDoctorPatientsCard";
 import NoteModal from "../../../components/Modals/NoteModal";
-//import isModalVisibleSingle from "../../../components/Modals/isModalVisibleSingle";
 
 const MyPatients = (props) => {
   // console.log("props:", props.isModalVisible);
@@ -295,8 +294,9 @@ const MyPatients = (props) => {
 
             <MyDoctorPatientsCard
               avatar={
-                element.item?.avatar ??
-                "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FH_avatars%2FDefaultHastaAvatar.png?alt=media&token=66f93caf-ef41-461b-9e20-b35ac92a8084"
+                element.item.avatar == ""
+                  ? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FH_avatars%2FDefaultHastaAvatar.png?alt=media&token=66f93caf-ef41-461b-9e20-b35ac92a8084"
+                  : element.item.avatar
               }
               name={element.item.name}
               text1={element.item.cinsiyet}

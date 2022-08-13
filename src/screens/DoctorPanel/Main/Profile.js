@@ -39,8 +39,9 @@ const Profile = ({ navigation }) => {
           setTime1(snapshot.data()?.time1.toDate() ?? "");
           setTime2(snapshot.data()?.time2.toDate() ?? "");
           setAvatar(
-            snapshot.data()?.avatar ??
-              "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea"
+            snapshot.data().avatar == ""
+              ? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
+              : snapshot.data().avatar
           );
         });
     }

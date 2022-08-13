@@ -21,7 +21,6 @@ const Profile = ({ navigation }) => {
     let unmounted = false;
 
     const user = firebase.auth().currentUser;
-    const d = new Date();
 
     if (!unmounted) {
       firebase
