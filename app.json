@@ -27,7 +27,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "a",
+      "bundleIdentifier": "com.hd.hdoktor",
+      "buildNumber": "1.0.0",
       "infoPlist": {
         "NSCameraUsageDescription": "HDOKTOR, kullanıcının profil fotoğrafına bir fotoğraf koymasına izin vermek için kamerayı kullanır.",
         "NSPhotoLibraryUsageDescription": "HDOKTOR, kullanıcının fotoğraflarını uygulamaya yüklemek için galerinize erişir.",
@@ -40,8 +41,10 @@
         "backgroundColor": "#FFFFFF"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"]
-
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"],
+      
+      "package": "com.hd.hdoktor",
+      "versionCode": 1 
     },
     "web": {
       "favicon": "./assets/favicon.png"
