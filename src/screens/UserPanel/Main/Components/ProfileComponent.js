@@ -9,7 +9,6 @@ import React, { useState } from "react";
 import { Avatar } from "react-native-elements";
 import InfoCard from "./InfoCard";
 import ProfilePhotoChangeModal from "../../../../components/Modals/ProfilePhotoChangeModal";
-import UpdateUserName from "../../../../db/UpdateUserName";
 import ProfileUpdateModal from "../../../../components/Modals/ProfileUpdateModal";
 
 const ProfileComponent = ({
@@ -22,15 +21,11 @@ const ProfileComponent = ({
   id,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
-  const [isInfoModalVisible, setIsInfoModalVisible] = useState(false);
-
-  const toggleInfoModal = () => {
-    setIsInfoModalVisible(!isInfoModalVisible);
-  };
 
   const toggleModalAvatar = () => {
     setModalVisible(!isModalVisible);
   };
+
   return (
     <View style={styles.cont}>
       <View style={styles.userImg}>
@@ -43,6 +38,7 @@ const ProfileComponent = ({
           <Avatar.Accessory size={27} onPress={toggleModalAvatar} />
         </Avatar>
         {/* --- Modal --- */}
+
         <ProfilePhotoChangeModal
           isModalVisible={isModalVisible}
           onBackdropPress={() => setModalVisible(false)}
@@ -50,12 +46,6 @@ const ProfileComponent = ({
           toggleModal={toggleModalAvatar}
         />
 
-        <ProfileUpdateModal
-          value={name}
-          infoTitle="ismini"
-          isInfoModalVisible={isInfoModalVisible}
-          onBackdropPress={() => setIsInfoModalVisible(false)}
-        />
         {/* --- Modal --- */}
 
         {/* <Text style={{ fontWeight: "500", fontSize: 24, marginTop: 20 }}>
@@ -66,20 +56,45 @@ const ProfileComponent = ({
       <View style={styles.userInfoCont}>
         <InfoCard
           icon={"user"}
-          topInfo="ismini"
+          topInfo="İsim"
           value={name}
-          onPressIcon={toggleInfoModal}
+          infoTitleModal="ismini düzenlemek için yeni isim giriniz."
+          placeHolderModal="Yeni isim"
+          id={id}
         />
 
-        <InfoCard icon={"at"} topInfo="E-mail" value={email} />
+        <InfoCard
+          icon={"at"}
+          topInfo="E-mail"
+          value={email}
+          infoTitleModal="email'ini düzenlemek için yeni email giriniz."
+          placeHolderModal="Yeni email"
+          id={id}
+        />
 
         <InfoCard
           icon={"phone"}
           topInfo="Telefon Numarası"
+          infoTitleModal="telefon numarasını düzenlemek için yeni telefon numarası giriniz."
+          placeHolderModal="5XXXXXXXXX"
           value={phoneNumber}
+          id={id}
         />
-        <InfoCard icon={"calendar-day"} topInfo="Yaş" value={age} />
-        <InfoCard icon={"venus-mars"} topInfo="Cinsiyet" value={gender} />
+        <InfoCard
+          icon={"calendar-day"}
+          topInfo="Yaş"
+          value={age}
+          infoTitleModal="Yaşını düzenlemek için yeni doğum tarihini giriniz."
+          placeHolderModal="yeni yaş"
+          id={id}
+        />
+        <InfoCard
+          icon={"venus-mars"}
+          topInfo="Cinsiyet"
+          value={gender}
+          infoTitleModal="Cinsiyeti düzenlemek için seçenklere tıklayınız."
+          id={id}
+        />
       </View>
     </View>
   );
