@@ -6,10 +6,11 @@ import {
   StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
+import * as ImagePicker from "expo-image-picker";
 import { Avatar } from "react-native-elements";
 import InfoCard from "./InfoCard";
 import ProfilePhotoChangeModal from "../../../../components/Modals/ProfilePhotoChangeModal";
-import ProfileUpdateModal from "../../../../components/Modals/ProfileUpdateModal";
+import firebase from "firebase/compat/app";
 
 const ProfileComponent = ({
   name,
@@ -21,29 +22,158 @@ const ProfileComponent = ({
   id,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [NewAvatarUri, setNewAvatarUri] = useState("");
+  const [ImageName, setImageName] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const toggleModalAvatar = () => {
-    setModalVisible(!isModalVisible);
+    if (!loading) {
+      setModalVisible(!isModalVisible);
+    }
+  };
+
+  const showImagePicker = async () => {
+    // Ask the user for the permission to access the media library
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert(
+        "Uyarı⚠️",
+        "Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz.",
+        [{ text: "Tamam", style: "cancel" }]
+      );
+
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    // Explore the result
+    // console.log(result);
+
+    if (!result.cancelled) {
+      const filename = result.uri.split("/").pop();
+      setNewAvatarUri(result.uri);
+      setImageName(filename);
+      setModalVisible(true);
+      //uploadAvatar(result.uri, filename);
+    }
+  };
+
+  const AvatarUpdate = async (uri, imageName) => {
+    const user = firebase.auth().currentUser;
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    var ref = firebase.storage().ref("avatars/H_avatars").child(imageName);
+    setLoading(true);
+    (await ref.put(blob)).ref.getDownloadURL().then((url) => {
+      // H_user, D_user-> Hastalarım, Chats avatar güncellenir.
+      // !!!! BİLDİRİMLERİN GÜNCELELLENEBİLMESİ İÇİN UNİQUE BİR ALAN OLMASI LAZIM!
+      user
+        .updateProfile({
+          photoURL: url,
+        })
+        .then(() => {
+          firebase
+            .firestore()
+            .collection("H_user")
+            .doc(user.uid)
+            .set({ avatar: url }, { merge: true });
+        })
+        .then(() => {
+          firebase
+            .firestore()
+            .collection("H_user")
+            .doc(user.uid)
+            .collection("Doktorlarım")
+            .onSnapshot((snaps) => {
+              if (!snaps.empty) {
+                snaps.forEach((snapsFor) => {
+                  firebase
+                    .firestore()
+                    .collection("D_user")
+                    .doc(snapsFor.data().Id)
+                    .collection("Hastalarım")
+                    .where("Id", "==", user.uid)
+                    .onSnapshot((snaps2) => {
+                      snaps2.forEach((snaps2For) => {
+                        snaps2For.ref.set({ avatar: url }, { merge: true });
+                      });
+                    });
+                });
+              }
+            });
+        })
+        .then(() => {
+          firebase
+            .firestore()
+            .collection("Chats")
+            .where("users", "array-contains", user.email)
+            .onSnapshot((snaps) => {
+              if (!snaps.empty) {
+                snaps.forEach((snapsFor) => {
+                  snapsFor.ref
+                    .update({
+                      avatar: [url, snapsFor.data().avatar[1]],
+                    })
+                    .then(() => {
+                      setLoading(false);
+                      setModalVisible(false);
+                    });
+                });
+              } else {
+                setLoading(false);
+                setModalVisible(false);
+              }
+            });
+        });
+    });
   };
 
   return (
     <View style={styles.cont}>
       <View style={styles.userImg}>
-        <Avatar
-          source={{ uri: avatar }}
-          size={110}
-          rounded
-          onPress={toggleModalAvatar}
-        >
-          <Avatar.Accessory size={27} onPress={toggleModalAvatar} />
-        </Avatar>
+        {avatar != "" ? (
+          <Avatar
+            source={{ uri: avatar }}
+            size={130}
+            rounded
+            onPress={showImagePicker}
+          >
+            <Avatar.Accessory size={27} onPress={showImagePicker} />
+          </Avatar>
+        ) : (
+          <Avatar
+            source={require("../../../../rec/Avatars/DefaultHastaAvatar.png")}
+            size={130}
+            rounded
+            onPress={showImagePicker}
+          >
+            <Avatar.Accessory size={27} onPress={showImagePicker} />
+          </Avatar>
+        )}
+
         {/* --- Modal --- */}
 
         <ProfilePhotoChangeModal
           isModalVisible={isModalVisible}
-          onBackdropPress={() => setModalVisible(false)}
-          onSwipeComplete={() => setModalVisible(false)}
+          onBackdropPress={() => {
+            !loading ? setModalVisible(false) : null;
+          }}
+          onSwipeComplete={() => {
+            !loading ? setModalVisible(false) : null;
+          }}
           toggleModal={toggleModalAvatar}
+          avatar={NewAvatarUri}
+          showImagePicker={showImagePicker}
+          AvatarUpdate={() => AvatarUpdate(NewAvatarUri, ImageName)}
+          loadingButton={loading}
         />
 
         {/* --- Modal --- */}
