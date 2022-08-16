@@ -58,10 +58,10 @@ const Profile = ({ navigation }) => {
         style={{ flex: 1 }}
         contentContainerStyle={{
           flexGrow: 1,
-          flex: 1,
           paddingHorizontal: 10,
           paddingEnd: 10,
           backgroundColor: "white",
+          paddingVertical: 20,
         }}
       >
         <ProfileComponent
