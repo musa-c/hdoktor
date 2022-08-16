@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
 import LogoLogin from "../../../components/LogoLogin";
@@ -11,22 +11,33 @@ const SignIn = () => {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#fff" }}>
-      <LogoLogin />
-      <Form type="Giriş Yap" />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 10,
+          backgroundColor: "white",
+        }}
+      >
+        <LogoLogin />
+        <Form type="Giriş Yap" />
 
-      <Text style={style.continueText}>Giriş yapmadan devam et</Text>
-      <TouchableOpacity style={style.continueButton}>
-        <Icon name="arrow-circle-right" size={63} color="#B71C1C" />
-      </TouchableOpacity>
-
-      <View style={style.signupTextCont}>
-        <Text style={style.signupText}>Henüz kaydolmadın mı?</Text>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("SignUp00", { screen: "SignUp0" })}
-        >
-          <Text style={style.signupButton}> Kaydol</Text>
+        <TouchableOpacity style={style.continueButton}>
+          <Text style={style.continueText}>Giriş yapmadan devam et</Text>
+          <Icon name="arrow-circle-right" size={63} color="#B71C1C" />
         </TouchableOpacity>
-      </View>
+
+        <View style={style.signupTextCont}>
+          <Text style={style.signupText}>Henüz kaydolmadın mı?</Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("SignUp00", { screen: "SignUp0" })
+            }
+          >
+            <Text style={style.signupButton}> Kaydol</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -43,6 +54,9 @@ const style = StyleSheet.create({
     paddingHorizontal: 16,
   },
   continueButton: {
+    // backgroundColor: "red",
+    //alignSelf: "center",
+    marginTop: 20,
     alignItems: "center",
   },
   signupTextCont: {
