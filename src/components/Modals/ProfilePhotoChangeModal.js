@@ -2,95 +2,71 @@ import { View, Text, Dimensions, TouchableOpacity } from "react-native";
 import React from "react";
 import Modal from "react-native-modal";
 import { Ionicons } from "@expo/vector-icons";
+import { Avatar } from "react-native-elements";
+import LoadingButton from "../Buttons/LoadingButton";
 
 const ProfilePhotoChangeModal = ({
   isModalVisible,
   toggleModal,
   onBackdropPress,
   onSwipeComplete,
+  avatar,
+  showImagePicker,
+  AvatarUpdate,
+  loadingButton,
 }) => {
   return (
     <Modal
       isVisible={isModalVisible}
-      style={{ margin: 0, justifyContent: "flex-end" }}
+      style={{
+        margin: 0,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
       swipeDirection="down"
       onBackdropPress={onBackdropPress}
       onSwipeComplete={onSwipeComplete}
     >
       <View
         style={{
-          height: Dimensions.get("screen").height / 3.5,
-          backgroundColor: "#fff",
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
+          // backgroundColor: "rgba(52, 52, 52, alpha)",
+          backgroundColor: "#EEEEEE",
+          borderRadius: 15,
+          width: Dimensions.get("screen").width / 1.1,
+          paddingVertical: 15,
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        <View
-          style={{
-            width: 70,
-            height: 6,
-            backgroundColor: "grey",
-            alignSelf: "center",
-            borderRadius: 10,
-            marginTop: 12,
-            position: "absolute",
-          }}
-        ></View>
         <Ionicons
           name="close-outline"
-          color="grey"
+          color="black"
           size={30}
           onPress={toggleModal}
-          style={{ alignSelf: "flex-end", marginRight: 5 }}
+          style={{ alignSelf: "flex-end", marginRight: 15 }}
         />
-
-        <View
-          style={{
-            justifyContent: "space-evenly",
-            flex: 1,
-            backgroundColor: "white",
-          }}
+        <Avatar
+          source={{ uri: avatar }}
+          size={160}
+          rounded
+          onPress={showImagePicker}
         >
-          <Text
-            style={{
-              fontSize: 25,
-              fontWeight: "bold",
-              alignSelf: "center",
-            }}
-          >
-            Fotoğraf Değiştir
-          </Text>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#d2302f",
-              width: 300,
-              height: 50,
-              alignSelf: "center",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 25,
-            }}
-          >
-            <Text style={{ fontSize: 20, color: "white", fontWeight: "600" }}>
-              Galerimden seç
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={{
-              backgroundColor: "#d2302f",
-              width: 300,
-              height: 50,
-              alignSelf: "center",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 25,
-            }}
-          >
-            <Text style={{ fontSize: 20, color: "white", fontWeight: "600" }}>
-              Fotoğraf çek
-            </Text>
-          </TouchableOpacity>
-        </View>
+          <Avatar.Accessory size={27} onPress={showImagePicker} />
+        </Avatar>
+
+        <LoadingButton
+          mode="contained-tonal"
+          style={{
+            backgroundColor: "#B71C1C",
+            marginTop: 20,
+            borderRadius: 20,
+          }}
+          FontStyle={{ color: "#F6F6F6", fontSize: 20 }}
+          text={"Kaydet"}
+          onPress={AvatarUpdate}
+          loading={loadingButton}
+          disabled={loadingButton}
+        />
       </View>
     </Modal>
   );
