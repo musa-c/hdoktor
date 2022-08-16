@@ -6,7 +6,7 @@ import {
   KeyboardAvoidingView,
   TouchableOpacity,
 } from "react-native";
-import { TextInput } from "react-native-paper";
+import { HelperText, TextInput } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { CheckBox } from "react-native-elements";
 import { Ionicons } from "@expo/vector-icons";
@@ -37,6 +37,8 @@ const ProfileUpdateModal = ({
   const [cinsiyet, setCinsiyet] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordSee, setispasswordSee] = useState(true);
+  const [ispasswordSeeAgain, setispasswordSeeAgain] = useState(true);
+
   const [error, setError] = useState("");
   const isCheckedErkek = () => {
     if (value == "Erkek") {
@@ -224,6 +226,36 @@ const ProfileUpdateModal = ({
         break;
       case "Cinsiyet":
         break;
+      case "Şifre":
+        if (updateValue != "") {
+          if (
+            /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(
+              updateValue
+            )
+          ) {
+            if (!Validation) {
+              setValidation(true);
+            }
+            return (
+              <TextInput.Icon
+                name="check-circle-outline"
+                forceTextInputFocus={false}
+                color={"green"}
+              />
+            );
+          } else {
+            if (Validation) {
+              setValidation(false);
+            }
+            return (
+              <TextInput.Icon
+                name="close-circle-outline"
+                forceTextInputFocus={false}
+                color={"#f44336"}
+              />
+            );
+          }
+        }
       default:
         break;
     }
@@ -558,11 +590,63 @@ const ProfileUpdateModal = ({
   };
 
   const PasswordUpdate = (updatePassword) => {
-    reauthenticate(password).then(() => {
-      user.updatePassword(updatePassword).then(() => {
-        alert("Şifre güncellendi!");
+    setLoading(true);
+    reauthenticate(password)
+      .then(() => {
+        user
+          .updatePassword(updatePassword)
+          .then(() => {
+            setLoading(false);
+            setUpdate(true);
+            setTimeout(() => {
+              setUpdate(false);
+              setValidation(false);
+              setLoading(false);
+              toggleModal();
+            }, 3000);
+          })
+          .catch((error) => {
+            const ErrorCode = error.code;
+            switch (ErrorCode.substr(5)) {
+              case "weak-password":
+                setError("Parola yeterince güçlü değil.");
+                break;
+              case "requires-recent-login":
+                setError("Lütfen mevcut şifrenizi tekrar giriniz.");
+                break;
+              default:
+                setError("Hata lütfen tekrar deneyiniz.");
+                break;
+            }
+            setLoading(false);
+          });
+      })
+      .catch((error) => {
+        const ErrorCode = error.code;
+        switch (ErrorCode.substr(5)) {
+          case "user-mismatch":
+            setError("Şifrenizi kontrol edip tekrar deneyiniz.");
+            setLoading(false);
+            break;
+          // case "user-not-found":
+          //   break;
+          case "invalid-credential":
+            break;
+          case "wrong-password":
+            setError("Yanlış şifre.");
+            setLoading(false);
+            break;
+          case "invalid-verification-code":
+          case "invalid-verification-id":
+            setError("Geçersiz doğrulama.");
+            setLoading(false);
+            break;
+          default:
+            setError("Güncelleme başarısız. Lütfen tekrar deneyin.");
+            setLoading(false);
+            break;
+        }
       });
-    });
   };
 
   const Update = async (topInfo, updateValue, toggleModal) => {
@@ -581,6 +665,9 @@ const ProfileUpdateModal = ({
         break;
       case "Cinsiyet":
         genderUpdate(id, updateValue);
+        break;
+      case "Şifre":
+        PasswordUpdate(updateValue);
         break;
       default:
         break;
@@ -601,6 +688,26 @@ const ProfileUpdateModal = ({
           name="eye-off-outline"
           forceTextInputFocus={false}
           onPress={() => setispasswordSee(!isPasswordSee)}
+        />
+      );
+    }
+  };
+
+  const passwordSeeAgain = () => {
+    if (!passwordSeeAgain) {
+      return (
+        <TextInput.Icon
+          name="eye-outline"
+          forceTextInputFocus={false}
+          onPress={() => setispasswordSeeAgain(!ispasswordSeeAgain)}
+        />
+      );
+    } else {
+      return (
+        <TextInput.Icon
+          name="eye-off-outline"
+          forceTextInputFocus={false}
+          onPress={() => setispasswordSeeAgain(!ispasswordSeeAgain)}
         />
       );
     }
@@ -628,6 +735,7 @@ const ProfileUpdateModal = ({
         setCheckedK(false);
         setValidation(false);
         setispasswordSee(true);
+        setispasswordSeeAgain(true);
         setPassword("");
         setError("");
         setUpdateValue("");
@@ -641,208 +749,221 @@ const ProfileUpdateModal = ({
           setCheckedK(true);
         }
       }}
+      avoidKeyboard
       //avoidKeyboard
     >
-      <KeyboardAvoidingView
-        behavior="padding"
-        contentContainerStyle={{
-          flex: 1,
-          justifyContent: "center",
-          paddingVertical: 10,
+      <SuccesModal isVisible={update} />
+      <View
+        style={{
+          backgroundColor: "#fff",
+          borderRadius: 15,
+          width: Dimensions.get("screen").width / 1.1,
+          paddingVertical: 15,
         }}
       >
-        <SuccesModal isVisible={update} />
-        <View
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: 15,
-            width: Dimensions.get("screen").width / 1.1,
-            paddingVertical: 15,
-          }}
-        >
-          <DateTimePickerModal
-            isVisible={isDatePickerVisible}
-            mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
-            locale="tr-TR"
-            confirmTextIOS="Tamam"
-            cancelTextIOS="İptal"
-          />
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirm}
+          onCancel={hideDatePicker}
+          locale="tr-TR"
+          confirmTextIOS="Tamam"
+          cancelTextIOS="İptal"
+        />
 
-          <View style={styles.titleCont}>
-            <Text style={styles.titleText}>Düzenleme</Text>
-          </View>
-          <View style={styles.textCont}>
-            <Text style={styles.infoTitle}>
-              <Text style={styles.valueStyle}>{value} </Text>
-              {infoTitle}
-            </Text>
-          </View>
-          {topInfo == "İsim" || topInfo == "Telefon Numarası" ? (
+        <View style={styles.titleCont}>
+          <Text style={styles.titleText}>Düzenleme</Text>
+        </View>
+        <View style={styles.textCont}>
+          <Text style={styles.infoTitle}>
+            <Text style={styles.valueStyle}>{value} </Text>
+            {infoTitle}
+          </Text>
+        </View>
+        {topInfo == "İsim" || topInfo == "Telefon Numarası" ? (
+          <TextInput
+            style={styles.textInput}
+            value={updateValue}
+            onChangeText={(text) => setUpdateValue(text)}
+            activeOutlineColor="#B71C1C"
+            outlineColor="white"
+            right={Validate(topInfo, updateValue)}
+            left={LeftComponent(topInfo)}
+            // underlineColor="red"
+            //placeholderTextColor="#fff"
+            theme={{ roundness: 10 }}
+            mode="outlined"
+            label={placeHolderModal}
+          ></TextInput>
+        ) : topInfo == "E-mail" || topInfo == "Şifre" ? (
+          <View>
+            {error != "" ? (
+              <>
+                <Ionicons
+                  name="alert-circle-outline"
+                  size={30}
+                  color="red"
+                  style={{ alignSelf: "center" }}
+                />
+                <Text
+                  style={{
+                    color: "red",
+                    fontSize: 18,
+                    alignSelf: "center",
+                    marginVertical: 10,
+                    fontWeight: "bold",
+                    marginHorizontal: 7,
+                  }}
+                >
+                  {error}
+                </Text>
+              </>
+            ) : null}
+
             <TextInput
               style={styles.textInput}
+              value={password}
+              onChangeText={(text) => setPassword(text)}
+              activeOutlineColor="#B71C1C"
+              outlineColor="white"
+              secureTextEntry={isPasswordSee}
+              right={topInfo != "Şifre" ? passwordSee() : null}
+              left={topInfo == "Şifre" ? passwordSee() : null}
+              //disabled={UpdadeTextInput}
+              //right={Validate(topInfo, updateValue)}
+              // underlineColor="red"
+              //placeholderTextColor="#fff"
+              theme={{ roundness: 10 }}
+              mode="outlined"
+              label={topInfo == "Şifre" ? "Mevcut Şifre" : "Şifre"}
+            ></TextInput>
+
+            <TextInput
+              style={[styles.textInput, { marginBottom: 10 }]}
               value={updateValue}
               onChangeText={(text) => setUpdateValue(text)}
               activeOutlineColor="#B71C1C"
               outlineColor="white"
               right={Validate(topInfo, updateValue)}
-              left={LeftComponent(topInfo)}
+              left={topInfo == "Şifre" ? passwordSeeAgain() : null}
+              secureTextEntry={topInfo == "Şifre" ? ispasswordSeeAgain : null}
               // underlineColor="red"
               //placeholderTextColor="#fff"
               theme={{ roundness: 10 }}
               mode="outlined"
               label={placeHolderModal}
             ></TextInput>
-          ) : topInfo == "E-mail" ? (
-            <View>
-              {error != "" ? (
-                <>
-                  <Ionicons
-                    name="alert-circle-outline"
-                    size={30}
-                    color="red"
-                    style={{ alignSelf: "center" }}
-                  />
-                  <Text
-                    style={{
-                      color: "red",
-                      fontSize: 18,
-                      alignSelf: "center",
-                      marginVertical: 10,
-                      fontWeight: "bold",
-                      marginHorizontal: 7,
-                    }}
-                  >
-                    {error}
-                  </Text>
-                </>
-              ) : null}
-
-              <TextInput
-                style={styles.textInput}
-                value={password}
-                onChangeText={(text) => setPassword(text)}
-                activeOutlineColor="#B71C1C"
-                outlineColor="white"
-                secureTextEntry={isPasswordSee}
-                right={passwordSee()}
-                //disabled={UpdadeTextInput}
-                //right={Validate(topInfo, updateValue)}
-                // underlineColor="red"
-                //placeholderTextColor="#fff"
-                theme={{ roundness: 10 }}
-                mode="outlined"
-                label={"Şifre"}
-              ></TextInput>
-
-              <TextInput
-                style={styles.textInput}
-                value={updateValue}
-                onChangeText={(text) => setUpdateValue(text)}
-                activeOutlineColor="#B71C1C"
-                outlineColor="white"
-                right={Validate(topInfo, updateValue)}
-                left={LeftComponent(topInfo)}
-                // underlineColor="red"
-                //placeholderTextColor="#fff"
-                theme={{ roundness: 10 }}
-                mode="outlined"
-                label={placeHolderModal}
-              ></TextInput>
-            </View>
-          ) : topInfo == "Yaş" ? (
-            <TouchableOpacity onPress={showDatePicker}>
-              <View
+            {(topInfo == "Şifre") & (updateValue != "") ? (
+              <HelperText
+                type="info"
+                visible={!Validation}
                 style={{
-                  flexDirection: "row",
-                  backgroundColor: "#ECECEC",
+                  color: "#f44336",
+                  textAlign: "justify",
+                  //backgroundColor: "red",
+                  marginBottom: 10,
+                  width: 300,
                   alignSelf: "center",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: 10,
-                  paddingHorizontal: 20,
-                  margin: 15,
-                  borderRadius: 10,
                 }}
               >
-                <Text style={{ fontSize: 20 }}>
-                  {dogumTarih == "" ? value : dogumTarih}
-                </Text>
-                <Ionicons
-                  name="chevron-down-outline"
-                  size={18}
-                  style={{ marginLeft: 10 }}
-                />
-              </View>
-            </TouchableOpacity>
-          ) : (
+                <Ionicons name="alert-circle-outline" />
+                &nbsp; Şifre, en az 8 en çok 32 karakter olmalıdır. En az; 1
+                harf, 1 rakam içermelidir. Boşluk içermemeli. Özel karakterler
+                kullanılabilir: @$!%*#?&^_-
+              </HelperText>
+            ) : null}
+          </View>
+        ) : topInfo == "Yaş" ? (
+          <TouchableOpacity onPress={showDatePicker}>
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "space-evenly",
-                marginVertical: 5,
+                backgroundColor: "#ECECEC",
+                alignSelf: "center",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 10,
+                paddingHorizontal: 20,
+                margin: 15,
+                borderRadius: 10,
               }}
             >
-              <CheckBox
-                center
-                title="Erkek"
-                checkedIcon="dot-circle-o"
-                uncheckedIcon="circle-o"
-                containerStyle={{
-                  alignSelf: "baseline",
-                  backgroundColor: "rgba(52, 52, 52, 0.0)",
-                  borderWidth: 0,
-                  borderRadius: 0,
-                }}
-                checked={checkedE}
-                checkedColor="#ba000d"
-                onPress={() => isCheckedErkek(true)}
-              />
-              <CheckBox
-                center
-                title="Kadın"
-                checkedIcon="dot-circle-o"
-                uncheckedIcon="circle-o"
-                containerStyle={{
-                  alignSelf: "baseline",
-                  backgroundColor: "rgba(52, 52, 52, 0.0)",
-                  borderWidth: 0,
-                  borderRadius: 0,
-                }}
-                checked={checkedK}
-                checkedColor="#ba000d"
-                onPress={() => isCheckedKadın(true)}
+              <Text style={{ fontSize: 20 }}>
+                {dogumTarih == "" ? value : dogumTarih}
+              </Text>
+              <Ionicons
+                name="chevron-down-outline"
+                size={18}
+                style={{ marginLeft: 10 }}
               />
             </View>
-          )}
-
-          <View style={styles.buttonCont}>
-            <LoadingButton
-              text={"Güncelle"}
-              loading={loading}
-              disabled={!Validation ? true : loading}
-              mode="contained"
-              color="#B71C1C"
-              onPress={() => {
-                if (Validation) {
-                  if (topInfo == "Yaş") {
-                    Update(topInfo, dogumTarih);
-                  } else if (topInfo == "E-mail") {
-                    Update(topInfo, updateValue);
-                  } else if (topInfo == "Cinsiyet") {
-                    Update(topInfo, cinsiyet);
-                  } else {
-                    Update(topInfo, updateValue), setUpdateValue("");
-                  }
-                }
+          </TouchableOpacity>
+        ) : (
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-evenly",
+              marginVertical: 5,
+            }}
+          >
+            <CheckBox
+              center
+              title="Erkek"
+              checkedIcon="dot-circle-o"
+              uncheckedIcon="circle-o"
+              containerStyle={{
+                alignSelf: "baseline",
+                backgroundColor: "rgba(52, 52, 52, 0.0)",
+                borderWidth: 0,
+                borderRadius: 0,
               }}
-              style={{ borderRadius: 20 }}
-              FontStyle={{ fontSize: 20, color: "white" }}
+              checked={checkedE}
+              checkedColor="#ba000d"
+              onPress={() => isCheckedErkek(true)}
+            />
+            <CheckBox
+              center
+              title="Kadın"
+              checkedIcon="dot-circle-o"
+              uncheckedIcon="circle-o"
+              containerStyle={{
+                alignSelf: "baseline",
+                backgroundColor: "rgba(52, 52, 52, 0.0)",
+                borderWidth: 0,
+                borderRadius: 0,
+              }}
+              checked={checkedK}
+              checkedColor="#ba000d"
+              onPress={() => isCheckedKadın(true)}
             />
           </View>
+        )}
+
+        <View style={styles.buttonCont}>
+          <LoadingButton
+            text={"Güncelle"}
+            loading={loading}
+            disabled={!Validation ? true : loading}
+            mode="contained"
+            color="#B71C1C"
+            onPress={() => {
+              if (Validation) {
+                if (topInfo == "Yaş") {
+                  Update(topInfo, dogumTarih);
+                } else if (topInfo == "E-mail") {
+                  Update(topInfo, updateValue);
+                } else if (topInfo == "Cinsiyet") {
+                  Update(topInfo, cinsiyet);
+                } else {
+                  Update(topInfo, updateValue), setUpdateValue("");
+                }
+              }
+            }}
+            style={{ borderRadius: 20 }}
+            FontStyle={{ fontSize: 20, color: "white" }}
+          />
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 };
