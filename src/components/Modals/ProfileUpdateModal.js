@@ -17,6 +17,7 @@ import Modal from "react-native-modal";
 import LoadingButton from "../Buttons/LoadingButton";
 import firebase from "firebase/compat/app";
 import SuccesModal from "./SuccesModal";
+import { truncate } from "lodash";
 
 const ProfileUpdateModal = ({
   value,
@@ -36,6 +37,7 @@ const ProfileUpdateModal = ({
   const [cinsiyet, setCinsiyet] = useState("");
   const [password, setPassword] = useState("");
   const [isPasswordSee, setispasswordSee] = useState(true);
+  const [error, setError] = useState("");
   const isCheckedErkek = () => {
     if (value == "Erkek") {
       if (Validation) {
@@ -100,13 +102,10 @@ const ProfileUpdateModal = ({
     setDatePickerVisibility(true);
   };
 
-  //console.log(topInfo);
   const [Validation, setValidation] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const Validate = (topInfo, updateValue) => {
-    console.log("topInfo:", topInfo);
-    console.log("updateValue:", updateValue);
-
     switch (topInfo) {
       case "İsim":
         if (updateValue != "") {
@@ -212,8 +211,6 @@ const ProfileUpdateModal = ({
         break;
       case "Yaş":
         // 13> büyük olma zorunluluğu getir!
-        console.log(Validation);
-        console.log("value:", value);
         if (updateValue != value) {
           if (!Validation) {
             setValidation(true);
@@ -302,7 +299,10 @@ const ProfileUpdateModal = ({
               });
           });
       })
-      .catch((e) => setUpdate(false));
+      .catch((e) => {
+        setUpdate(false);
+        setLoading(false);
+      });
   };
 
   const phoneNumberUpdate = (id, updatePhoneNumber) => {
@@ -424,24 +424,137 @@ const ProfileUpdateModal = ({
   };
 
   const EmailUpdate = (id, emailUpdate) => {
-    reauthenticate(password).then(() => {
-      user.updateEmail(emailUpdate).then(() => {
-        firebase
-          .firestore()
-          .collection("H_user")
-          .doc(id)
-          .update({ email: emailUpdate.toLowerCase() })
-          .then(() => {
-            setUpdate(true);
-            setTimeout(() => {
-              setUpdate(false);
-              setValidation(false);
+    // GÜNCELLENENLER: H_user, Chats, D_user->Hastalarım
+    setLoading(true);
+    reauthenticate(password)
+      .then(() => {
+        const UpdateEmail = user.updateEmail(emailUpdate.toLowerCase());
+        UpdateEmail.then(() => {
+          firebase
+            .firestore()
+            .collection("Chats")
+            .where("users", "array-contains", value.toLowerCase())
+            .get()
+            .then((chatSnaps) => {
+              chatSnaps.forEach((chatSnapsFor) => {
+                if (chatSnapsFor.exists) {
+                  chatSnapsFor.ref.update({
+                    users: [
+                      emailUpdate.toLowerCase(),
+                      chatSnapsFor.data().users[1],
+                    ],
+                  });
+                }
+              });
+            })
+            .then(() => {
+              firebase
+                .firestore()
+                .collection("H_user")
+                .doc(id)
+                .update({ email: emailUpdate.toLowerCase() })
+                .then(() => {
+                  firebase
+                    .firestore()
+                    .collection("H_user")
+                    .doc(id)
+                    .collection("Doktorlarım")
+                    .onSnapshot((querySnaps) => {
+                      if (!querySnaps.empty) {
+                        querySnaps.forEach((queryFor) => {
+                          firebase
+                            .firestore()
+                            .collection("D_user")
+                            .doc(queryFor.data().Id)
+                            .collection("Hastalarım")
+                            .where("Id", "==", user.uid)
+                            .get()
+                            .then((snapsThen) => {
+                              snapsThen.forEach((snapsThenFor) => {
+                                snapsThenFor.ref.update({
+                                  email: emailUpdate.toLowerCase(),
+                                });
+                              });
+                            })
+                            .then(() => {
+                              setLoading(false);
+                              setUpdate(true);
+                              setTimeout(() => {
+                                setUpdate(false);
+                                setValidation(false);
+                                setLoading(false);
+                                toggleModal();
+                              }, 3000);
+                            });
+                        });
+                      } else {
+                        setLoading(false);
+                        setUpdate(true);
+                        setTimeout(() => {
+                          setUpdate(false);
+                          setValidation(false);
+                          setLoading(false);
+                          toggleModal();
+                        }, 3000);
+                      }
+                    });
+                });
+            });
+        }).catch((error) => {
+          const ErrorCode = error.code;
+          switch (ErrorCode.substr(5)) {
+            case "invalid-email":
+              setError("Email adresi geçersiz.");
               setLoading(false);
-              toggleModal();
-            }, 3000);
-          });
+              break;
+            case "email-already-in-use":
+              setError("Bu E-mail kullanılıyor.");
+              setLoading(false);
+
+              break;
+            case "requires-recent-login":
+              setError(
+                "İsteğiniz zaman aşımına uğradı. Lütfen şifrenizi ve yeni email'inizi tekrar girip deneyiziz."
+              );
+              setLoading(false);
+
+              break;
+            default:
+              break;
+          }
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        switch (errorCode.substr(5)) {
+          case "user-mismatch":
+            setError("Şifrenizi kontrol edip tekrar deneyiniz.");
+            setLoading(false);
+
+            break;
+          // case "user-not-found":
+          //   alert("Kullanıcı Bulunamadı.")
+          //   break;
+          // case "invalid-email":
+          //   alert("Geçersiz E-posta")
+          //   break;
+          case "wrong-password":
+            setError("Yanlış şifre.");
+            setLoading(false);
+
+            break;
+          case "invalid-verification-code":
+          case "invalid-verification-id":
+            setError("Geçersiz doğrulama.");
+            setLoading(false);
+
+            break;
+          default:
+            setError("Güncelleme başarısız. Lütfen tekrar deneyin.");
+            setLoading(false);
+            break;
+        }
       });
-    });
   };
 
   const PasswordUpdate = (updatePassword) => {
@@ -451,8 +564,6 @@ const ProfileUpdateModal = ({
       });
     });
   };
-
-  const [loading, setLoading] = useState(false);
 
   const Update = async (topInfo, updateValue, toggleModal) => {
     switch (topInfo) {
@@ -475,7 +586,6 @@ const ProfileUpdateModal = ({
         break;
     }
   };
-  console.log("authEmail:", user.email);
   const passwordSee = () => {
     if (!isPasswordSee) {
       return (
@@ -496,8 +606,6 @@ const ProfileUpdateModal = ({
     }
   };
 
-  console.log(isPasswordSee);
-
   const LeftComponent = (topInfo) => {
     if (topInfo == "Telefon Numarası") {
       return <TextInput.Affix text="+90" textStyle={{ fontSize: 20 }} />;
@@ -512,7 +620,7 @@ const ProfileUpdateModal = ({
         justifyContent: "center",
         alignItems: "center",
       }}
-      onBackdropPress={onBackdropPress}
+      onBackdropPress={!loading ? onBackdropPress : null}
       backdropOpacity={0.8}
       onModalHide={() => {
         setdogumTarih("");
@@ -521,6 +629,9 @@ const ProfileUpdateModal = ({
         setValidation(false);
         setispasswordSee(true);
         setPassword("");
+        setError("");
+        setUpdateValue("");
+        setLoading(false);
         //setUpdadeTextInput(false);
       }}
       onModalShow={() => {
@@ -585,6 +696,29 @@ const ProfileUpdateModal = ({
             ></TextInput>
           ) : topInfo == "E-mail" ? (
             <View>
+              {error != "" ? (
+                <>
+                  <Ionicons
+                    name="alert-circle-outline"
+                    size={30}
+                    color="red"
+                    style={{ alignSelf: "center" }}
+                  />
+                  <Text
+                    style={{
+                      color: "red",
+                      fontSize: 18,
+                      alignSelf: "center",
+                      marginVertical: 10,
+                      fontWeight: "bold",
+                      marginHorizontal: 7,
+                    }}
+                  >
+                    {error}
+                  </Text>
+                </>
+              ) : null}
+
               <TextInput
                 style={styles.textInput}
                 value={password}
@@ -741,7 +875,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   textInput: {
-    margin: 20,
+    marginBottom: 20,
+    marginHorizontal: 20,
     fontSize: 20,
     backgroundColor: "#ECECEC",
     //height: 70,
