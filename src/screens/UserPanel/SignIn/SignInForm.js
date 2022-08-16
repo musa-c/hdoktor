@@ -27,6 +27,7 @@ const Form = () => {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
+        const user = firebase.auth().currentUser;
         firebase
           .firestore()
           .collection("H_user")
@@ -55,11 +56,77 @@ const Form = () => {
                   firebase
                     .firestore()
                     .collection("H_user")
-                    .where("Id", "==", firebase.auth().currentUser.uid)
-                    .onSnapshot((snaps) => {
+                    .where("Id", "==", user.uid)
+                    .get()
+                    .then((snaps) => {
                       if (!snaps.empty) {
                         // Kullanıcı eğer emaili değiştip mail kutusuna gelen linki tıklayıp eski emaili dönerse gerekli veritabanı işlemleri uygulamanacak!
-                        alert("oldu gibi");
+                        console.log(user.uid);
+
+                        firebase
+                          .firestore()
+                          .collection("H_user")
+                          .doc(user.uid)
+                          .get()
+                          .then((thenQery) => {
+                            firebase
+                              .firestore()
+                              .collection("Chats")
+                              .where(
+                                "users",
+                                "array-contains",
+                                thenQery.data().email
+                              )
+                              .get()
+                              .then((thenQery2) => {
+                                thenQery2.forEach((thenFor) => {
+                                  thenFor.ref.update({
+                                    users: [
+                                      user.email,
+                                      thenFor.data().users[1],
+                                    ],
+                                  });
+                                });
+                              })
+                              .then(() => {
+                                thenQery.ref.update({
+                                  email: user.email,
+                                });
+                              });
+                          })
+                          .then(() => {
+                            firebase
+                              .firestore()
+                              .collection("H_user")
+                              .doc(user.uid)
+                              .collection("Doktorlarım")
+                              .onSnapshot((querySnaps) => {
+                                querySnaps.forEach((queryFor) => {
+                                  firebase
+                                    .firestore()
+                                    .collection("D_user")
+                                    .doc(queryFor.data().Id)
+                                    .collection("Hastalarım")
+                                    .where("Id", "==", user.uid)
+                                    .get()
+                                    .then((snapsThen) => {
+                                      snapsThen.forEach((snapsThenFor) => {
+                                        snapsThenFor.ref.update({
+                                          email: user.email,
+                                        });
+                                      });
+                                    });
+                                });
+                              });
+                          })
+                          .then(() => {
+                            SetLoading(false);
+                            setEmail("");
+                            setPassword("");
+                            setErrorMessage("");
+                            navigation.navigate("TabU");
+                          });
+
                         SetLoading(false);
                         setErrorMessage("");
                       } else {
