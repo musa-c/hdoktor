@@ -950,10 +950,9 @@ const SignUp00 = ({ navigation }) => {
                           }}
                         >
                           <Ionicons name="alert-circle-outline" />
-                          &nbsp; Şifre, Minimum 8 maksimum 32 karakter
-                          olmalıdır. En az; 1 harf, 1 rakam içermelidir. Boşluk
-                          içermemeli. Özel karakterler kullanılabilir:
-                          "@$!%*#?&^_-"
+                          &nbsp; Şifre, en az 8 en çok 32 karakter olmalıdır. En
+                          az; 1 harf, 1 rakam içermelidir. Boşluk içermemeli.
+                          Özel karakterler kullanılabilir: @$!%*#?&^_-
                         </HelperText>
                       )}
 
