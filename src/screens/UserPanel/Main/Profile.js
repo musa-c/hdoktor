@@ -19,10 +19,8 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     let unmounted = false;
-
-    const user = firebase.auth().currentUser;
-
     if (!unmounted) {
+      const user = firebase.auth().currentUser;
       firebase
         .firestore()
         .collection("H_user")
@@ -35,10 +33,7 @@ const Profile = ({ navigation }) => {
           setPhoneNumber(snapshot.data().phoneNumber);
           setDate(snapshot.data().date);
           setId(snapshot.data().Id);
-          setAvatar(
-            snapshot.data()?.avatar ??
-              "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultHastaAvatar.png?alt=media&token=0e4d1b7c-d8d1-477f-87ea-55768082f81b"
-          );
+          setAvatar(snapshot.data()?.avatar ?? "");
           // TEL NO
           // YAŞ
           //
