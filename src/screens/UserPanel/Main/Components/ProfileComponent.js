@@ -188,7 +188,7 @@ const ProfileComponent = ({
           icon={"user"}
           topInfo="İsim"
           value={name}
-          infoTitleModal="ismini düzenlemek için yeni isim giriniz."
+          infoTitleModal="İsmini güncellemek için yeni isim giriniz."
           placeHolderModal="Yeni isim"
           id={id}
         />
@@ -197,7 +197,7 @@ const ProfileComponent = ({
           icon={"at"}
           topInfo="E-mail"
           value={email}
-          infoTitleModal="email'ini düzenlemek için yeni email giriniz."
+          infoTitleModal="email'ini güncellemek için yeni email giriniz."
           placeHolderModal="Yeni email"
           id={id}
         />
@@ -205,7 +205,7 @@ const ProfileComponent = ({
         <InfoCard
           icon={"phone"}
           topInfo="Telefon Numarası"
-          infoTitleModal="telefon numarasını düzenlemek için yeni telefon numarası giriniz."
+          infoTitleModal="telefon numaranı güncellemek için yeni telefon numarası giriniz."
           placeHolderModal="5XXXXXXXXX"
           value={phoneNumber}
           id={id}
@@ -214,7 +214,7 @@ const ProfileComponent = ({
           icon={"calendar-day"}
           topInfo="Yaş"
           value={age}
-          infoTitleModal="Yaşını düzenlemek için yeni doğum tarihini giriniz."
+          infoTitleModal="Yaşını güncellemek için yeni doğum tarihini giriniz."
           placeHolderModal="yeni yaş"
           id={id}
         />
@@ -222,8 +222,17 @@ const ProfileComponent = ({
           icon={"venus-mars"}
           topInfo="Cinsiyet"
           value={gender}
-          infoTitleModal="Cinsiyeti düzenlemek için seçenklere tıklayınız."
+          infoTitleModal="Cinsiyetini güncellemek için seçenklere tıklayınız."
           id={id}
+        />
+
+        <InfoCard
+          icon={"lock"}
+          topInfo="Şifre"
+          value="********"
+          infoTitleModal="Şifreyi güncellemek için yeni şifre giriniz."
+          id={id}
+          placeHolderModal="Yeni Şifre"
         />
       </View>
     </View>
