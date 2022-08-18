@@ -26,7 +26,9 @@ function HomeD(props) {
 
   useEffect(() => {
     let unmounted = false;
-    setRefreshing(true);
+    if (!unmounted) {
+      setRefreshing(true);
+    }
     const myuser = firebase.auth().currentUser;
     firebase
       .firestore()

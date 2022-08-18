@@ -22,7 +22,9 @@ const MyPatients = (props) => {
   console.log("modalCardVisible:", modalCardVisible);
   useEffect(() => {
     let unmounted = false;
-    setRefreshing(true);
+    if (!unmounted) {
+      setRefreshing(true);
+    }
     firebase.auth().onAuthStateChanged((doctor) => {
       if (doctor) {
         firebase
@@ -293,21 +295,17 @@ const MyPatients = (props) => {
             />
 
             <MyDoctorPatientsCard
-              avatar={
-                element.item.avatar == ""
-                  ? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FH_avatars%2FDefaultHastaAvatar.png?alt=media&token=66f93caf-ef41-461b-9e20-b35ac92a8084"
-                  : element.item.avatar
-              }
+              avatar={element.item.avatar}
               name={element.item.name}
               text1={element.item.cinsiyet}
               iconFont1="venus-mars"
               text2={element.item.email}
               iconFont2="at"
               randevuCount={element.item.randevuCount}
+              KHastalik={element.item.KHastalik}
               RandevuSaat={element.item.RandevuSaat}
               RandevuTarih={element.item.RandevuTarih}
               onPressRandevuModal={() => {
-                console.log("bas");
                 setHid(element.item.Id);
                 sethuserName(element.item.name);
                 setHDocId(element.item.key);

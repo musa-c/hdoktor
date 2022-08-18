@@ -30,7 +30,9 @@ const MyDoctor = ({ route }) => {
 
   useEffect(() => {
     let unmounted = false;
-    setRefreshing(true);
+    if (!unmounted) {
+      setRefreshing(true);
+    }
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         // alert("Null Değilim")

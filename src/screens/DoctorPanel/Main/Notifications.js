@@ -50,7 +50,7 @@ const Notifications = () => {
     <View style={styles.cont}>
       <FlatList
         data={data}
-        contentContainerStyle={{ flex: 1 }}
+        contentContainerStyle={{ flexGrow: 1 }}
         ListEmptyComponent={ListEmptyComponent}
         renderItem={({ item }) => (
           <>
@@ -63,12 +63,23 @@ const Notifications = () => {
                 }}
               >
                 <Badge status="primary" />
-                <Avatar
-                  size={60}
-                  rounded
-                  title="MC"
-                  containerStyle={{ backgroundColor: "#3d4db7" }}
-                />
+                {item.avatar == "" ? (
+                  <Avatar
+                    size={60}
+                    rounded
+                    //title="MC"
+                    source={require("../../../rec/Avatars/DefaultHastaAvatar.png")}
+                    containerStyle={{ backgroundColor: "#3d4db7" }}
+                  />
+                ) : (
+                  <Avatar
+                    size={60}
+                    rounded
+                    //title="MC"
+                    source={{ uri: item.avatar }}
+                    containerStyle={{ backgroundColor: "#3d4db7" }}
+                  />
+                )}
               </View>
               <View style={styles.cardCont}>
                 <Text

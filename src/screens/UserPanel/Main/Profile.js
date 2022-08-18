@@ -29,7 +29,7 @@ const Profile = ({ navigation }) => {
           setName(snapshot.data().name);
           setEmail(snapshot.data().email);
           setCinsiyet(snapshot.data()?.cinsiyet);
-          setKHastalik(snapshot.data().KHastalık);
+          setKHastalik(snapshot.data().KHastalik);
           setPhoneNumber(snapshot.data().phoneNumber);
           setDate(snapshot.data().date);
           setId(snapshot.data().Id);
@@ -71,6 +71,7 @@ const Profile = ({ navigation }) => {
           age={date}
           gender={cinsiyet}
           phoneNumber={phoneNumber}
+          KHastalik={KHastalik}
           id={Id}
         />
       </ScrollView>

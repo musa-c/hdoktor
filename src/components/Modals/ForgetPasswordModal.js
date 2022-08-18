@@ -129,16 +129,18 @@ const ForgetPasswordModal = ({ isModalVisible, onBackdropPress }) => {
                 E-posta adresini gir, şifreni sıfırlayabilmen için sana bir
                 bağlantı gönderelim.
               </Text>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  color: "red",
-                  marginBottom: 10,
-                }}
-              >
-                {error}
-              </Text>
+              {error != "" && (
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "bold",
+                    color: "red",
+                    marginBottom: 10,
+                  }}
+                >
+                  {error}
+                </Text>
+              )}
             </View>
             <TextInput
               style={styles.textInput}

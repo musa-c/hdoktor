@@ -54,7 +54,7 @@ const Notifications = () => {
                 <Avatar
                   size={60}
                   rounded
-                  title="MC"
+                  source={{ uri: item.avatar }}
                   containerStyle={{ backgroundColor: "#3d4db7" }}
                 />
               </View>

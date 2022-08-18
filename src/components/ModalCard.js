@@ -235,6 +235,7 @@ const ModalCard = ({
                     // console.log("hastlarım silinme başarısız");
                     //});
                   } else if (docd.docs.length == 1) {
+                    setDisabled(false);
                     setIsVisibleModal(false);
                     // docd.forEach((singleDoc) => {
                     //   firebase

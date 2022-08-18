@@ -119,13 +119,11 @@ const Appointment = ({ route }) => {
       .then((snapshot) => {
         if (!unmounted) {
           setH_Name(snapshot.data().name);
-          setH_Avatar(
-            snapshot.data()?.avatar ??
-              "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultHastaAvatar.png?alt=media&token=0e4d1b7c-d8d1-477f-87ea-55768082f81b"
-          );
+          setH_Avatar(snapshot.data()?.avatar ?? "");
           setH_Cinsiyet(snapshot.data().cinsiyet);
           setH_Id(snapshot.data().Id);
           setH_email(snapshot.data().email);
+          setKHastalik(snapshot.data().KHastalik);
         }
       });
     return () => {
@@ -390,6 +388,7 @@ const Appointment = ({ route }) => {
   const [H_Avatar, setH_Avatar] = useState();
   const [H_Cinsiyet, setH_Cinsiyet] = useState();
   const [H_email, setH_email] = useState();
+  const [KHastalik, setKHastalik] = useState();
 
   const [refreshUseEffect, setRefreshUseEffect] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -429,6 +428,7 @@ const Appointment = ({ route }) => {
               RandevuTarih: tarihTr,
               RandevuSaat: clockd,
               avatar: H_Avatar,
+              KHastalik: KHastalik,
             });
           var now = new Date();
 
@@ -444,6 +444,8 @@ const Appointment = ({ route }) => {
               RandevuTarih: tarihTr,
               RandevuSaat: clockd,
               saat: now,
+              KHastalik: KHastalik,
+              id: H_id,
             });
 
           setModalVisible(!isModalVisible);

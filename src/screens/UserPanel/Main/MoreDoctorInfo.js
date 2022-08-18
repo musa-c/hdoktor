@@ -33,7 +33,6 @@ const MoreDoctorInfo = ({ navigation }) => {
   const [brans, setBrans] = useState("");
   const [avatar, setAvatar] = useState();
 
-  const arr = [];
   useEffect(() => {
     let unmounted = false;
     // currentUser = firebase.auth().currentUser;

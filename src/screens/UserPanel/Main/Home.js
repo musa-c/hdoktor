@@ -22,7 +22,9 @@ function HomeU(props) {
 
   useEffect(() => {
     let unmounted = false;
-    setRefreshing(true);
+    if (!unmounted) {
+      setRefreshing(true);
+    }
     firebase
       .firestore()
       .collection("D_user")

@@ -66,17 +66,14 @@ const PatientConfirmation = ({ navigation }) => {
           .doc(doctor?.uid ?? "")
           .onSnapshot((snapshot) => {
             if (!unmounted) {
-              setD_Name(snapshot.data()?.name ?? "");
-              setD_Email(snapshot.data()?.email ?? "");
-              setD_Id(snapshot.data()?.Id ?? "");
-              setAlan(snapshot.data()?.brans ?? "");
+              setD_Name(snapshot.data()?.name);
+              setD_Email(snapshot.data()?.email);
+              setD_Id(snapshot.data()?.Id);
+              setAlan(snapshot.data()?.brans);
               setCalisilanYer(snapshot.data()?.CalisilanYer ?? "");
-              setIletisimSaat1(snapshot.data()?.time1 ?? "");
-              setIletisimSaat2(snapshot.data()?.time2 ?? "");
-              setD_Avatar(
-                snapshot.data()?.avatar ??
-                  "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea"
-              );
+              setIletisimSaat1(snapshot.data()?.time1);
+              setIletisimSaat2(snapshot.data()?.time2);
+              setD_Avatar(snapshot.data()?.avatar);
             }
           });
       }
@@ -219,7 +216,7 @@ const PatientConfirmation = ({ navigation }) => {
             .add({
               name: name,
               cinsiyet: cinsiyet,
-              // KHastalik:KHastalik,
+              KHastalik: KHastalik,
               Id: H_ID,
               email: email,
               randevuCount: 1,
@@ -374,17 +371,25 @@ const PatientConfirmation = ({ navigation }) => {
                             source={require("../../components/Icons/doctor.png")}></Image>
                         </View> */}
 
-                  <Avatar
-                    size={85}
-                    source={{
-                      uri:
-                        element.item?.avatar ??
-                        "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultHastaAvatar.png?alt=media&token=0e4d1b7c-d8d1-477f-87ea-55768082f81b",
-                    }}
-                    avatarStyle={styles.imageStyle}
-                    activeOpacity={0.7}
-                    rounded
-                  />
+                  {element.item.avatar == "" ? (
+                    <Avatar
+                      size={85}
+                      source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+                      avatarStyle={styles.imageStyle}
+                      activeOpacity={0.7}
+                      rounded
+                    />
+                  ) : (
+                    <Avatar
+                      size={85}
+                      source={{
+                        uri: element.item.avatar,
+                      }}
+                      avatarStyle={styles.imageStyle}
+                      activeOpacity={0.7}
+                      rounded
+                    />
+                  )}
                 </View>
 
                 <View style={styles.CardInfo}>

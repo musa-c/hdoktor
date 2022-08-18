@@ -23,9 +23,9 @@ const ProfilePhotoChangeModal = ({
         justifyContent: "center",
         alignItems: "center",
       }}
-      swipeDirection="down"
+      //swipeDirection="down"
       onBackdropPress={onBackdropPress}
-      onSwipeComplete={onSwipeComplete}
+      //onSwipeComplete={onSwipeComplete}
     >
       <View
         style={{
@@ -38,13 +38,13 @@ const ProfilePhotoChangeModal = ({
           alignItems: "center",
         }}
       >
-        <Ionicons
+        {/* <Ionicons
           name="close-outline"
           color="black"
           size={30}
           onPress={toggleModal}
           style={{ alignSelf: "flex-end", marginRight: 15 }}
-        />
+        /> */}
         <Avatar
           source={{ uri: avatar }}
           size={160}
@@ -55,12 +55,13 @@ const ProfilePhotoChangeModal = ({
         </Avatar>
 
         <LoadingButton
-          mode="contained-tonal"
+          mode="contained"
           style={{
-            backgroundColor: "#B71C1C",
+            // backgroundColor: "#B71C1C",
             marginTop: 20,
             borderRadius: 20,
           }}
+          color="#B71C1C"
           FontStyle={{ color: "#F6F6F6", fontSize: 20 }}
           text={"Kaydet"}
           onPress={AvatarUpdate}
