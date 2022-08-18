@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import React from "react";
 import LoadingButton from "../Buttons/LoadingButton";
-import { Avatar } from "react-native-elements";
+import { Avatar, Card } from "react-native-elements";
 import MultiRandevuButton from "../Buttons/MultiRandevuButton";
 import CardText from "./CardText";
 
@@ -15,6 +15,7 @@ const MyDoctorPatientsCard = ({
   randevuCount,
   RandevuSaat,
   RandevuTarih,
+  KHastalik,
   onPressChatId,
   onPressGetNotes,
   onPressRandevuModal,
@@ -33,6 +34,16 @@ const MyDoctorPatientsCard = ({
           <CardText text={text1} iconFont={iconFont1} size={22} />
           {text2 != "" ? (
             <CardText text={text2} iconFont={iconFont2} size={22} />
+          ) : null}
+          {KHastalik ? (
+            <>
+              <CardText
+                text={"Kronik Hastalaık"}
+                iconFont={"capsules"}
+                size={22}
+              />
+              <CardText text={KHastalik} style={{ textAlign: "auto" }} />
+            </>
           ) : null}
 
           {randevuCount == 1 ? (

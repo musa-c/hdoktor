@@ -19,6 +19,7 @@ const ProfileComponent = ({
   phoneNumber,
   age,
   gender,
+  KHastalik,
   id,
 }) => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -75,64 +76,179 @@ const ProfileComponent = ({
     (await ref.put(blob)).ref.getDownloadURL().then((url) => {
       // H_user, D_user-> Hastalarım, Chats avatar güncellenir.
       // !!!! BİLDİRİMLERİN GÜNCELELLENEBİLMESİ İÇİN UNİQUE BİR ALAN OLMASI LAZIM!
-      user
-        .updateProfile({
-          photoURL: url,
-        })
-        .then(() => {
-          firebase
-            .firestore()
-            .collection("H_user")
-            .doc(user.uid)
-            .set({ avatar: url }, { merge: true });
-        })
-        .then(() => {
-          firebase
-            .firestore()
-            .collection("H_user")
-            .doc(user.uid)
-            .collection("Doktorlarım")
-            .onSnapshot((snaps) => {
-              if (!snaps.empty) {
-                snaps.forEach((snapsFor) => {
-                  firebase
-                    .firestore()
-                    .collection("D_user")
-                    .doc(snapsFor.data().Id)
-                    .collection("Hastalarım")
-                    .where("Id", "==", user.uid)
-                    .onSnapshot((snaps2) => {
-                      snaps2.forEach((snaps2For) => {
-                        snaps2For.ref.set({ avatar: url }, { merge: true });
+      if (user.photoURL != null) {
+        // daha önce photoURL tanımlanmışsa
+        firebase
+          .storage()
+          .ref("avatars/H_avatars")
+          .child(user.photoURL)
+          .delete()
+          .then(() => {
+            //console.log("başarılı eski photo silindi.");
+            user
+              .updateProfile({
+                photoURL: imageName,
+              })
+              .then(() => {
+                firebase
+                  .firestore()
+                  .collection("H_user")
+                  .doc(user.uid)
+                  .set({ avatar: url }, { merge: true });
+              })
+              .then(() => {
+                firebase
+                  .firestore()
+                  .collection("H_user")
+                  .doc(user.uid)
+                  .collection("Doktorlarım")
+                  .onSnapshot((snaps) => {
+                    if (!snaps.empty) {
+                      snaps.forEach((snapsFor) => {
+                        firebase
+                          .firestore()
+                          .collection("D_user")
+                          .doc(snapsFor.data().Id)
+                          .collection("Hastalarım")
+                          .where("Id", "==", user.uid)
+                          .onSnapshot((snaps2) => {
+                            snaps2.forEach((snaps2For) => {
+                              snaps2For.ref.set(
+                                { avatar: url },
+                                { merge: true }
+                              );
+                            });
+                          });
                       });
-                    });
-                });
-              }
-            });
-        })
-        .then(() => {
-          firebase
-            .firestore()
-            .collection("Chats")
-            .where("users", "array-contains", user.email)
-            .onSnapshot((snaps) => {
-              if (!snaps.empty) {
-                snaps.forEach((snapsFor) => {
-                  snapsFor.ref
-                    .update({
-                      avatar: [url, snapsFor.data().avatar[1]],
-                    })
-                    .then(() => {
+                    }
+                  });
+              })
+              .then(() => {
+                firebase
+                  .firestore()
+                  .collection("Chats")
+                  .where("users", "array-contains", user.email)
+                  .onSnapshot((snaps) => {
+                    if (!snaps.empty) {
+                      snaps.forEach((snapsFor) => {
+                        snapsFor.ref
+                          .update({
+                            avatar: [url, snapsFor.data().avatar[1]],
+                          })
+                          .then(() => {
+                            setLoading(false);
+                            setModalVisible(false);
+                          });
+                      });
+                    } else {
                       setLoading(false);
                       setModalVisible(false);
-                    });
-                });
-              } else {
+                    }
+                  });
+              });
+          })
+          .catch((error) => {
+            const ErrorCode = error.code;
+            switch (ErrorCode.substr(8)) {
+              case "unknown":
+                setError("Bilinmeyen bir hata oluştu.");
                 setLoading(false);
-                setModalVisible(false);
-              }
-            });
-        });
+                break;
+              case "quota-exceeded":
+                setError(
+                  "Kota aşıldı. İşleminiz gerçekleştirilemiyor. Lütfen bu hatayı yetkiliye bildiriniz."
+                );
+                setLoading(false);
+                break;
+              case "unauthenticated":
+                setError("Kullanıcı kimliği doğrulanamadı.");
+                setLoading(false);
+                break;
+              case "unauthorized":
+                setError("Bu eylemi gerçekleştirebilme yetkiniz yok.");
+                setLoading(false);
+                break;
+              case "retry-limit-exceeded":
+                setError(
+                  "İşlem zaman aşımına uğradı. Lütfen tekrar deneyiniz."
+                );
+                setLoading(false);
+                break;
+              case "canceled":
+                setError("İşlem iptal edildi.");
+                setLoading(false);
+                break;
+              case "server-file-wrong-size":
+                setError("Tekrak deneyiniz. Boyut farkı var.");
+                setLoading(false);
+                break;
+              default:
+                setError("Hata. Lütfen tekrar deneyiniz.");
+                setLoading(false);
+                break;
+            }
+          });
+      } else {
+        // daha önce photoURL tanımlanmamışsa
+        user
+          .updateProfile({
+            photoURL: imageName,
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("H_user")
+              .doc(user.uid)
+              .set({ avatar: url }, { merge: true });
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("H_user")
+              .doc(user.uid)
+              .collection("Doktorlarım")
+              .onSnapshot((snaps) => {
+                if (!snaps.empty) {
+                  snaps.forEach((snapsFor) => {
+                    firebase
+                      .firestore()
+                      .collection("D_user")
+                      .doc(snapsFor.data().Id)
+                      .collection("Hastalarım")
+                      .where("Id", "==", user.uid)
+                      .onSnapshot((snaps2) => {
+                        snaps2.forEach((snaps2For) => {
+                          snaps2For.ref.set({ avatar: url }, { merge: true });
+                        });
+                      });
+                  });
+                }
+              });
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("Chats")
+              .where("users", "array-contains", user.email)
+              .onSnapshot((snaps) => {
+                if (!snaps.empty) {
+                  snaps.forEach((snapsFor) => {
+                    snapsFor.ref
+                      .update({
+                        avatar: [url, snapsFor.data().avatar[1]],
+                      })
+                      .then(() => {
+                        setLoading(false);
+                        setModalVisible(false);
+                      });
+                  });
+                } else {
+                  setLoading(false);
+                  setModalVisible(false);
+                }
+              });
+          });
+      }
     });
   };
 
@@ -166,9 +282,9 @@ const ProfileComponent = ({
           onBackdropPress={() => {
             !loading ? setModalVisible(false) : null;
           }}
-          onSwipeComplete={() => {
-            !loading ? setModalVisible(false) : null;
-          }}
+          // onSwipeComplete={() => {
+          //   !loading ? setModalVisible(false) : null;
+          // }}
           toggleModal={toggleModalAvatar}
           avatar={NewAvatarUri}
           showImagePicker={showImagePicker}
@@ -224,6 +340,19 @@ const ProfileComponent = ({
           value={gender}
           infoTitleModal="Cinsiyetini güncellemek için seçenklere tıklayınız."
           id={id}
+        />
+
+        <InfoCard
+          icon={"capsules"}
+          topInfo="Kronik Hastalık"
+          value={
+            KHastalik == undefined
+              ? "Kronik hastalığınızı belirtmediniz."
+              : KHastalik
+          }
+          infoTitleModal="güncelleyebilirsiniz."
+          id={id}
+          placeHolderModal="Kronik Hastalık"
         />
 
         <InfoCard

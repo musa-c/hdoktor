@@ -21,7 +21,11 @@ const InfoCard = ({
   return (
     <>
       <ProfileUpdateModal
-        value={value}
+        value={
+          value == "Kronik hastalığınızı belirtmediniz."
+            ? "Kronik hastalığınızı"
+            : value
+        }
         id={id}
         infoTitle={infoTitleModal}
         toggleModal={toggleModal}
@@ -35,7 +39,16 @@ const InfoCard = ({
         <Text style={styles.topInfoStyle}>{topInfo}</Text>
         <View style={{ flexDirection: "row" }}>
           <FontAwesome5 name={icon} size={22} />
-          <Text style={styles.ValueStyle}>{value}</Text>
+          <Text
+            style={[
+              styles.ValueStyle,
+              value == "Kronik hastalığınızı belirtmediniz."
+                ? { fontStyle: "italic", color: "grey" }
+                : { fontStyle: "normal" },
+            ]}
+          >
+            {value}
+          </Text>
           <Ionicons
             name="ellipsis-horizontal-circle"
             size={22}

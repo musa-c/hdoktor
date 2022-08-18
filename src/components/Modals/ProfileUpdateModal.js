@@ -106,10 +106,10 @@ const ProfileUpdateModal = ({
 
   const [Validation, setValidation] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const Validate = (topInfo, updateValue) => {
     switch (topInfo) {
       case "İsim":
+      case "Kronik Hastalık":
         if (updateValue != "") {
           if (updateValue.length > 1) {
             if (!Validation) {
@@ -448,6 +448,46 @@ const ProfileUpdateModal = ({
       });
   };
 
+  const KHastalikUpdate = (id, KHastalikUpdate) => {
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(id)
+      .update({ KHastalik: KHastalikUpdate })
+      .then(() => {
+        firebase
+          .firestore()
+          .collection("H_user")
+          .doc(id)
+          .collection("Doktorlarım")
+          .onSnapshot((snaps) => {
+            snaps.forEach((snapsFor) => {
+              firebase
+                .firestore()
+                .collection("D_user")
+                .doc(snapsFor.data().Id)
+                .collection("Hastalarım")
+                .where("Id", "==", id)
+                .onSnapshot((snaps2) => {
+                  snaps2.forEach((snaps2For) => {
+                    snaps2For.ref
+                      .update({ KHastalik: KHastalikUpdate })
+                      .then(() => {
+                        console.log("KHastalik Başarılı Güncelleme");
+                      })
+                      .catch(() => {
+                        console.log("KHastalik Başarısız Güncelleme");
+                      });
+                  });
+                });
+            });
+          });
+      })
+      .catch(() => {
+        console.log("başarısızn güncelleme.");
+      });
+  };
+
   //const [UpdadeTextInput, setUpdadeTextInput] = useState(false);
 
   const reauthenticate = (password) => {
@@ -669,6 +709,9 @@ const ProfileUpdateModal = ({
       case "Şifre":
         PasswordUpdate(updateValue);
         break;
+      case "Kronik Hastalık":
+        KHastalikUpdate(id, updateValue);
+        break;
       default:
         break;
     }
@@ -780,7 +823,9 @@ const ProfileUpdateModal = ({
             {infoTitle}
           </Text>
         </View>
-        {topInfo == "İsim" || topInfo == "Telefon Numarası" ? (
+        {topInfo == "İsim" ||
+        topInfo == "Telefon Numarası" ||
+        topInfo == "Kronik Hastalık" ? (
           <TextInput
             style={styles.textInput}
             value={updateValue}
@@ -950,7 +995,10 @@ const ProfileUpdateModal = ({
               if (Validation) {
                 if (topInfo == "Yaş") {
                   Update(topInfo, dogumTarih);
-                } else if (topInfo == "E-mail") {
+                } else if (
+                  topInfo == "E-mail" ||
+                  topInfo == "Kronik Hastalık"
+                ) {
                   Update(topInfo, updateValue);
                 } else if (topInfo == "Cinsiyet") {
                   Update(topInfo, cinsiyet);
@@ -993,7 +1041,8 @@ const styles = StyleSheet.create({
   },
   textCont: {
     flexDirection: "row",
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
+    marginBottom: 10,
   },
   textInput: {
     marginBottom: 20,
