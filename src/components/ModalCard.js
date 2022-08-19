@@ -22,6 +22,7 @@ const ModalCard = ({
   HDocId,
   HEmail,
   onModalHide,
+  Huser,
 }) => {
   const [isVisibleModal, setIsVisibleModal] = useState(false);
   const [randevu, setRandevu] = useState([]);
@@ -362,42 +363,45 @@ const ModalCard = ({
                   text={element.item.RandevuSaat}
                 />
               </View>
-
-              <View
-                style={{
-                  //backgroundColor: "red",
-                  flex: 1,
-                  alignItems: "center",
-                }}
-              >
-                <LoadingButton
-                  //icon="minus-box-outline"
-                  //size={30}
-                  // fontsize={10}
-                  onPress={() => {
-                    PatientRemove(
-                      element.item.RandevuSaat,
-                      element.item.RandevuTarih
-                      //setLoading(true)
-                    );
-                  }}
-                  FontStyle={{ fontSize: 15 }}
-                  loading={
-                    (element.item.RandevuSaat == RandevuSaat) &
-                    (element.item.RandevuTarih == RandevuTarih)
-                      ? loading
-                      : false
-                  }
-                  disabled={disabled}
-                  mode={"outlined"}
-                  text="Kaldır"
-                  key={{
-                    Saat: element.item.RandevuSaat,
-                    Tarih: element.item.RandevuTarih,
-                  }}
-                />
-              </View>
-              <Separator />
+              {Huser != "hasta" ? (
+                <>
+                  <View
+                    style={{
+                      //backgroundColor: "red",
+                      flex: 1,
+                      alignItems: "center",
+                    }}
+                  >
+                    <LoadingButton
+                      //icon="minus-box-outline"
+                      //size={30}
+                      // fontsize={10}
+                      onPress={() => {
+                        PatientRemove(
+                          element.item.RandevuSaat,
+                          element.item.RandevuTarih
+                          //setLoading(true)
+                        );
+                      }}
+                      FontStyle={{ fontSize: 15 }}
+                      loading={
+                        (element.item.RandevuSaat == RandevuSaat) &
+                        (element.item.RandevuTarih == RandevuTarih)
+                          ? loading
+                          : false
+                      }
+                      disabled={disabled}
+                      mode={"outlined"}
+                      text="Kaldır"
+                      key={{
+                        Saat: element.item.RandevuSaat,
+                        Tarih: element.item.RandevuTarih,
+                      }}
+                    />
+                  </View>
+                  <Separator />
+                </>
+              ) : null}
             </View>
           )}
         />

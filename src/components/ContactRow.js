@@ -12,7 +12,15 @@ const ContactRow = ({ name, subtitle, onPress, style, avatar }) => {
         {/* {name.split(" ").reduce((prev, current) => `${prev}${current[0]}`, '')}  */}
         {/* ??? */}
         {/* </Text> */}
-        <Avatar size={66} source={{ uri: avatar }} rounded />
+        {avatar == "" ? (
+          <Avatar
+            size={66}
+            source={require("../rec/Avatars/DefaultDoctorAvatar.png")}
+            rounded
+          />
+        ) : (
+          <Avatar size={66} source={{ uri: avatar }} rounded />
+        )}
       </View>
       <View style={styles.textsContainer}>
         <Text style={styles.name}>{name}</Text>
