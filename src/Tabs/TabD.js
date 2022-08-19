@@ -138,6 +138,7 @@ import MoreDoctorInfo from "../screens/DoctorPanel/Main/MoreDoctorInfo";
 const DSignUpStack = createStackNavigator();
 import DSignUp0 from "../screens/DoctorPanel/SignUp/SignUp0";
 import DSignUp1 from "../screens/DoctorPanel/SignUp/SignUp1";
+import MorePatientInfo from "../screens/DoctorPanel/Main/MorePatientInfo";
 
 const DSignUpScreen = () => {
   return (
@@ -206,8 +207,17 @@ const TabD = () => {
         name="MoreDoctorInfo"
         component={MoreDoctorInfo}
         options={{
-          headerBackTitle: "Ana Sayfa",
-          headerTitle: "Profil",
+          headerBackTitleVisible: false,
+          headerTitle: "Doktor Profil",
+          headerShown: true,
+        }}
+      />
+      <MainStack.Screen
+        name="MorePatientInfo"
+        component={MorePatientInfo}
+        options={{
+          headerBackTitleVisible: false,
+          headerTitle: "Hasta Profil",
           headerShown: true,
         }}
       />
