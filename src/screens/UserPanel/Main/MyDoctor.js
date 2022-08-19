@@ -135,30 +135,44 @@ const MyDoctor = ({ route }) => {
               onBackdropPress={() => setmodalCardVisible(false)}
               id={Did}
               RandevuDate={RandevuDate}
-              userName={DuserName}
+              username={DuserName}
+              Huser="hasta"
             />
 
-            <MyDoctorPatientsCard
-              avatar={
-                element.item?.avatar ??
-                "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("MoreDoctorInfo", {
+                  doctorId: element.item.key,
+                  name: element.item.name,
+                  brans: element.item.brans,
+                  gender: element.item.cinsiyet,
+                  email: element.item.email,
+                  time1: element.item.iletisimSaat1.toDate(),
+                  time2: element.item.iletisimSaat2.toDate(),
+                  CalisilanYer: element.item.calisilanYer,
+                  avatar: element.item.avatar,
+                })
               }
-              name={element.item.name}
-              text1={element.item.brans}
-              iconFont1="stethoscope"
-              text2={element.item.calisilanYer}
-              iconFont2="h-square"
-              randevuCount={element.item.randevuCount}
-              RandevuSaat={element.item.RandevuSaat}
-              RandevuTarih={element.item.RandevuTarih}
-              onPressRandevuModal={() => {
-                setDid(element.item.Id);
-                setDuserName(element.item.name);
-                setmodalCardVisible(true);
-              }}
-              onPressChatId={() => ChatId(element.item.email)}
-              user={"hasta"}
-            />
+            >
+              <MyDoctorPatientsCard
+                avatar={element.item.avatar}
+                name={element.item.name}
+                text1={element.item.brans}
+                iconFont1="stethoscope"
+                text2={element.item.calisilanYer}
+                iconFont2="h-square"
+                randevuCount={element.item.randevuCount}
+                RandevuSaat={element.item.RandevuSaat}
+                RandevuTarih={element.item.RandevuTarih}
+                onPressRandevuModal={() => {
+                  setDid(element.item.Id);
+                  setDuserName(element.item.name);
+                  setmodalCardVisible(true);
+                }}
+                onPressChatId={() => ChatId(element.item.email)}
+                user={"hasta"}
+              />
+            </TouchableOpacity>
           </View>
         )}
       />
