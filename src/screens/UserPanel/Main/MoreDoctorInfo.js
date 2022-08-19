@@ -1,307 +1,131 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useState } from "react";
+import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Rating, Avatar } from "react-native-elements";
-import firebase from "firebase/compat/app";
+import { useRoute } from "@react-navigation/native";
+import InfoCardMoreDoctorPatients from "../../../components/Card/InfoCardMoreDoctorPatients";
 import moment from "moment";
 import trLocale from "moment/locale/tr";
-import { useRoute } from "@react-navigation/native";
+import LoadingButton from "../../../components/Buttons/LoadingButton";
 
 const MoreDoctorInfo = ({ navigation }) => {
   const route = useRoute();
   const DoctorId = route.params.doctorId;
-  const [H_name, setH_name] = useState();
-  const [H_PhoneNumber, setH_PhoneNumber] = useState();
-  const [H_Cinsiyet, setH_Cinsiyet] = useState();
-  const [H_email, setH_email] = useState();
-  const [H_KHastalik, setH_KHastalik] = useState();
-  const [H_Date, set_HDate] = useState();
-  const [H_ID, setH_ID] = useState();
+  const D_Name = route.params.name;
+  const D_CalisilanYer = route.params.CalisilanYer;
+  const time1 = route.params.time1;
+  const time2 = route.params.time2;
+  const brans = route.params.brans;
+  const avatar = route.params.avatar;
+  const email = route.params.email;
+  const gender = route.params.gender;
 
-  const [D_Name, setD_Name] = useState();
-  const [D_CalisilanYer, SetD_CalisilanYer] = useState();
-  const [time1, setTime1] = useState("");
-  const [time2, setTime2] = useState("");
-  const [brans, setBrans] = useState("");
-  const [avatar, setAvatar] = useState();
-
-  useEffect(() => {
-    let unmounted = false;
-    // currentUser = firebase.auth().currentUser;
-    // console.log(currentUser);
-    firebase.auth().onAuthStateChanged((user) => {
-      if (user) {
-        firebase
-          .firestore()
-          .collection("H_user")
-          .doc(user?.uid.toString() ?? "")
-          .onSnapshot((snapshot) => {
-            if (!unmounted) {
-              setH_name(snapshot.data()?.name ?? "");
-              setH_PhoneNumber(snapshot.data()?.PhoneNumber ?? "");
-              setH_Cinsiyet(snapshot.data()?.cinsiyet ?? "");
-              setH_email(snapshot.data()?.email ?? "");
-              set_HDate(snapshot.data()?.date ?? "");
-              setH_KHastalik(snapshot.data()?.KHastalık ?? "");
-              setH_ID(snapshot.data()?.Id ?? "");
-            }
-          });
-
-        firebase
-          .firestore()
-          .doc("D_user" + "/" + DoctorId ?? " ")
-          .onSnapshot((snapshot) => {
-            if (!unmounted) {
-              setD_Name(snapshot.data()?.name ?? "");
-              setBrans(snapshot.data().brans);
-              SetD_CalisilanYer(snapshot.data()?.CalisilanYer ?? "");
-              setTime1(snapshot.data().time1.toDate());
-              setTime2(snapshot.data().time2.toDate());
-              setAvatar(snapshot.data()?.avatar ?? "");
-            }
-          });
-      }
-    });
-
-    return () => {
-      unmounted = true;
-    };
-  }, []);
-
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const toggleModal = () => {
-    setModalVisible(!isModalVisible);
-  };
-
-  const { height } = Dimensions.get("window");
-
-  const [screenHeight, setScreenHeight] = useState(height);
-
-  const onContentSizeChange = (contentWidth, contentHeight) => {
-    setScreenHeight(contentHeight);
-  };
-
-  const scrollEnabled = screenHeight > height;
+  const [raiting, setRaiting] = useState();
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", flexGrow: 1 }}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ flexGrow: 1 }}
-        scrollEnabled={scrollEnabled}
-        onContentSizeChange={onContentSizeChange}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 10,
+          paddingEnd: 10,
+          backgroundColor: "white",
+          paddingVertical: 20,
+        }}
       >
-        <View style={styles.userImg}>
-          <Rating
-            type="custom"
-            ratingColor="#b71b1f"
-            ratingBackgroundColor="#c8c7c8"
-            ratingCount={5}
-            imageSize={20}
-            onFinishRating={(text) => setRaiting(text)}
-            startingValue={2}
-            tintColor="white"
-            // style={{marginBottom:20}}
-          />
+        <Rating
+          type="custom"
+          ratingColor="#FF2442"
+          ratingBackgroundColor="#c8c7c8"
+          ratingCount={5}
+          imageSize={22}
+          onFinishRating={(text) => setRaiting(text)}
+          startingValue={2}
+          tintColor="white"
+        />
 
+        <View style={styles.userImg}>
           {avatar == "" ? (
             <Avatar
-              source={require("../../../rec/Avatars//DefaultDoctorAvatar.png")}
-              size={100}
+              source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+              size={130}
               rounded
             ></Avatar>
           ) : (
-            <Avatar source={{ uri: avatar }} size={100} rounded></Avatar>
+            <Avatar source={{ uri: avatar }} size={130} rounded></Avatar>
           )}
-
-          <Text style={{ fontWeight: "500", fontSize: 24 }}>{D_Name}</Text>
-
-          <TouchableOpacity>
-            <View
-              style={{
-                padding: 10,
-                backgroundColor: "#eceff1",
-                marginBottom: 7,
-                borderRadius: 15,
-                width: 200,
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "row",
-              }}
-            >
-              <Text style={{ fontSize: 20 }}>
-                Mesaj At &nbsp;&nbsp;&nbsp;
-                <Ionicons name="chatbubbles-outline" size={25} />
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View style={styles.userInfoCont}>
-          <View style={styles.userInfo}>
-            <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-              Çalıştığı kurum
-            </Text>
-
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons name="business-outline" size={22} />
-              <Text
-                style={{
-                  fontWeight: "400",
-                  fontSize: 20,
-                  paddingHorizontal: 10,
-                  flex: 1,
-                }}
-              >
-                {D_CalisilanYer}
-              </Text>
-              <Ionicons name="ellipsis-horizontal-outline" size={22} />
-            </View>
-          </View>
-          <View
-            style={{
-              height: StyleSheet.hairlineWidth,
-              marginStart: 45,
-              backgroundColor: "red",
-            }}
-          ></View>
-
-          <View style={styles.userInfo}>
-            <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-              Branş
-            </Text>
-
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons name="pulse-outline" size={22} />
-              <Text
-                style={{
-                  fontWeight: "400",
-                  fontSize: 20,
-                  paddingHorizontal: 10,
-                  flex: 1,
-                }}
-              >
-                {brans}
-              </Text>
-              <Ionicons name="ellipsis-horizontal-outline" size={22} />
-            </View>
-          </View>
-          <View
-            style={{
-              height: StyleSheet.hairlineWidth,
-              marginStart: 45,
-              backgroundColor: "red",
-            }}
-          ></View>
-
-          <View style={styles.userInfo}>
-            <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-              Hasta iletişim saatleri
-            </Text>
-
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons name="time-outline" size={22} />
-              <Text
-                style={{
-                  fontWeight: "400",
-                  fontSize: 20,
-                  paddingHorizontal: 10,
-                  flex: 1,
-                }}
-              >
-                {moment(time1).locale("tr", trLocale).format("LT")} -{" "}
-                {moment(time2).locale("tr", trLocale).format("LT")}
-              </Text>
-              <Ionicons name="ellipsis-horizontal-outline" size={22} />
-            </View>
-          </View>
-          <View
-            style={{
-              height: StyleSheet.hairlineWidth,
-              marginStart: 45,
-              backgroundColor: "red",
-            }}
-          ></View>
-
-          <View style={styles.userInfo}>
-            <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-              Fotoğraflar
-            </Text>
-
-            <View style={{ flexDirection: "row" }}>
-              <Ionicons name="images-outline" size={22} />
-              <Text
-                style={{
-                  fontWeight: "400",
-                  fontSize: 20,
-                  paddingHorizontal: 10,
-                  flex: 1,
-                  color: "grey",
-                }}
-              >
-                Gösterilecek fotoğraf yok
-              </Text>
-              <Ionicons name="ellipsis-horizontal-outline" size={22} />
-            </View>
-          </View>
-          <View
-            style={{
-              height: StyleSheet.hairlineWidth,
-              marginStart: 45,
-              backgroundColor: "red",
-            }}
-          ></View>
         </View>
 
-        <View style={styles.btnCont}>
-          <TouchableOpacity
+        <View
+          style={{
+            flexDirection: "row",
+            marginTop: 15,
+            marginBottom: 10,
+            alignItems: "center",
+            justifyContent: "space-evenly",
+          }}
+        >
+          <LoadingButton
+            text={"Mesaj At"}
+            FontStyle={{ fontSize: 16, color: "white" }}
+            mode="contained"
+            style={{ borderRadius: 15 }}
+            color="#FF2442"
+          />
+          <LoadingButton
+            text={"Randevu Oluştur"}
+            FontStyle={{ fontSize: 16, color: "white" }}
+            mode="contained"
+            style={{ borderRadius: 15 }}
+            color="#FF2442"
             onPress={() => navigation.navigate("Appointment", { id: DoctorId })}
-            style={{ flex: 1, justifyContent: "center" }}
-          >
-            <LinearGradient
-              // Button Linear Gradient
-              colors={["#df3a37", "#df3a37", "#d2302f", "#c42627", "#b71b1f"]}
-              start={{ x: 0.8, y: 0.21 }}
-              end={{ x: 0.5, y: 0.8 }}
-              style={styles.button}
-            >
-              <Text style={styles.BtnText}>
-                Randevu oluştur &nbsp;&nbsp;&nbsp;
-                <Ionicons name="calendar-outline" size={25} />
-              </Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          />
         </View>
-        {/* eceff1 */}
+
+        <InfoCardMoreDoctorPatients
+          topInfo="İsim"
+          value={D_Name}
+          icon={"user"}
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo="Branş"
+          value={brans}
+          icon="stethoscope"
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"Cinsiyet"}
+          value={gender}
+          icon={"venus-mars"}
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"Çalışılan Yer"}
+          value={
+            D_CalisilanYer == ""
+              ? "Çalışılan yer belirtilmemiş."
+              : D_CalisilanYer
+          }
+          icon="h-square"
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"E-mail"}
+          value={email}
+          icon={"at"}
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"Çalışma Saat Aralığı"}
+          value={
+            moment(time1).locale("tr", trLocale).format("LT") +
+            " - " +
+            moment(time2).locale("tr", trLocale).format("LT")
+          }
+          icon="clock"
+        />
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  btnCont: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
-  button: {
-    borderRadius: 20,
-  },
-  BtnText: {
-    padding: 15,
-    fontSize: 20,
-    color: "white",
-    fontWeight: "bold",
-    paddingVertical: 10,
-  },
   monthYear: {
     flexDirection: "row",
     marginTop: 10,
@@ -358,6 +182,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
     flex: 1,
+    marginTop: 15,
   },
   userInfoCont: {
     justifyContent: "center",
