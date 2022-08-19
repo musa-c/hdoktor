@@ -14,6 +14,8 @@ import firebase from "firebase/compat/app";
 import { Avatar } from "react-native-elements";
 import Separator from "../../../components/Separator";
 import ListEmptyComponent from "../../../components/ListEmptyComponent";
+import trLocale from "moment/locale/tr";
+import moment from "moment";
 
 function HomeU(props) {
   const [users, setUsers] = useState([]);
@@ -76,6 +78,14 @@ function HomeU(props) {
               onPress={() =>
                 navigation.navigate("MoreDoctorInfo", {
                   doctorId: element.item.key,
+                  name: element.item.name,
+                  brans: element.item.brans,
+                  gender: element.item.cinsiyet,
+                  email: element.item.email,
+                  time1: element.item.time1.toDate(),
+                  time2: element.item.time2.toDate(),
+                  CalisilanYer: element.item.CalisilanYer,
+                  avatar: element.item.avatar,
                 })
               }
             >
@@ -123,12 +133,16 @@ function HomeU(props) {
                     <Icon name="stethoscope" size={22} color="#B71C1C" />
                     &nbsp;&nbsp;{element.item.brans}
                   </Text>
-                  <Text
-                    style={{ color: "black", fontSize: 17, paddingStart: 5 }}
-                  >
-                    <Icon name="h-square" size={22} color="#B71C1C" />
-                    &nbsp;&nbsp;{element.item.CalisilanYer}
-                  </Text>
+
+                  {element.item.CalisilanYer != "" ? (
+                    <Text
+                      style={{ color: "black", fontSize: 17, paddingStart: 5 }}
+                    >
+                      <Icon name="h-square" size={22} color="#B71C1C" />
+                      &nbsp;&nbsp;{element.item.CalisilanYer}
+                    </Text>
+                  ) : null}
+
                   <View
                     style={{
                       marginHorizontal: 5,

@@ -1,54 +1,37 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { View, StyleSheet, Dimensions, ScrollView } from "react-native";
 import { Rating, Avatar } from "react-native-elements";
-import firebase from "firebase/compat/app";
+import { useRoute } from "@react-navigation/native";
 import moment from "moment";
 import trLocale from "moment/locale/tr";
+import InfoCardMoreDoctorPatients from "../../../components/Card/InfoCardMoreDoctorPatients";
 
 const MoreDoctorInfo = () => {
+  const route = useRoute();
+  const DoctorId = route.params.doctorId;
+  const D_Name = route.params.name;
+  const D_CalisilanYer = route.params.CalisilanYer;
+  const time1 = route.params.time1;
+  const time2 = route.params.time2;
+  const brans = route.params.brans;
+  const avatar = route.params.avatar;
+  const email = route.params.email;
+  const gender = route.params.gender;
+
   const [raiting, setRaiting] = useState();
-  const [isModalVisible, setModalVisible] = useState(false);
-  const [avatar, setAvatar] = useState();
-
-  useEffect(() => {
-    let unmounted = false;
-
-    const user = firebase.auth().currentUser;
-    if (!unmounted) {
-      firebase
-        .firestore()
-        .collection("D_user")
-        .doc(user.uid)
-        .onSnapshot((snapshot) => {
-          setName(snapshot.data()?.name ?? "");
-          setBrans(snapshot.data()?.brans ?? "");
-          setCalisilanYer(snapshot.data()?.CalisilanYer ?? "");
-          setTime1(snapshot.data()?.time1.toDate() ?? "");
-          setTime2(snapshot.data()?.time2.toDate() ?? "");
-          setAvatar(
-            snapshot.data()?.avatar ??
-              "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FDefaultDoctorAvatar.png?alt=media&token=022e0299-4a3f-4127-93bc-dd70dc42f6ea"
-          );
-        });
-    }
-
-    return () => {
-      unmounted = true;
-    };
-  }, []);
-
-  const [name, setName] = useState("");
-  const [brans, setBrans] = useState("");
-  const [CalisilanYer, setCalisilanYer] = useState("");
-  const [time1, setTime1] = useState("");
-  const [time2, setTime2] = useState("");
-
-  // console.log(moment(time1).locale("tr", trLocale).format('LT'))
 
   return (
-    <View style={styles.cont}>
-      <View style={styles.userImg}>
+    <View style={{ flex: 1, backgroundColor: "white", flexGrow: 1 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          paddingHorizontal: 10,
+          paddingEnd: 10,
+          backgroundColor: "white",
+          paddingVertical: 20,
+        }}
+      >
         <Rating
           type="custom"
           ratingColor="#b71b1f"
@@ -60,151 +43,121 @@ const MoreDoctorInfo = () => {
           tintColor="white"
           // style={{marginBottom:20}}
         />
-
-        <Avatar source={{ uri: avatar }} size={110} rounded></Avatar>
-
-        <Text style={{ fontWeight: "500", fontSize: 24 }}>{name}</Text>
-      </View>
-      <View style={styles.userInfoCont}>
-        <View style={styles.userInfo}>
-          <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-            Çalıştığı kurum
-          </Text>
-
-          <View style={{ flexDirection: "row" }}>
-            <Ionicons name="business-outline" size={22} />
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 20,
-                paddingHorizontal: 10,
-                flex: 1,
-              }}
-            >
-              {CalisilanYer}
-            </Text>
-            <Ionicons name="ellipsis-horizontal-outline" size={22} />
-          </View>
+        <View style={styles.userImg}>
+          {avatar == "" ? (
+            <Avatar
+              source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+              size={130}
+              rounded
+            ></Avatar>
+          ) : (
+            <Avatar source={{ uri: avatar }} size={130} rounded></Avatar>
+          )}
         </View>
-        <View
-          style={{
-            height: StyleSheet.hairlineWidth,
-            marginStart: 45,
-            backgroundColor: "red",
-          }}
-        ></View>
-
-        <View style={styles.userInfo}>
-          <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-            Branş
-          </Text>
-
-          <View style={{ flexDirection: "row" }}>
-            <Ionicons name="pulse-outline" size={22} />
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 20,
-                paddingHorizontal: 10,
-                flex: 1,
-              }}
-            >
-              {brans}
-            </Text>
-            <Ionicons name="ellipsis-horizontal-outline" size={22} />
-          </View>
-        </View>
-        <View
-          style={{
-            height: StyleSheet.hairlineWidth,
-            marginStart: 45,
-            backgroundColor: "red",
-          }}
-        ></View>
-
-        <View style={styles.userInfo}>
-          <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-            Hasta iletişim saatleri
-          </Text>
-
-          <View style={{ flexDirection: "row" }}>
-            <Ionicons name="time-outline" size={22} />
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 20,
-                paddingHorizontal: 10,
-                flex: 1,
-              }}
-            >
-              {moment(time1).locale("tr", trLocale).format("LT")} -{" "}
-              {moment(time2).locale("tr", trLocale).format("LT")}
-            </Text>
-            <Ionicons name="ellipsis-horizontal-outline" size={22} />
-          </View>
-        </View>
-        <View
-          style={{
-            height: StyleSheet.hairlineWidth,
-            marginStart: 45,
-            backgroundColor: "red",
-          }}
-        ></View>
-
-        <View style={styles.userInfo}>
-          <Text style={{ marginBottom: 7, marginLeft: 32, color: "grey" }}>
-            Fotoğraflar
-          </Text>
-
-          <View style={{ flexDirection: "row" }}>
-            <Ionicons name="images-outline" size={22} />
-            <Text
-              style={{
-                fontWeight: "400",
-                fontSize: 20,
-                paddingHorizontal: 10,
-                flex: 1,
-                color: "grey",
-              }}
-            >
-              Gösterilecek fotoğraf yok
-            </Text>
-            <Ionicons name="ellipsis-horizontal-outline" size={22} />
-          </View>
-        </View>
-        <View
-          style={{
-            height: StyleSheet.hairlineWidth,
-            marginStart: 45,
-            backgroundColor: "red",
-          }}
-        ></View>
-      </View>
+        <InfoCardMoreDoctorPatients
+          topInfo="İsim"
+          value={D_Name}
+          icon={"user"}
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo="Branş"
+          value={brans}
+          icon="stethoscope"
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"Cinsiyet"}
+          value={gender}
+          icon={"venus-mars"}
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"Çalışılan Yer"}
+          value={
+            D_CalisilanYer == ""
+              ? "Çalışılan yer belirtilmemiş."
+              : D_CalisilanYer
+          }
+          icon="h-square"
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"E-mail"}
+          value={email}
+          icon={"at"}
+        />
+        <InfoCardMoreDoctorPatients
+          topInfo={"Çalışma Saat Aralığı"}
+          value={
+            moment(time1).locale("tr", trLocale).format("LT") +
+            " - " +
+            moment(time2).locale("tr", trLocale).format("LT")
+          }
+          icon="clock"
+        />
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  cont: {
-    flex: 1,
-    backgroundColor: "white",
-
-    // borderColor:"yellow",
-    // borderWidth:2,
+  monthYear: {
+    flexDirection: "row",
+    marginTop: 10,
   },
-
-  userImg: {
-    // backgroundColor:"blue",
-    justifyContent: "space-around",
+  mentYearText: {
+    marginHorizontal: 5,
+    fontSize: 25,
+    fontWeight: "700",
+  },
+  montDayCont: {
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  monthDayBox: {
+    justifyContent: "space-evenly",
+    width: 70,
+    height: 90,
+    backgroundColor: "#64b5f6",
+    borderRadius: 10,
+    marginStart: 5,
     alignItems: "center",
-    flex: 0.7,
-    // flexGrow:1,
+    marginEnd: 5,
+    flexGrow: 5,
+  },
+  monthDayMonthText: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  monthDayDayText: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+  RandevuClockCont: {
+    paddingVertical: 5,
+    paddingHorizontal: 5,
+  },
+  RandevuClockBox: {
+    width: Dimensions.get("screen").width / 3.8,
+    backgroundColor: "green",
+    borderRadius: 5,
+    marginStart: 5,
+    marginEnd: 5,
+    flexDirection: "row",
+    justifyContent: "center",
+    height: 35,
+    alignItems: "center",
+    flexGrow: 1,
+  },
+  RandevuClockText: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  userImg: {
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    flex: 1,
+    marginTop: 15,
   },
   userInfoCont: {
-    // backgroundColor:"red",
-    // marginHorizontal:20,
     justifyContent: "center",
-    marginTop: 10,
   },
   userInfo: {
     backgroundColor: "white",
@@ -212,13 +165,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     padding: 10,
     marginVertical: 5,
-  },
-  text: {
-    padding: 15,
-    fontSize: 20,
-    color: "white",
-    fontWeight: "bold",
-    paddingVertical: 10,
   },
 });
 

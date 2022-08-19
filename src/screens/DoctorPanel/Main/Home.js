@@ -47,24 +47,11 @@ function HomeD(props) {
           setMyId(myuser.uid);
           setRefreshing(false);
         }
-
-        const a = firebase.auth().currentUser.metadata.creationTime;
-
-        //console.log(a);
       });
     return () => {
       unmounted = true;
     };
   }, [refresh]);
-
-  //   const isEmpty = () =>{
-  //    users.forEach((user)=>{
-  //     console.log(user.key)
-  //   return users.length == 1 & user.key == myId
-  // })
-  //   }
-
-  //console.log(users)
 
   const navigation = useNavigation();
   return (
@@ -97,6 +84,14 @@ function HomeD(props) {
               onPress={() =>
                 navigation.navigate("MoreDoctorInfo", {
                   doctorId: element.item.key,
+                  name: element.item.name,
+                  CalisilanYer: element.item.CalisilanYer,
+                  time1: element.item.time1.toDate(),
+                  time2: element.item.time2.toDate(),
+                  email: element.item.email,
+                  avatar: element.item.avatar,
+                  gender: element.item.cinsiyet,
+                  brans: element.item.brans,
                 })
               }
             >
@@ -138,12 +133,19 @@ function HomeD(props) {
                       <Icon name="stethoscope" size={22} color="#B71C1C" />
                       &nbsp;&nbsp;{element.item.brans}
                     </Text>
-                    <Text
-                      style={{ color: "black", fontSize: 19, paddingStart: 5 }}
-                    >
-                      <Icon name="h-square" size={22} color="#B71C1C" />
-                      &nbsp;&nbsp;{element.item.CalisilanYer}
-                    </Text>
+                    {element.item.CalisilanYer != "" ? (
+                      <Text
+                        style={{
+                          color: "black",
+                          fontSize: 19,
+                          paddingStart: 5,
+                        }}
+                      >
+                        <Icon name="h-square" size={22} color="#B71C1C" />
+                        &nbsp;&nbsp;{element.item.CalisilanYer}
+                      </Text>
+                    ) : null}
+
                     <View style={{ marginHorizontal: 5, marginTop: 5 }}></View>
                     <View
                       style={{

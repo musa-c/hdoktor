@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import firebase from "firebase/compat/app";
 import Header from "../../../components/Header/Header";
 
@@ -294,30 +300,43 @@ const MyPatients = (props) => {
               onModalHide={() => setmodalCardVisible(false)}
             />
 
-            <MyDoctorPatientsCard
-              avatar={element.item.avatar}
-              name={element.item.name}
-              text1={element.item.cinsiyet}
-              iconFont1="venus-mars"
-              text2={element.item.email}
-              iconFont2="at"
-              randevuCount={element.item.randevuCount}
-              KHastalik={element.item.KHastalik}
-              RandevuSaat={element.item.RandevuSaat}
-              RandevuTarih={element.item.RandevuTarih}
-              onPressRandevuModal={() => {
-                setHid(element.item.Id);
-                sethuserName(element.item.name);
-                setHDocId(element.item.key);
-                setHEmail(element.item.email);
-                setmodalCardVisible(!modalCardVisible);
-              }}
-              onPressChatId={() => ChatId(element.item.email)}
-              onPressGetNotes={() => getNotes(element.item.key)}
-              PatientRemoveIconPress={() =>
-                PatientRemove(element.item.key, element.item.email)
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("MorePatientInfo", {
+                  Id: element.item.Id,
+                  name: element.item.name,
+                  email: element.item.email,
+                  KHastalik: element.item.KHastalik,
+                  gender: element.item.cinsiyet,
+                  avatar: element.item.avatar,
+                })
               }
-            />
+            >
+              <MyDoctorPatientsCard
+                avatar={element.item.avatar}
+                name={element.item.name}
+                text1={element.item.cinsiyet}
+                iconFont1="venus-mars"
+                text2={element.item.email}
+                iconFont2="at"
+                randevuCount={element.item.randevuCount}
+                KHastalik={element.item.KHastalik}
+                RandevuSaat={element.item.RandevuSaat}
+                RandevuTarih={element.item.RandevuTarih}
+                onPressRandevuModal={() => {
+                  setHid(element.item.Id);
+                  sethuserName(element.item.name);
+                  setHDocId(element.item.key);
+                  setHEmail(element.item.email);
+                  setmodalCardVisible(!modalCardVisible);
+                }}
+                onPressChatId={() => ChatId(element.item.email)}
+                onPressGetNotes={() => getNotes(element.item.key)}
+                PatientRemoveIconPress={() =>
+                  PatientRemove(element.item.key, element.item.email)
+                }
+              />
+            </TouchableOpacity>
           </View>
         )}
       />

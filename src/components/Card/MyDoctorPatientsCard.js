@@ -26,16 +26,25 @@ const MyDoctorPatientsCard = ({
     <View style={styles.cont}>
       <View style={styles.card}>
         <View style={styles.cardImage}>
-          <Avatar size={85} rounded source={{ uri: avatar }} />
+          {avatar == "" ? (
+            <Avatar
+              size={85}
+              rounded
+              source={require("../../rec/Avatars/DefaultDoctorAvatar.png")}
+            />
+          ) : (
+            <Avatar size={85} rounded source={{ uri: avatar }} />
+          )}
         </View>
         <View style={styles.CardInfo}>
           <Text style={styles.name}>{name}</Text>
-
-          <CardText text={text1} iconFont={iconFont1} size={22} />
-          {text2 != "" ? (
+          {user == "hasta" ? (
+            <CardText text={text1} iconFont={iconFont1} size={22} />
+          ) : null}
+          {(text2 != "") & (user == "hasta") ? (
             <CardText text={text2} iconFont={iconFont2} size={22} />
           ) : null}
-          {KHastalik ? (
+          {KHastalik & (user == "hasta") ? (
             <>
               <CardText
                 text={"Kronik Hastalaık"}
@@ -99,7 +108,7 @@ const MyDoctorPatientsCard = ({
             />
           ) : null}
 
-          {randevuCount == 1 ? (
+          {(randevuCount == 1) & (user != "hasta") ? (
             <LoadingButton
               icon={"minus-box-outline"}
               size={40}

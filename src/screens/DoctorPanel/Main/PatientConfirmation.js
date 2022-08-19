@@ -27,6 +27,7 @@ const PatientConfirmation = ({ navigation }) => {
   const [DCalisilanYer, setCalisilanYer] = useState("");
   const [DIletisimSaat1, setIletisimSaat1] = useState("");
   const [DIletisimSaat2, setIletisimSaat2] = useState("");
+  const [D_Cinsiyet, setD_Cinsiyet] = useState("");
   const [DAvatar, setD_Avatar] = useState("");
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -74,6 +75,7 @@ const PatientConfirmation = ({ navigation }) => {
               setIletisimSaat1(snapshot.data()?.time1);
               setIletisimSaat2(snapshot.data()?.time2);
               setD_Avatar(snapshot.data()?.avatar);
+              setD_Cinsiyet(snapshot.data().cinsiyet);
             }
           });
       }
@@ -123,6 +125,8 @@ const PatientConfirmation = ({ navigation }) => {
               iletisimSaat1: DIletisimSaat1,
               iletisimSaat2: DIletisimSaat2,
               Id: DId,
+              cinsiyet: D_Cinsiyet,
+              avatar: DAvatar,
             })
             .then((docRef) => {
               //  console.log(docRef.id)

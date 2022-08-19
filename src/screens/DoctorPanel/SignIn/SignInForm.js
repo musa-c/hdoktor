@@ -1,15 +1,10 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import firebase from "firebase/compat/app";
+import { TextInput } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import LoadingAnimation from "../../../components/Animations/LoadingAnimation";
+import ForgetPasswordModal from "../../../components/Modals/ForgetPasswordModal";
 
 const Form = () => {
   const [email, setEmail] = useState("");
@@ -21,6 +16,8 @@ const Form = () => {
   const [found, setFound] = useState();
   const [D_userID, setD_userID] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isFPModalVisible, setIsFPModalVisible] = useState(false);
+  const [isPasswordSee, setispasswordSee] = useState(true);
 
   const signIn = async () => {
     setLoading(true);
@@ -112,6 +109,30 @@ const Form = () => {
       });
   };
 
+  const PasswordSee = () => {
+    if (isPasswordSee) {
+      return (
+        <TextInput.Icon
+          name="eye-off-outline"
+          forceTextInputFocus={false}
+          color={"#B71C1C"}
+          style={{ marginTop: "50%" }}
+          onPress={() => setispasswordSee(!isPasswordSee)}
+        />
+      );
+    } else {
+      return (
+        <TextInput.Icon
+          name="eye-outline"
+          forceTextInputFocus={false}
+          color={"#B71C1C"}
+          style={{ marginTop: "50%" }}
+          onPress={() => setispasswordSee(!isPasswordSee)}
+        />
+      );
+    }
+  };
+
   return (
     <View style={style.container}>
       {errroMessage == "Yanlış e-posta/şifre kombinasyonu." ||
@@ -124,27 +145,64 @@ const Form = () => {
         ""
       )}
 
+      <ForgetPasswordModal
+        isModalVisible={isFPModalVisible}
+        onBackdropPress={() => setIsFPModalVisible(false)}
+      />
+
       <LoadingAnimation isLoading={loading} />
+
       <TextInput
         style={style.inputBox}
-        placeholder="E-mail"
-        placeholderTextColor="#fff"
-        keyboardType="email-address"
+        mode="outlined"
+        theme={{ roundness: 25 }}
+        activeOutlineColor="#B71C1C"
+        outlineColor="#ECECEC"
+        left={
+          <TextInput.Icon
+            name="at"
+            forceTextInputFocus={true}
+            color={"#B71C1C"}
+            style={{ marginTop: "50%" }}
+            onPress={() => {}}
+          />
+        }
         value={email}
+        label="E-mail"
+        keyboardType="email-address"
         onChangeText={(text) => setEmail(text)}
       />
 
       <TextInput
         style={style.inputBox}
-        placeholder="Şifre"
+        mode="outlined"
+        theme={{ roundness: 25 }}
+        activeOutlineColor="#B71C1C"
+        outlineColor="#ECECEC"
+        left={
+          <TextInput.Icon
+            name="lock-outline"
+            forceTextInputFocus={true}
+            color={"#B71C1C"}
+            style={{ marginTop: "50%" }}
+            onPress={() => {}}
+          />
+        }
+        right={PasswordSee()}
         value={password}
+        label="Şifre"
         onChangeText={(text) => setPassword(text)}
-        secureTextEntry={true}
-        placeholderTextColor="#fff"
+        secureTextEntry={isPasswordSee}
       />
 
       <TouchableOpacity style={style.button} onPress={() => signIn()}>
         <Text style={style.buttonText}>Giriş Yap</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{ marginTop: 5, padding: 5 }}
+        onPress={() => setIsFPModalVisible(true)}
+      >
+        <Text style={{ fontSize: 16 }}>Şifreni mi unuttun?</Text>
       </TouchableOpacity>
     </View>
   );
@@ -159,15 +217,13 @@ const style = StyleSheet.create({
   inputBox: {
     width: 300,
     height: 50,
-    backgroundColor: "#E57373",
-    borderRadius: 25,
-    paddingHorizontal: 16,
-    fontSize: 16,
+    backgroundColor: "#ECECEC",
+    fontSize: 20,
     color: "#fff",
     marginVertical: 10,
   },
   buttonText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: "500",
     color: "#fff",
     textAlign: "center",

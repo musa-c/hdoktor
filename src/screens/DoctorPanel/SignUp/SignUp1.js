@@ -15,7 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { CheckBox } from "react-native-elements";
-import { TextInput } from "react-native-paper";
+import { TextInput, HelperText } from "react-native-paper";
 import Modal from "react-native-modal";
 import firebase from "firebase/compat/app";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -379,7 +379,7 @@ const SignUp1 = ({ navigation }) => {
 
                 <TextInput
                   style={styles.input}
-                  placeholder="Çalışılan yer"
+                  label="Çalışılan Yer"
                   placeholderTextColor="grey"
                   value={CalisilanYer}
                   onChangeText={(text) => SetCalisilanYer(text)}
@@ -392,7 +392,7 @@ const SignUp1 = ({ navigation }) => {
 
                 <TextInput
                   style={styles.input}
-                  placeholder="Şifre"
+                  label="Şifre"
                   placeholderTextColor="grey"
                   secureTextEntry={ispasswordSee}
                   activeUnderlineColor="#f44336"
@@ -405,9 +405,30 @@ const SignUp1 = ({ navigation }) => {
                   onChangeText={(text) => setPassword(text)}
                 />
 
+                {password == ""
+                  ? false
+                  : !isPasswordValidate && (
+                      <HelperText
+                        type="info"
+                        visible={password == "" ? false : !isPasswordValidate}
+                        style={{
+                          color: "#f44336",
+                          textAlign: "justify",
+                          //backgroundColor: "red",
+                          width: 300,
+                          alignSelf: "center",
+                        }}
+                      >
+                        <Ionicons name="alert-circle-outline" />
+                        &nbsp; Şifre, en az 8 en çok 32 karakter olmalıdır. En
+                        az; 1 harf, 1 rakam içermelidir. Boşluk içermemeli. Özel
+                        karakterler kullanılabilir: @$!%*#?&^_-
+                      </HelperText>
+                    )}
+
                 <TextInput
                   style={styles.input}
-                  placeholder="Tekrar Şifre"
+                  label="Tekrar Şifre"
                   placeholderTextColor="grey"
                   secureTextEntry={isAgainPasswordSee}
                   left={againPasswordSee()}
@@ -728,7 +749,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 300,
-    height: 50,
+    height: 60,
     margin: 15,
     backgroundColor: "white",
     fontSize: 18,

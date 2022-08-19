@@ -410,6 +410,7 @@ const ProfileUpdateModal = ({
   };
 
   const genderUpdate = (id, genderUpdate) => {
+    setLoading(true);
     firebase
       .firestore()
       .collection("H_user")
@@ -449,6 +450,7 @@ const ProfileUpdateModal = ({
   };
 
   const KHastalikUpdate = (id, KHastalikUpdate) => {
+    setLoading(true);
     firebase
       .firestore()
       .collection("H_user")
@@ -473,10 +475,18 @@ const ProfileUpdateModal = ({
                     snaps2For.ref
                       .update({ KHastalik: KHastalikUpdate })
                       .then(() => {
-                        console.log("KHastalik Başarılı Güncelleme");
+                        setUpdate(true);
+                        setTimeout(() => {
+                          setUpdate(false);
+                          setValidation(false);
+                          setLoading(false);
+                          toggleModal();
+                        }, 3000);
                       })
                       .catch(() => {
-                        console.log("KHastalik Başarısız Güncelleme");
+                        setUpdate(false);
+                        setLoading(false);
+                        alert("Başarısız güncelleme. Lütfen tekrar deneyiniz.");
                       });
                   });
                 });

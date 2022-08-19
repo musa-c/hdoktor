@@ -354,9 +354,8 @@ const SignUp0 = ({ navigation, route }) => {
           flexGrow: 1,
           paddingTop: 15,
           paddingEnd: 10,
-          backgroundColor: "blue",
         }}
-        style={{ backgroundColor: "blue" }}
+        style={{ backgroundColor: "white" }}
       >
         <View style={styles.box}>
           <StatusBar barStyle="dark-content" backgroundColor="white" />
@@ -387,7 +386,7 @@ const SignUp0 = ({ navigation, route }) => {
             <View style={{ flex: 2 }}>
               <TextInput
                 style={styles.input}
-                placeholder="İsim"
+                label="İsim"
                 placeholderTextColor="grey"
                 value={name}
                 onChangeText={(text) => setName(text)}
@@ -399,7 +398,7 @@ const SignUp0 = ({ navigation, route }) => {
               />
               <TextInput
                 style={styles.input}
-                placeholder="E-mail"
+                label="E-mail"
                 placeholderTextColor="grey"
                 underlineColor="#f44336"
                 activeUnderlineColor="#f44336"
@@ -690,7 +689,7 @@ const styles = StyleSheet.create({
   },
   input: {
     width: 300,
-    height: 50,
+    height: 60,
     margin: 15,
     backgroundColor: "white",
     fontSize: 18,
