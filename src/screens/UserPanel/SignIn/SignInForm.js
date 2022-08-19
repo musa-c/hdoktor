@@ -4,7 +4,6 @@ import firebase from "firebase/compat/app";
 import { useNavigation } from "@react-navigation/native";
 import LoadingAnimation from "../../../components/Animations/LoadingAnimation";
 import { TextInput } from "react-native-paper";
-import ProfileUpdateModal from "../../../components/Modals/ProfileUpdateModal";
 import ForgetPasswordModal from "../../../components/Modals/ForgetPasswordModal";
 
 const Form = () => {
