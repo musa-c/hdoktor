@@ -25,6 +25,238 @@ const ProfileComponent = ({
   brans,
   id,
 }) => {
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [NewAvatarUri, setNewAvatarUri] = useState("");
+  const [ImageName, setImageName] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const toggleModalAvatar = () => {
+    if (!loading) {
+      setModalVisible(!isModalVisible);
+    }
+  };
+
+  const showImagePicker = async () => {
+    // Ask the user for the permission to access the media library
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      Alert.alert(
+        "Uyarı⚠️",
+        "Bu uygulamanın fotoğraflarınıza erişmesine izin vermeyi reddettiniz.",
+        [{ text: "Tamam", style: "cancel" }]
+      );
+
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
+
+    // Explore the result
+    // console.log(result);
+
+    if (!result.cancelled) {
+      const filename = result.uri.split("/").pop();
+      setNewAvatarUri(result.uri);
+      setImageName(filename);
+      setModalVisible(true);
+      //uploadAvatar(result.uri, filename);
+    }
+  };
+
+  const AvatarUpdate = async (uri, imageName) => {
+    const user = firebase.auth().currentUser;
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    var ref = firebase.storage().ref("avatars/D_avatars").child(imageName);
+    setLoading(true);
+    (await ref.put(blob)).ref.getDownloadURL().then((url) => {
+      // H_user, D_user-> Hastalarım, Chats avatar güncellenir.
+      // !!!! BİLDİRİMLERİN GÜNCELELLENEBİLMESİ İÇİN UNİQUE BİR ALAN OLMASI LAZIM!
+      if (user.photoURL != null) {
+        // daha önce photoURL tanımlanmışsa
+        firebase
+          .storage()
+          .ref("avatars/D_avatars")
+          .child(user.photoURL)
+          .delete()
+          .then(() => {
+            //console.log("başarılı eski photo silindi.");
+            user
+              .updateProfile({
+                photoURL: imageName,
+              })
+              .then(() => {
+                firebase
+                  .firestore()
+                  .collection("D_user")
+                  .doc(user.uid)
+                  .set({ avatar: url }, { merge: true });
+              })
+              .then(() => {
+                firebase
+                  .firestore()
+                  .collection("D_user")
+                  .doc(user.uid)
+                  .collection("Hastalarım")
+                  .onSnapshot((snaps) => {
+                    if (!snaps.empty) {
+                      snaps.forEach((snapsFor) => {
+                        firebase
+                          .firestore()
+                          .collection("H_user")
+                          .doc(snapsFor.data().Id)
+                          .collection("Doktorlarım")
+                          .where("Id", "==", user.uid)
+                          .onSnapshot((snaps2) => {
+                            snaps2.forEach((snaps2For) => {
+                              snaps2For.ref.set(
+                                { avatar: url },
+                                { merge: true }
+                              );
+                            });
+                          });
+                      });
+                    }
+                  });
+              })
+              .then(() => {
+                firebase
+                  .firestore()
+                  .collection("Chats")
+                  .where("users", "array-contains", user.email)
+                  .onSnapshot((snaps) => {
+                    if (!snaps.empty) {
+                      snaps.forEach((snapsFor) => {
+                        snapsFor.ref
+                          .update({
+                            avatar: [snapsFor.data().avatar[0], url],
+                          })
+                          .then(() => {
+                            setLoading(false);
+                            setModalVisible(false);
+                          });
+                      });
+                    } else {
+                      setLoading(false);
+                      setModalVisible(false);
+                    }
+                  });
+              });
+          })
+          .catch((error) => {
+            const ErrorCode = error.code;
+            switch (ErrorCode.substr(8)) {
+              case "unknown":
+                setError("Bilinmeyen bir hata oluştu.");
+                setLoading(false);
+                break;
+              case "quota-exceeded":
+                setError(
+                  "Kota aşıldı. İşleminiz gerçekleştirilemiyor. Lütfen bu hatayı yetkiliye bildiriniz."
+                );
+                setLoading(false);
+                break;
+              case "unauthenticated":
+                setError("Kullanıcı kimliği doğrulanamadı.");
+                setLoading(false);
+                break;
+              case "unauthorized":
+                setError("Bu eylemi gerçekleştirebilme yetkiniz yok.");
+                setLoading(false);
+                break;
+              case "retry-limit-exceeded":
+                setError(
+                  "İşlem zaman aşımına uğradı. Lütfen tekrar deneyiniz."
+                );
+                setLoading(false);
+                break;
+              case "canceled":
+                setError("İşlem iptal edildi.");
+                setLoading(false);
+                break;
+              case "server-file-wrong-size":
+                setError("Tekrak deneyiniz. Boyut farkı var.");
+                setLoading(false);
+                break;
+              default:
+                setError("Hata. Lütfen tekrar deneyiniz.");
+                setLoading(false);
+                break;
+            }
+          });
+      } else {
+        // daha önce photoURL tanımlanmamışsa
+        user
+          .updateProfile({
+            photoURL: imageName,
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("D_user")
+              .doc(user.uid)
+              .set({ avatar: url }, { merge: true });
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("D_user")
+              .doc(user.uid)
+              .collection("Hastalarım")
+              .onSnapshot((snaps) => {
+                if (!snaps.empty) {
+                  snaps.forEach((snapsFor) => {
+                    firebase
+                      .firestore()
+                      .collection("H_user")
+                      .doc(snapsFor.data().Id)
+                      .collection("Doktorlarım")
+                      .where("Id", "==", user.uid)
+                      .onSnapshot((snaps2) => {
+                        snaps2.forEach((snaps2For) => {
+                          snaps2For.ref.set({ avatar: url }, { merge: true });
+                        });
+                      });
+                  });
+                }
+              });
+          })
+          .then(() => {
+            firebase
+              .firestore()
+              .collection("Chats")
+              .where("users", "array-contains", user.email)
+              .onSnapshot((snaps) => {
+                if (!snaps.empty) {
+                  snaps.forEach((snapsFor) => {
+                    snapsFor.ref
+                      .update({
+                        avatar: [snapsFor.data().avatar[0], url],
+                      })
+                      .then(() => {
+                        setLoading(false);
+                        setModalVisible(false);
+                      });
+                  });
+                } else {
+                  setLoading(false);
+                  setModalVisible(false);
+                }
+              });
+          });
+      }
+    });
+  };
+
+  const valueArr = [time1, time2];
+
   return (
     <View style={styles.cont}>
       <View style={styles.userImg}>
@@ -45,24 +277,24 @@ const ProfileComponent = ({
             source={{ uri: avatar }}
             size={130}
             rounded
-            // onPress={showImagePicker}
+            onPress={showImagePicker}
           >
-            {/* <Avatar.Accessory size={27} onPress={showImagePicker} /> */}
+            <Avatar.Accessory size={27} onPress={showImagePicker} />
           </Avatar>
         ) : (
           <Avatar
             source={require("../../../../rec/Avatars/DefaultDoctorAvatar.png")}
             size={130}
             rounded
-            // onPress={showImagePicker}
+            onPress={showImagePicker}
           >
-            {/* <Avatar.Accessory size={27} onPress={showImagePicker} /> */}
+            <Avatar.Accessory size={27} onPress={showImagePicker} />
           </Avatar>
         )}
 
         {/* --- Modal --- */}
 
-        {/* <ProfilePhotoChangeModal
+        <ProfilePhotoChangeModal
           isModalVisible={isModalVisible}
           onBackdropPress={() => {
             !loading ? setModalVisible(false) : null;
@@ -75,7 +307,7 @@ const ProfileComponent = ({
           showImagePicker={showImagePicker}
           AvatarUpdate={() => AvatarUpdate(NewAvatarUri, ImageName)}
           loadingButton={loading}
-        /> */}
+        />
 
         {/* --- Modal --- */}
       </View>
@@ -104,6 +336,7 @@ const ProfileComponent = ({
             topInfo="Çalışılan Yer"
             infoTitleModal="Çalıştığınız yeri güncelleyebilirsiniz."
             value={CalisilanYer}
+            placeHolderModal="Yeni çalışma yeri"
             id={id}
           />
         ) : (
@@ -112,6 +345,7 @@ const ProfileComponent = ({
             topInfo="Çalışılan Yer"
             infoTitleModal="Çalıştığınız yeri güncelleyebilirsiniz."
             value={"Çalışılan Yer belirtilmedi."}
+            placeHolderModal="Çalışılan yer"
             id={id}
           />
         )}
@@ -120,11 +354,7 @@ const ProfileComponent = ({
           icon={"clock"}
           topInfo="Çalışma Saatleri"
           infoTitleModal="Çalışma saatlerini güncellek için yeni saat aralığı seçiniz."
-          value={
-            moment(time1).locale("tr", trLocale).format("LT") +
-            " - " +
-            moment(time2).locale("tr", trLocale).format("LT")
-          }
+          value={valueArr}
           id={id}
         />
 
