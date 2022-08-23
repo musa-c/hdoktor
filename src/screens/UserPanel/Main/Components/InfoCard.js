@@ -33,6 +33,10 @@ const InfoCard = ({
         topInfo={topInfo}
         isInfoModalVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
+        w_user="H_user"
+        w_user_other="D_user"
+        w_user_collection="Doktorlarım"
+        w_user_other_collection="Hastalarım"
       />
 
       <View style={styles.userInfo}>
