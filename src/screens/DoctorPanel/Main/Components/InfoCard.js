@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
 import Separator from "./Separator";
 import ProfileUpdateModal from "../../../../components/Modals/ProfileUpdateModal";
+import moment from "moment";
+import trLocale from "moment/locale/tr";
 
 const InfoCard = ({
   topInfo,
@@ -29,13 +31,23 @@ const InfoCard = ({
         topInfo={topInfo}
         isInfoModalVisible={isModalVisible}
         onBackdropPress={() => setModalVisible(false)}
+        w_user="D_user"
+        w_user_other="H_user"
+        w_user_collection="Hastalarım"
+        w_user_other_collection="Doktorlarım"
       />
 
       <View style={styles.userInfo}>
         <Text style={styles.topInfoStyle}>{topInfo}</Text>
         <View style={{ flexDirection: "row" }}>
           <FontAwesome5 name={icon} size={22} />
-          <Text style={styles.ValueStyle}>{value}</Text>
+          <Text style={styles.ValueStyle}>
+            {topInfo == "Çalışma Saatleri"
+              ? moment(value[0]).locale("tr", trLocale).format("LT") +
+                " - " +
+                moment(value[1]).locale("tr", trLocale).format("LT")
+              : value}
+          </Text>
           <Ionicons
             name="ellipsis-horizontal-circle"
             size={22}
