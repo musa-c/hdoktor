@@ -3,6 +3,8 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import firebase from "firebase/compat/app";
 import Header from "../../../components/Header/Header";
 import ProfileComponent from "./Components/ProfileComponent";
+import moment from "moment";
+import trLocale from "moment/locale/tr";
 
 const Profile = ({ navigation }) => {
   const [avatar, setAvatar] = useState();
@@ -25,11 +27,11 @@ const Profile = ({ navigation }) => {
         .collection("D_user")
         .doc(user.uid)
         .onSnapshot((snapshot) => {
-          setName(snapshot.data()?.name);
-          setBrans(snapshot.data()?.brans);
-          setCalisilanYer(snapshot.data()?.CalisilanYer);
-          setTime1(snapshot.data()?.time1.toDate());
-          setTime2(snapshot.data()?.time2.toDate());
+          setName(snapshot.data().name);
+          setBrans(snapshot.data().brans);
+          setCalisilanYer(snapshot.data().CalisilanYer);
+          setTime1(snapshot.data().time1.toDate());
+          setTime2(snapshot.data().time2.toDate());
           setAvatar(snapshot.data().avatar);
           setEmail(snapshot.data().email);
           setCinsiyet(snapshot.data().cinsiyet);
@@ -70,6 +72,8 @@ const Profile = ({ navigation }) => {
           brans={brans}
           time1={time1}
           time2={time2}
+          // time1={moment(time1).locale("tr", trLocale).format("LT")}
+          // time2={moment(time2).locale("tr", trLocale).format("LT")}
           id={Id}
         />
       </ScrollView>
