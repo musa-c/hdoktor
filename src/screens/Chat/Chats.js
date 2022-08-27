@@ -55,8 +55,6 @@ const Chats = ({ navigation }) => {
     };
   }, []);
 
-  console.log(DAvatar);
-
   const user = firebase.auth().currentUser;
   const [name, setName] = useState();
 
