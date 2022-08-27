@@ -1,16 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
-
 import Logo from "./Logo";
-
 import IconFeather from "react-native-vector-icons/Feather";
-
+import firebase from "firebase/compat/app";
 import { Badge } from "react-native-elements";
-
 import { useNavigation } from "@react-navigation/native";
 
-const Header = ({ onPressChats, onPressNotifications }) => {
+const Header = ({ onPressChats, onPressNotifications, W_user }) => {
+  const [unreadNotification, setUnreadNotification] = useState();
+  const [unreadMessage, setUnreadMessage] = useState();
+
   const navigation = useNavigation();
+  const user = firebase.auth().currentUser;
+
+  useEffect(() => {
+    let unmounted = false;
+
+    if (W_user == "D_user") {
+      firebase
+        .firestore()
+        .collection("D_user")
+        .doc(user.uid)
+        .collection("Bildirimlerim")
+        .where("read", "==", false)
+        .onSnapshot((snaps) => {
+          if (!unmounted) {
+            setUnreadNotification(snaps.docs.length);
+          }
+        });
+
+      firebase
+        .firestore()
+        .collection("Chats")
+        .where("users", "array-contains", user.email)
+        .where("Dread", "==", false)
+        .onSnapshot((snaps) => {
+          if (!unmounted) {
+            setUnreadMessage(snaps.docs.length);
+          }
+        });
+    } else if (W_user == "H_user") {
+      firebase
+        .firestore()
+        .collection("H_user")
+        .doc(user.uid)
+        .collection("Bildirimlerim")
+        .where("read", "==", false)
+        .onSnapshot((snaps) => {
+          if (!unmounted) {
+            setUnreadNotification(snaps.docs.length);
+          }
+        });
+
+      firebase
+        .firestore()
+        .collection("Chats")
+        .where("users", "array-contains", user.email)
+        .where("Hread", "==", false)
+        .onSnapshot((snaps) => {
+          if (!unmounted) {
+            setUnreadMessage(snaps.docs.length);
+          }
+        });
+    }
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 
   return (
     <View style={styles.viewStyle}>
@@ -23,11 +79,13 @@ const Header = ({ onPressChats, onPressNotifications }) => {
             }}
           >
             <IconFeather name="mail" size={30} color="black" />
-            <Badge
-              value="2"
-              status="primary"
-              containerStyle={{ position: "absolute", left: 20 }}
-            />
+            {unreadMessage != 0 ? (
+              <Badge
+                value={unreadMessage}
+                status="primary"
+                containerStyle={{ position: "absolute", left: 20 }}
+              />
+            ) : null}
           </View>
         </TouchableOpacity>
       </View>
@@ -45,11 +103,13 @@ const Header = ({ onPressChats, onPressNotifications }) => {
             }}
           >
             <IconFeather name="bell" size={30} color="black" />
-            <Badge
-              value="5"
-              status="primary"
-              containerStyle={{ position: "absolute", left: 17 }}
-            />
+            {unreadNotification != 0 ? (
+              <Badge
+                value={unreadNotification}
+                status="primary"
+                containerStyle={{ position: "absolute", left: 17 }}
+              />
+            ) : null}
           </View>
         </TouchableOpacity>
       </View>
