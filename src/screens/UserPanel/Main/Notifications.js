@@ -4,20 +4,26 @@ import firebase from "firebase/compat/app";
 import moment from "moment";
 import { Avatar, Badge } from "react-native-elements";
 import Separator from "../../../components/Separator";
+import ListEmptyComponent from "../../../components/ListEmptyComponent";
 
 const Notifications = () => {
   const user = firebase.auth().currentUser;
   const [data, setData] = useState([]);
+  const [refresh, setRefresh] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     let unmounted = false;
-
+    if (!unmounted) {
+      setRefreshing(true);
+    }
     firebase
       .firestore()
       .collection("H_user")
       .doc(user.uid)
       .collection("Bildirimlerim")
-      .onSnapshot((snapshot) => {
+      .get()
+      .then((snapshot) => {
         const data = [];
         snapshot.forEach((documentSnapshot) => {
           data.push({
@@ -27,19 +33,44 @@ const Notifications = () => {
         });
         if (!unmounted) {
           setData(data);
+          setRefreshing(false);
         }
+      })
+      .then(() => {
+        firebase
+          .firestore()
+          .collection("H_user")
+          .doc(user.uid)
+          .collection("Bildirimlerim")
+          .where("read", "==", false)
+          .get()
+          .then((snaps) => {
+            snaps.forEach((snapsFor) => {
+              snapsFor.ref.update({ read: true });
+            });
+          });
       });
     return () => {
       unmounted = true;
     };
-  }, []);
-
-  console.log(data);
+  }, [refresh]);
 
   return (
     <View style={styles.cont}>
       <FlatList
         data={data}
+        refreshing={refreshing}
+        contentContainerStyle={{ flexGrow: 1 }}
+        onRefresh={() => {
+          setRefresh(!refresh);
+          setRefreshing(true);
+        }}
+        ListEmptyComponent={
+          <ListEmptyComponent
+            text="Bildirim bulunmamakta."
+            refreshing={refreshing}
+          />
+        }
         renderItem={({ item }) => (
           <>
             <View style={{ flexDirection: "row" }}>
@@ -47,10 +78,10 @@ const Notifications = () => {
                 style={{
                   justifyContent: "center",
                   alignItems: "flex-end",
-                  flex: 1,
+                  marginLeft: 10,
                 }}
               >
-                <Badge status="primary" />
+                {!item.read ? <Badge status="primary" /> : null}
                 <Avatar
                   size={60}
                   rounded
@@ -99,6 +130,7 @@ const styles = StyleSheet.create({
   },
   cardCont: {
     // flex:15,
+    flex: 1,
     marginVertical: 5,
     padding: 10,
     paddingLeft: 20,

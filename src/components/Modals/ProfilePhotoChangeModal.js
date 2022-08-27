@@ -23,13 +23,10 @@ const ProfilePhotoChangeModal = ({
         justifyContent: "center",
         alignItems: "center",
       }}
-      //swipeDirection="down"
       onBackdropPress={onBackdropPress}
-      //onSwipeComplete={onSwipeComplete}
     >
       <View
         style={{
-          // backgroundColor: "rgba(52, 52, 52, alpha)",
           backgroundColor: "#EEEEEE",
           borderRadius: 15,
           width: Dimensions.get("screen").width / 1.1,
@@ -38,13 +35,6 @@ const ProfilePhotoChangeModal = ({
           alignItems: "center",
         }}
       >
-        {/* <Ionicons
-          name="close-outline"
-          color="black"
-          size={30}
-          onPress={toggleModal}
-          style={{ alignSelf: "flex-end", marginRight: 15 }}
-        /> */}
         <Avatar
           source={{ uri: avatar }}
           size={160}
@@ -57,7 +47,6 @@ const ProfilePhotoChangeModal = ({
         <LoadingButton
           mode="contained"
           style={{
-            // backgroundColor: "#B71C1C",
             marginTop: 20,
             borderRadius: 20,
           }}

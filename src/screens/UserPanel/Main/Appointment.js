@@ -446,6 +446,7 @@ const Appointment = ({ route }) => {
               saat: now,
               KHastalik: KHastalik,
               id: H_id,
+              read: false,
             });
 
           setModalVisible(!isModalVisible);

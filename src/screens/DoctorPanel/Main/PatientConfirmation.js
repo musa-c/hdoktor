@@ -198,6 +198,8 @@ const PatientConfirmation = ({ navigation }) => {
         RandevuSaat: RandevuSaat,
         saat: now,
         randevu: true,
+        read: false,
+        avatar: DAvatar,
       });
 
     var user = firebase.auth().currentUser;
@@ -338,6 +340,7 @@ const PatientConfirmation = ({ navigation }) => {
             RandevuSaat: RandevuSaat,
             saat: now,
             randevu: false,
+            read: false,
           });
       }
     });
@@ -351,6 +354,7 @@ const PatientConfirmation = ({ navigation }) => {
           navigation.navigate("ChatsScreen", { screen: "Chats" })
         }
         onPressNotifications={() => navigation.navigate("Notifications")}
+        W_user="D_user"
       />
       <FlatList
         data={users}
@@ -378,7 +382,7 @@ const PatientConfirmation = ({ navigation }) => {
                   {element.item.avatar == "" ? (
                     <Avatar
                       size={85}
-                      source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+                      source={require("../../../rec/Avatars/DefaultHastaAvatar.png")}
                       avatarStyle={styles.imageStyle}
                       activeOpacity={0.7}
                       rounded

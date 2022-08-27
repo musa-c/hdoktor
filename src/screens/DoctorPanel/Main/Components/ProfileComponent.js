@@ -29,6 +29,7 @@ const ProfileComponent = ({
   const [NewAvatarUri, setNewAvatarUri] = useState("");
   const [ImageName, setImageName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [raiting, setRaiting] = useState();
 
   const toggleModalAvatar = () => {
     if (!loading) {
@@ -266,7 +267,7 @@ const ProfileComponent = ({
           ratingBackgroundColor="#c8c7c8"
           ratingCount={5}
           imageSize={20}
-          //onFinishRating={(text) => setRaiting(text)}
+          readonly
           startingValue={2}
           tintColor="white"
           style={{ marginBottom: 20 }}

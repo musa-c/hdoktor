@@ -56,6 +56,7 @@ function HomeU(props) {
           navigation.navigate("ChatsScreen", { screen: "Chats" })
         }
         onPressNotifications={() => navigation.navigate("Notifications")}
+        W_user="H_user"
       />
       <Ad />
       <FlatList

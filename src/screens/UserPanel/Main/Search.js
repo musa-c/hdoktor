@@ -14,6 +14,7 @@ const Search = () => {
           navigation.navigate("ChatsScreen", { screen: "Chats" })
         }
         onPressNotifications={() => navigation.navigate("Notifications")}
+        W_user="H_user"
       />
       {/* <View style={style.cont}>
                 

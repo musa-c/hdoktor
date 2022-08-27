@@ -3,7 +3,7 @@ import React from "react";
 import AnimatedLottieView from "lottie-react-native";
 import Modal from "react-native-modal";
 
-const CreateAccountSucces = ({ isCreateAccount }) => {
+const CreateAccountSucces = ({ isCreateAccount, title }) => {
   return (
     <Modal
       isVisible={isCreateAccount}
@@ -53,7 +53,7 @@ const CreateAccountSucces = ({ isCreateAccount }) => {
               marginLeft: 9,
             }}
           >
-            Hesap oluşturuldu!
+            {title}
           </Text>
         </View>
       </View>

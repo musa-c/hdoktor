@@ -271,6 +271,7 @@ const MyPatients = (props) => {
           navigation.navigate("ChatsScreen", { screen: "Chats" })
         }
         onPressNotifications={() => navigation.navigate("Notifications")}
+        W_user="D_user"
       />
       {/* <ScrollView> */}
       <FlatList

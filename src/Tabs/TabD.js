@@ -89,20 +89,36 @@ const TabDBottom = () => {
 };
 
 const OtherStack = createStackNavigator();
-import AboutUs from "../screens/DoctorPanel/Main/AboutUs";
-import Contract from "../screens/DoctorPanel/Main/Contract";
-import Deglerendir from "../screens/DoctorPanel/Main/Degerlendir";
-import PaymentPlan from "../screens/DoctorPanel/Main/PaymentPlan";
+import Hakkimizda from "../components/Pages/Other/Hakkimizda";
+import UyelikSozlesmesi from "../components/Pages/Other/UyelikSozlesmesi";
+import Iletisim from "../components/Pages/Other/Iletisim";
+import Others from "../components/Pages/Other/Others";
 
 import Notifications from "../screens/DoctorPanel/Main/Notifications";
 
 const OtherScreen = () => {
   return (
     <OtherStack.Navigator>
-      <OtherStack.Screen name="Hakkımızda" component={AboutUs} />
-      <OtherStack.Screen name="Sozlesme" component={Contract} />
-      <OtherStack.Screen name="Deglerendir" component={Deglerendir} />
-      <OtherStack.Screen name="OdemePlan" component={PaymentPlan} />
+      {/* <OtherStack.Screen name="Hakkımızda" component={Hakkimizda} />
+      <OtherStack.Screen name="Sozlesme" component={UyelikSozlesmesi} />
+      <OtherStack.Screen name="İletişim" component={Iletisim} /> */}
+      <OtherStack.Screen
+        name="Others"
+        component={Others}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitleVisible: false,
+        })}
+      />
+
+      <OtherStack.Screen
+        name="Iletisim"
+        component={Iletisim}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitleVisible: false,
+        })}
+      />
     </OtherStack.Navigator>
   );
 };
@@ -117,12 +133,14 @@ const ChatsScreen = () => {
       <ChatStack.Screen
         name="Chats"
         component={Chats}
-        options={{ headerTitle: "Mesajlar", headerBackTitle: "Geri" }}
+        options={{ headerTitle: "Mesajlar", headerLeftLabelVisible: false }}
       />
       <ChatStack.Screen
         name="Chat"
         component={Chat}
-        options={{ headerTitle: "", headerBackTitle: "Geri" }}
+        options={({ route }) => ({
+          title: route.params.name,
+        })}
       />
     </ChatStack.Navigator>
   );

@@ -316,7 +316,10 @@ const SignUp1 = ({ navigation }) => {
           {/* ANİMATİON */}
 
           <LoadingAnimation isLoading={isLoading} />
-          <CreateAccountSucces isCreateAccount={isCreateAccount} />
+          <CreateAccountSucces
+            isCreateAccount={isCreateAccount}
+            title="Hesap oluşturuldu!"
+          />
 
           <View style={{ alignItems: "center" }}>
             <View style={styles.InputCard}>

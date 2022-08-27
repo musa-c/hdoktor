@@ -61,6 +61,7 @@ function HomeD(props) {
           navigation.navigate("ChatsScreen", { screen: "Chats" })
         }
         onPressNotifications={() => navigation.navigate("Notifications")}
+        W_user="D_user"
       />
       <Ad />
 

@@ -94,9 +94,47 @@ import Chats from "../screens/Chat/Chats";
 const ChatsScreen = () => {
   return (
     <ChatStack.Navigator>
-      <ChatStack.Screen name="Chats" component={Chats} />
-      <ChatStack.Screen name="Chat" component={Chat} />
+      <ChatStack.Screen
+        name="Chats"
+        component={Chats}
+        options={{ headerTitle: "Mesajlar", headerLeftLabelVisible: false }}
+      />
+      <ChatStack.Screen
+        name="Chat"
+        component={Chat}
+        options={({ route }) => ({
+          title: route.params.name,
+        })}
+      />
     </ChatStack.Navigator>
+  );
+};
+
+const OtherStack = createStackNavigator();
+
+import Others from "../components/Pages/Other/Others";
+import Iletisim from "../components/Pages/Other/Iletisim";
+
+const OthersScreen = () => {
+  return (
+    <OtherStack.Navigator>
+      <OtherStack.Screen
+        name="Others"
+        component={Others}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitleVisible: false,
+        })}
+      />
+      <OtherStack.Screen
+        name="Iletisim"
+        component={Iletisim}
+        options={({ route }) => ({
+          title: route.params.title,
+          headerBackTitleVisible: false,
+        })}
+      />
+    </OtherStack.Navigator>
   );
 };
 
@@ -144,6 +182,12 @@ const TabU = () => {
         name="Appointment"
         component={Appointment}
         options={{ title: "Randevu", headerBackTitle: "Geri" }}
+      />
+
+      <MainStack.Screen
+        name="OtherScreen"
+        component={OthersScreen}
+        options={{ headerShown: false }}
       />
       <MainStack.Screen
         name="Notifications"

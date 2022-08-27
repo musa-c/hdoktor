@@ -38,6 +38,7 @@ const MoreDoctorInfo = () => {
           ratingBackgroundColor="#c8c7c8"
           ratingCount={5}
           imageSize={20}
+          readonly
           onFinishRating={(text) => setRaiting(text)}
           startingValue={2}
           tintColor="white"
