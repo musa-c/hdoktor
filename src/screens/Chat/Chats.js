@@ -8,6 +8,7 @@ import Separator from "../../components/Separator";
 
 const Chats = ({ navigation }) => {
   const [DAvatar, setDavatar] = useState();
+  const [W_user, setW_user] = useState();
 
   const [chats, setChats] = useState([]);
   useEffect(() => {
@@ -29,20 +30,22 @@ const Chats = ({ navigation }) => {
       .get()
       .then((snapshot) => {
         if (snapshot.empty) {
+          setW_user("H_user");
           firebase
             .firestore()
             .collection("H_user")
             .doc(user.uid)
             .onSnapshot((snapshot) => {
-              setDavatar(snapshot.data().avatar);
+              setDavatar(snapshot.data()?.avatar ?? "");
             });
         } else {
+          setW_user("D_user");
           firebase
             .firestore()
             .collection("D_user")
             .doc(user.uid)
             .onSnapshot((snapshot) => {
-              setDavatar(snapshot.data().avatar);
+              setDavatar(snapshot.data()?.avatar ?? "");
             });
         }
       });
@@ -51,6 +54,8 @@ const Chats = ({ navigation }) => {
       unmounted = true;
     };
   }, []);
+
+  console.log(DAvatar);
 
   const user = firebase.auth().currentUser;
   const [name, setName] = useState();
@@ -65,15 +70,26 @@ const Chats = ({ navigation }) => {
               .names.find(
                 (x) => x !== firebase.auth().currentUser?.displayName
               )}
-            avatar={chat.data().avatar.find((x) => x !== DAvatar)}
+            avatar={chat.data().avatar.find((x) => x != DAvatar)}
             subtitle={
               chat.data().messages.length === 0
-                ? "Henüz mesaj yok"
+                ? ""
                 : chat.data().messages[0].text
             }
-            onPress={() => navigation.navigate("Chat", { id: chat.id })}
+            read={W_user == "H_user" ? chat.data().Hread : chat.data().Dread}
+            w_user={W_user == "H_user" ? "D_user" : "H_user"}
+            onPress={() =>
+              navigation.navigate("Chat", {
+                id: chat.id,
+                name: chat
+                  .data()
+                  .names.find(
+                    (x) => x !== firebase.auth().currentUser?.displayName
+                  ),
+              })
+            }
           />
-          <Separator marginStart={88} />
+          <Separator marginStart={88} backgroundColor="#E2E2E2" />
         </React.Fragment>
       ))}
     </ScrollView>
