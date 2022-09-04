@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, ScrollView } from "react-native";
+import { StyleSheet, ScrollView, View, Text } from "react-native";
 import firebase from "firebase/compat/app";
 import ContactRow from "../../components/ContactRow";
 import Separator from "../../components/Separator";
@@ -55,42 +55,65 @@ const Chats = ({ navigation }) => {
     };
   }, []);
 
+  const ListEmptyComponent = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "white",
+        }}
+      >
+        <Text style={{ fontSize: 20, color: "grey" }}>Mesaj bulunmamakta.</Text>
+      </View>
+    );
+  };
+
   const user = firebase.auth().currentUser;
   const [name, setName] = useState();
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
-      {chats.map((chat) => (
-        <React.Fragment key={chat.id}>
-          <ContactRow
-            name={chat
-              .data()
-              .names.find(
-                (x) => x !== firebase.auth().currentUser?.displayName
-              )}
-            avatar={chat.data().avatar.find((x) => x != DAvatar)}
-            subtitle={
-              chat.data().messages.length === 0
-                ? ""
-                : chat.data().messages[0].text
-            }
-            read={W_user == "H_user" ? chat.data().Hread : chat.data().Dread}
-            w_user={W_user == "H_user" ? "D_user" : "H_user"}
-            onPress={() =>
-              navigation.navigate("Chat", {
-                id: chat.id,
-                name: chat
+    <>
+      {chats.length > 0 ? (
+        <ScrollView style={{ flex: 1, backgroundColor: "white" }}>
+          {chats.map((chat) => (
+            <React.Fragment key={chat.id}>
+              <ContactRow
+                name={chat
                   .data()
                   .names.find(
                     (x) => x !== firebase.auth().currentUser?.displayName
-                  ),
-              })
-            }
-          />
-          <Separator marginStart={88} backgroundColor="#E2E2E2" />
-        </React.Fragment>
-      ))}
-    </ScrollView>
+                  )}
+                avatar={chat.data().avatar.find((x) => x != DAvatar)}
+                subtitle={
+                  chat.data().messages.length === 0
+                    ? ""
+                    : chat.data().messages[0].text
+                }
+                read={
+                  W_user == "H_user" ? chat.data().Hread : chat.data().Dread
+                }
+                w_user={W_user == "H_user" ? "D_user" : "H_user"}
+                onPress={() =>
+                  navigation.navigate("Chat", {
+                    id: chat.id,
+                    name: chat
+                      .data()
+                      .names.find(
+                        (x) => x !== firebase.auth().currentUser?.displayName
+                      ),
+                  })
+                }
+              />
+              <Separator marginStart={88} backgroundColor="#E2E2E2" />
+            </React.Fragment>
+          ))}
+        </ScrollView>
+      ) : (
+        <ListEmptyComponent />
+      )}
+    </>
   );
 };
 
