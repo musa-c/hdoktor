@@ -109,12 +109,13 @@ const Chat = ({ route }) => {
         firebase
           .firestore()
           .doc("Chats/" + route.params.id)
-          .set({ Hread: false }, { merge: true });
+          .set({ Hread: false, Dread: true }, { merge: true });
       } else if (W_user == "D_user") {
+        console.log(W_user == "D_user");
         firebase
           .firestore()
           .doc("Chats/" + route.params.id)
-          .set({ Dread: false }, { merge: true });
+          .set({ Dread: false, Hread: true }, { merge: true });
       }
 
       // append içindeki 1. parametre mevcut mesajlar, 2. parametre gönder butonuna basıldıktan sonraki mesajlar
