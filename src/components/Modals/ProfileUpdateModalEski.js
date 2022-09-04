@@ -815,7 +815,7 @@ const ProfileUpdateModalEski = ({
       avoidKeyboard
       //avoidKeyboard
     >
-      <SuccesModal isVisible={update} />
+      <SuccesModal isVisible={update} text="Güncelleme başarılı!" />
       <View
         style={{
           backgroundColor: "#fff",

@@ -3,7 +3,7 @@ import React from "react";
 import Modal from "react-native-modal";
 import AnimatedLottieView from "lottie-react-native";
 
-const SuccesModal = ({ isVisible }) => {
+const SuccesModal = ({ isVisible, text }) => {
   return (
     <Modal
       isVisible={isVisible}
@@ -26,7 +26,7 @@ const SuccesModal = ({ isVisible }) => {
       >
         <View
           style={{
-            width: "85%",
+            // width: "85%",
             backgroundColor: "#f5f5f5",
             borderRadius: 8,
             justifyContent: "flex-start",
@@ -59,7 +59,7 @@ const SuccesModal = ({ isVisible }) => {
               marginLeft: 9,
             }}
           >
-            Güncelleme Başarılı!
+            {text}
           </Text>
         </View>
         {/* <Button title="Hide modal" onPress={toggleModal} /> */}
