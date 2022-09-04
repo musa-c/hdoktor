@@ -87,6 +87,7 @@ function HomeU(props) {
                   time2: element.item.time2.toDate(),
                   CalisilanYer: element.item.CalisilanYer,
                   avatar: element.item.avatar,
+                  rating: element.item.rating,
                 })
               }
             >
