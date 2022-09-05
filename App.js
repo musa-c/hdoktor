@@ -4,9 +4,10 @@ import { StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import TabD from "./src/Tabs/TabD";
 import TabU from "./src/Tabs/TabU";
+import TabAnonuymous from "./src/Tabs/AnonymousTabs/Tab";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./src/screens/Login";
-import { LogBox, View } from "react-native";
+import { LogBox, View, StatusBar } from "react-native";
 import ImagePickerExample1 from "./ImagePickerExample1";
 
 // firebase
@@ -45,25 +46,36 @@ export default function App() {
     // <View style={style.HomeStyle}>
     //   <ImagePickerExample1 />
     // </View>
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen
-          name="UMain"
-          component={TabU}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="DMain"
-          component={TabD}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar barStyle="dark-content" />
+
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen
+            name="UMain"
+            component={TabU}
+            options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+            name="TabAnonuymous"
+            component={TabAnonuymous}
+            options={{ headerShown: false }}
+          />
+
+          <Stack.Screen
+            name="DMain"
+            component={TabD}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={Login}
+            options={{ headerShown: false }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 }
 
