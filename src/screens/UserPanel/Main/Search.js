@@ -80,7 +80,7 @@ const style = StyleSheet.create({
     color: "black",
   },
   input: {
-    borderRadius: 25,
+    borderRadius: 10,
     height: 40,
   },
 });
