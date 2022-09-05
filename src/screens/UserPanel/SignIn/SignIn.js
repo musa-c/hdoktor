@@ -22,7 +22,17 @@ const SignIn = () => {
         <LogoLogin />
         <Form type="Giriş Yap" />
 
-        <TouchableOpacity style={style.continueButton}>
+        <TouchableOpacity
+          style={style.continueButton}
+          onPress={() =>
+            navigation.navigate("TabAnonuymous", {
+              screen: "TabU",
+              params: {
+                w_anonymous: "h_anonymous",
+              },
+            })
+          }
+        >
           <Text style={style.continueText}>Giriş yapmadan devam et</Text>
           <Icon name="arrow-circle-right" size={63} color="#B71C1C" />
         </TouchableOpacity>
