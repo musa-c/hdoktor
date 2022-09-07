@@ -68,6 +68,21 @@ const SignUp1 = ({ navigation }) => {
     setIsLoading(true);
     SetCreateAccountUnEnabled(true);
 
+    var NameArray = [];
+    for (let i = 1; i < name.toLowerCase().length + 1; i++) {
+      NameArray.push(name.substring(0, i));
+    }
+
+    var BransArray = [];
+    for (let i = 1; i < brans.toLowerCase().length + 1; i++) {
+      BransArray.push(brans.substring(0, i));
+    }
+
+    var CalisilanYerArray = [];
+    for (let i = 1; i < CalisilanYer.toLowerCase().length + 1; i++) {
+      CalisilanYerArray.push(CalisilanYer.substring(0, i));
+    }
+
     await firebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
@@ -86,6 +101,10 @@ const SignUp1 = ({ navigation }) => {
             cinsiyet: cinsiyet,
             Id: userCredential.user.uid,
             avatar: "",
+            nameSearch: NameArray,
+            rating: 0,
+            bransSearch: BransArray,
+            calislanYerSearch: CalisilanYerArray,
           })
           .catch({
             // kaydedilen kullanıcı firestore'ya kaydedilmediği için sil kullanıcıyı.
