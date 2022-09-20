@@ -43,13 +43,14 @@ const styles = StyleSheet.create({
   viewStyle: {
     backgroundColor: "#fff",
     flexDirection: "row",
-    height: 60,
+    //height: 60,
     borderWidth: 0.3,
     borderLeftWidth: 0,
     borderRightWidth: 0,
     borderTopWidth: 0,
     borderColor: "grey",
-    paddingTop: 20,
+    paddingTop: 5,
+    // padding:20
   },
 });
 
