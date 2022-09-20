@@ -47,8 +47,7 @@ export default function App() {
     //   <ImagePickerExample1 />
     // </View>
     <>
-      <StatusBar barStyle="dark-content" />
-
+      <StatusBar backgroundColor={"white"} barStyle="dark-content" />
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen
