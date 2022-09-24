@@ -56,9 +56,7 @@ const Form = () => {
                     .get()
                     .then((snaps) => {
                       if (!snaps.empty) {
-                        // Kullanıcı eğer emaili değiştip mail kutusuna gelen linki tıklayıp eski emaili dönerse gerekli veritabanı işlemleri uygulamanacak!
-                        console.log(user.uid);
-
+                        // Kullanıcı eğer emaili değiştip mail kutusuna gelen linki tıklayıp eski emaili dönerse gerekli veritabanı işlemleri uygulanacak!
                         firebase
                           .firestore()
                           .collection("H_user")
@@ -183,7 +181,9 @@ const Form = () => {
             //   alert('Email adresi geçersiz.');
             break;
           default:
-            alert("Giriş başarısız. Lütfen tekrar deneyin.");
+            Alert.alert("Hata", "Giriş başarısız. Lütfen tekrar deneyin.", [
+              { text: "Tamam" },
+            ]);
             break;
         }
       });
@@ -193,20 +193,22 @@ const Form = () => {
     if (isPasswordSee) {
       return (
         <TextInput.Icon
-          name="eye-off-outline"
+          icon="eye-off-outline"
           forceTextInputFocus={false}
-          color={"#B71C1C"}
-          style={{ marginTop: "50%" }}
+          iconColor={"#B71C1C"}
+          style={{
+            marginTop: 15,
+          }}
           onPress={() => setispasswordSee(!isPasswordSee)}
         />
       );
     } else {
       return (
         <TextInput.Icon
-          name="eye-outline"
+          icon="eye-outline"
           forceTextInputFocus={false}
-          color={"#B71C1C"}
-          style={{ marginTop: "50%" }}
+          iconColor={"#B71C1C"}
+          style={{ marginTop: 15 }}
           onPress={() => setispasswordSee(!isPasswordSee)}
         />
       );
@@ -240,11 +242,10 @@ const Form = () => {
         outlineColor="#ECECEC"
         left={
           <TextInput.Icon
-            name="at"
+            icon="at"
             forceTextInputFocus={true}
-            color={"#B71C1C"}
-            style={{ marginTop: "50%" }}
-            onPress={() => {}}
+            iconColor={"#B71C1C"}
+            style={{ marginTop: 15 }}
           />
         }
         value={email}
@@ -261,11 +262,10 @@ const Form = () => {
         outlineColor="#ECECEC"
         left={
           <TextInput.Icon
-            name="lock-outline"
+            icon="lock-outline"
             forceTextInputFocus={true}
-            color={"#B71C1C"}
-            style={{ marginTop: "50%" }}
-            onPress={() => {}}
+            iconColor={"#B71C1C"}
+            style={{ marginTop: 15 }}
           />
         }
         right={PasswordSee()}

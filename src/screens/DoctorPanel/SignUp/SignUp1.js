@@ -225,7 +225,8 @@ const SignUp1 = ({ navigation }) => {
     if (!ispasswordSee) {
       return (
         <TextInput.Icon
-          name="eye-outline"
+          icon="eye-outline"
+          iconColor="#B71C1C"
           forceTextInputFocus={false}
           onPress={() => setispasswordSee(!ispasswordSee)}
         />
@@ -233,7 +234,8 @@ const SignUp1 = ({ navigation }) => {
     } else {
       return (
         <TextInput.Icon
-          name="eye-off-outline"
+          icon="eye-off-outline"
+          iconColor="#B71C1C"
           forceTextInputFocus={false}
           onPress={() => setispasswordSee(!ispasswordSee)}
         />
@@ -245,7 +247,8 @@ const SignUp1 = ({ navigation }) => {
     if (!isAgainPasswordSee) {
       return (
         <TextInput.Icon
-          name="eye-outline"
+          icon="eye-outline"
+          iconColor="#B71C1C"
           forceTextInputFocus={false}
           onPress={() => setAgainPasswordSee(!isAgainPasswordSee)}
         />
@@ -253,7 +256,8 @@ const SignUp1 = ({ navigation }) => {
     } else {
       return (
         <TextInput.Icon
-          name="eye-off-outline"
+          icon="eye-off-outline"
+          iconColor="#B71C1C"
           forceTextInputFocus={false}
           onPress={() => setAgainPasswordSee(!isAgainPasswordSee)}
         />
@@ -269,26 +273,26 @@ const SignUp1 = ({ navigation }) => {
           isAgainPasswordValidate = true;
           return (
             <TextInput.Icon
-              name="check-circle-outline"
+              icon="check-circle-outline"
               forceTextInputFocus={false}
-              color={"green"}
+              iconColor={"green"}
             />
           );
         } else {
           return (
             <TextInput.Icon
-              name="close-circle-outline"
+              icon="close-circle-outline"
               forceTextInputFocus={false}
-              color={"#f44336"}
+              iconColor={"#f44336"}
             />
           );
         }
       } else {
         return (
           <TextInput.Icon
-            name="close-circle-outline"
+            icon="close-circle-outline"
             forceTextInputFocus={false}
-            color={"#f44336"}
+            iconColor={"#f44336"}
           />
         );
       }
@@ -301,9 +305,13 @@ const SignUp1 = ({ navigation }) => {
     if (password != "") {
       if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&^_-]{8,}$/.test(password)) {
         isPasswordValidate = true;
-        return <TextInput.Icon name="check-circle-outline" color={"green"} />;
+        return (
+          <TextInput.Icon icon="check-circle-outline" iconColor={"green"} />
+        );
       } else {
-        return <TextInput.Icon name="close-circle-outline" color={"#f44336"} />;
+        return (
+          <TextInput.Icon icon="close-circle-outline" iconColor={"#f44336"} />
+        );
       }
     }
   };

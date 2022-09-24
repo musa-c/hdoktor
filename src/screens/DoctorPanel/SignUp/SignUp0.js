@@ -282,17 +282,17 @@ const SignUp0 = ({ navigation, route }) => {
         isNameValidation = true;
         return (
           <TextInput.Icon
-            name="check-circle-outline"
+            icon="check-circle-outline"
             forceTextInputFocus={false}
-            color={"green"}
+            iconColor={"green"}
           />
         );
       } else {
         return (
           <TextInput.Icon
-            name="close-circle-outline"
+            icon="close-circle-outline"
             forceTextInputFocus={false}
-            color={"#f44336"}
+            iconColor={"#f44336"}
           />
         );
       }
@@ -326,17 +326,17 @@ const SignUp0 = ({ navigation, route }) => {
         isEmailValitadion = true;
         return (
           <TextInput.Icon
-            name="check-circle-outline"
+            icon="check-circle-outline"
             forceTextInputFocus={false}
-            color={"green"}
+            iconColor={"green"}
           />
         );
       } else {
         return (
           <TextInput.Icon
-            name="close-circle-outline"
+            icon="close-circle-outline"
             forceTextInputFocus={false}
-            color={"#f44336"}
+            iconColor={"#f44336"}
           />
         );
       }

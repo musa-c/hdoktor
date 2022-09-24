@@ -8,6 +8,7 @@ import { FlatList } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 import ListEmptyComponentSeacrh from "../../../components/Anonymous/ListEmptyComponentSeacrh";
 import RenderItemSearch from "./RenderItemSearch";
+import LoadigIndicator from "../../../components/LoadigIndicator";
 
 const Search = ({ navigation, route }) => {
   const [search, setSearch] = useState();
@@ -137,10 +138,6 @@ const Search = ({ navigation, route }) => {
       });
   };
 
-  const LoadingIndicator = () => {
-    return loading ? <ActivityIndicator animating size="small" /> : null;
-  };
-
   const searchFirestore = (search) => {
     setSearch(search);
     const searchx =
@@ -224,7 +221,7 @@ const Search = ({ navigation, route }) => {
       <FlatList
         data={UsersData}
         contentContainerStyle={{ flexGrow: 1 }}
-        ListHeaderComponent={LoadingIndicator}
+        ListHeaderComponent={<LoadigIndicator loading={loading} />}
         ListEmptyComponent={
           (search != "") & (search != undefined) ? (
             <ListEmptyComponentSeacrh

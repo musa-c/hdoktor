@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
+import Constants from "expo-constants";
 import Logo from "./Logo";
 import IconFeather from "react-native-vector-icons/Feather";
 import firebase from "firebase/compat/app";
@@ -121,13 +122,14 @@ const styles = StyleSheet.create({
   viewStyle: {
     backgroundColor: "#fff",
     flexDirection: "row",
-    height: 60,
+    //height: 40,
+    paddingBottom: 5,
     borderWidth: 0.3,
     borderLeftWidth: 0,
     borderRightWidth: 0,
     borderTopWidth: 0,
     borderColor: "grey",
-    paddingTop: 20,
+    paddingTop: Constants.statusBarHeight - 15,
   },
 });
 

@@ -388,9 +388,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="check-circle-outline"
+                icon="check-circle-outline"
                 forceTextInputFocus={false}
-                color={"green"}
+                iconColor={"green"}
               />
             );
           } else {
@@ -399,9 +399,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="close-circle-outline"
+                icon="close-circle-outline"
                 forceTextInputFocus={false}
-                color={"#f44336"}
+                iconColor={"#f44336"}
               />
             );
           }
@@ -420,9 +420,9 @@ const ProfileUpdateModal = ({
               }
               return (
                 <TextInput.Icon
-                  name="check-circle-outline"
+                  icon="check-circle-outline"
                   forceTextInputFocus={false}
-                  color={"green"}
+                  iconColor={"green"}
                 />
               );
             } else {
@@ -431,9 +431,9 @@ const ProfileUpdateModal = ({
               }
               return (
                 <TextInput.Icon
-                  name="close-circle-outline"
+                  icon="close-circle-outline"
                   forceTextInputFocus={false}
-                  color={"#f44336"}
+                  iconColor={"#f44336"}
                 />
               );
             }
@@ -443,9 +443,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="close-circle-outline"
+                icon="close-circle-outline"
                 forceTextInputFocus={false}
-                color={"#f44336"}
+                iconColor={"#f44336"}
               />
             );
           }
@@ -463,9 +463,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="check-circle-outline"
+                icon="check-circle-outline"
                 forceTextInputFocus={false}
-                color={"green"}
+                iconColor={"green"}
               />
             );
           } else {
@@ -474,9 +474,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="close-circle-outline"
+                icon="close-circle-outline"
                 forceTextInputFocus={false}
-                color={"#f44336"}
+                iconColor={"#f44336"}
               />
             );
           }
@@ -509,9 +509,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="check-circle-outline"
+                icon="check-circle-outline"
                 forceTextInputFocus={false}
-                color={"green"}
+                iconColor={"green"}
               />
             );
           } else {
@@ -520,9 +520,9 @@ const ProfileUpdateModal = ({
             }
             return (
               <TextInput.Icon
-                name="close-circle-outline"
+                icon="close-circle-outline"
                 forceTextInputFocus={false}
-                color={"#f44336"}
+                iconColor={"#f44336"}
               />
             );
           }
@@ -1208,7 +1208,7 @@ const ProfileUpdateModal = ({
     if (!isPasswordSee) {
       return (
         <TextInput.Icon
-          name="eye-outline"
+          icon="eye-outline"
           forceTextInputFocus={false}
           onPress={() => setispasswordSee(!isPasswordSee)}
         />
@@ -1216,7 +1216,7 @@ const ProfileUpdateModal = ({
     } else {
       return (
         <TextInput.Icon
-          name="eye-off-outline"
+          icon="eye-off-outline"
           forceTextInputFocus={false}
           onPress={() => setispasswordSee(!isPasswordSee)}
         />
@@ -1228,7 +1228,7 @@ const ProfileUpdateModal = ({
     if (!ispasswordSeeAgain) {
       return (
         <TextInput.Icon
-          name="eye-outline"
+          icon="eye-outline"
           forceTextInputFocus={false}
           onPress={() => setispasswordSeeAgain(!ispasswordSeeAgain)}
         />
@@ -1236,7 +1236,7 @@ const ProfileUpdateModal = ({
     } else {
       return (
         <TextInput.Icon
-          name="eye-off-outline"
+          icon="eye-off-outline"
           forceTextInputFocus={false}
           onPress={() => setispasswordSeeAgain(!ispasswordSeeAgain)}
         />
