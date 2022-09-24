@@ -1,55 +1,66 @@
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, FlatList } from "react-native";
 import React, { useState, useCallback, useEffect } from "react";
-import Header from "../../../components/Anonymous/Header";
+import Header from "../../../components/Header/Header";
 import { SearchBar } from "react-native-elements";
 import { StyleSheet } from "react-native";
 import firebase from "firebase/compat/app";
-import { FlatList } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 import ListEmptyComponentSeacrh from "../../../components/Anonymous/ListEmptyComponentSeacrh";
 import RenderItemSearch from "./RenderItemSearch";
+import Icon from "@expo/vector-icons/Ionicons";
+import LoadigIndicator from "../../../components/LoadigIndicator";
 
 const Search = ({ navigation, route }) => {
+  const [PastUserData, setPastUserData] = useState([]);
+  const [IsPastUser, setIsPastUser] = useState(false);
   const [search, setSearch] = useState("");
   const [UsersData, setUsersData] = useState([]);
-  const [pastUserData, setPastUserData] = useState([]);
   const [searchTitle, setSearchTitle] = useState("isim");
   const [loading, setLoading] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const user = firebase.auth().currentUser;
-  useEffect(() => {
-    let unmounted = false;
-    firebase
-      .firestore()
-      .collection("H_user")
-      .doc(user.uid)
-      .collection("GeçmişAramalar")
-      .onSnapshot((snapshot) => {
-        const pastUserData = [];
-        snapshot.forEach((snapsFor) => {
-          firebase
-            .firestore()
-            .collection("D_user")
-            .doc(snapsFor.data().doctorId)
-            .get()
-            .then((snaps) => {
-              pastUserData.push({
-                ...snaps.data(),
-                key: snaps.id,
-              });
-            });
-        });
-        if (!unmounted) {
-          setPastUserData(pastUserData);
-        }
-      });
+  // useEffect(() => {
+  //   let unmounted = false;
+  //   var pastUserData = [];
+  //   if (!unmounted) {
+  //     setLoading(true);
+  //   }
+  //   firebase
+  //     .firestore()
+  //     .collection("H_user")
+  //     .doc(user.uid)
+  //     .collection("GeçmişAramalar")
+  //     .onSnapshot((snapshot) => {
+  //       snapshot.forEach((snapsFor) => {
+  //         firebase
+  //           .firestore()
+  //           .collection("D_user")
+  //           .doc(snapsFor.data().doctorId)
+  //           .onSnapshot((snaps) => {
+  //             pastUserData.push({
+  //               ...snaps.data(),
+  //               key: snaps.id,
+  //             });
+  //           });
+  //       });
+  //       if (!unmounted) {
+  //         if (pastUserData.length != 0) {
+  //           setPastUserData(pastUserData);
+  //           setIsPastUser(true);
+  //           setLoading(false);
+  //         }
 
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+  //       }
+  //     });
+
+  //   return () => {
+  //     unmounted = true;
+  //   };
+  // }, [refresh]);
 
   const NameSearch = (searchx) => {
     setLoading(true);
+    setIsPastUser(false);
     firebase
       .firestore()
       .collection("D_user")
@@ -91,6 +102,7 @@ const Search = ({ navigation, route }) => {
 
   const BransSearch = (searchx) => {
     setLoading(true);
+    setIsPastUser(false);
     firebase
       .firestore()
       .collection("D_user")
@@ -131,6 +143,7 @@ const Search = ({ navigation, route }) => {
 
   const CalisilanYerSearch = (searchx) => {
     setLoading(true);
+    setIsPastUser(false);
     firebase
       .firestore()
       .collection("D_user")
@@ -169,8 +182,36 @@ const Search = ({ navigation, route }) => {
       });
   };
 
-  const LoadingIndicator = () => {
-    return loading ? <ActivityIndicator animating size="small" /> : null;
+  const LoadingIndicatorPastUser = () => {
+    return (
+      <>
+        {loading ? (
+          <ActivityIndicator animating size="small" />
+        ) : (
+          <FlatlistHeaderText />
+        )}
+      </>
+    );
+  };
+
+  const FlatlistHeaderText = () => {
+    return (
+      <View
+        style={{
+          backgroundColor: "#eee",
+          alignSelf: "flex-end",
+          borderRadius: 5,
+          padding: 5,
+          marginRight: 5,
+          flexDirection: "row",
+        }}
+      >
+        <Text style={{ fontSize: 13, color: "black", marginRight: 5 }}>
+          Geçmiş aramalar
+        </Text>
+        <Icon name="close-circle-outline" size={20} color="black" />
+      </View>
+    );
   };
 
   const searchFirestore = (search) => {
@@ -194,17 +235,17 @@ const Search = ({ navigation, route }) => {
         }
       } else {
         setUsersData([]);
+        setIsPastUser(true);
       }
     }
   };
-
-  console.log("search: ", typeof search);
 
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <Header
         onPressChats={() => navigation.navigate("ChatsScreen")}
         onPressNotifications={() => navigation.navigate("Notifications")}
+        W_user="H_user"
       />
       <Text
         style={{
@@ -249,21 +290,35 @@ const Search = ({ navigation, route }) => {
         cancelButtonTitle="Vazgeç"
       />
 
+      <>
+        {/* <FlatList
+            data={PastUserData}
+            contentContainerStyle={{ flexGrow: 1 }}
+            ListHeaderComponent={LoadingIndicatorPastUser}
+            renderItem={useCallback(_renderItem, [PastUserData])}
+          /> */}
+      </>
       <FlatList
-        data={search == "" ? pastUserData : UsersData}
+        data={UsersData}
         contentContainerStyle={{ flexGrow: 1 }}
-        ListHeaderComponent={LoadingIndicator}
+        ListHeaderComponent={<LoadigIndicator loading={loading} />}
         ListEmptyComponent={
-          search != "" || search != undefined ? (
+          search != "" ? (
             <ListEmptyComponentSeacrh
               text="Doktor bulunamadı."
-              style={{}}
               loading={loading}
             />
           ) : null
         }
-        renderItem={useCallback(_renderItem, [UsersData, pastUserData])}
+        renderItem={useCallback(_renderItem, [UsersData])}
       />
+
+      {/* <FlatList
+        data={PastUserData}
+        contentContainerStyle={{ flexGrow: 1 }}
+        ListHeaderComponent={LoadingIndicator}
+        renderItem={_renderItem}
+      /> */}
     </View>
   );
 };
