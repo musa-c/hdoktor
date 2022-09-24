@@ -25,6 +25,7 @@ const Form = () => {
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
+        const user = firebase.auth().currentUser;
         firebase
           .firestore()
           .collection("D_user")
@@ -52,16 +53,93 @@ const Form = () => {
                   setErrorMessage("");
                   navigation.navigate("TabD");
                 } else {
-                  setLoading(false);
-                  setErrorMessage("");
-                  Alert.alert("Hatalı Giriş", "Hatalı kullanıcı girişi!", [
-                    {
-                      text: "Tekrar Dene",
-                      //   onPress: () => console.log("Cancel Pressed"),
-                      style: "destructive",
-                    },
-                    // { text: "OK", onPress: () => console.log("OK Pressed") }
-                  ]);
+                  firebase
+                    .firestore()
+                    .collection("D_user")
+                    .where("Id", "==", user.uid)
+                    .get()
+                    .then((snaps) => {
+                      if (!snaps.empty) {
+                        firebase
+                          .firestore()
+                          .collection("D_user")
+                          .doc(user.uid)
+                          .get()
+                          .then((thenQery) => {
+                            firebase
+                              .firestore()
+                              .collection("Chats")
+                              .where(
+                                "users",
+                                "array-contains",
+                                thenQery.data().email
+                              )
+                              .get()
+                              .then((thenQery2) => {
+                                thenQery2.forEach((thenFor) => {
+                                  thenFor.ref.update({
+                                    users: [
+                                      thenFor.data().users[0],
+                                      user.email,
+                                    ],
+                                  });
+                                });
+                              })
+                              .then(() => {
+                                thenQery.ref.update({
+                                  email: user.email,
+                                });
+                              });
+                          })
+                          .then(() => {
+                            firebase
+                              .firestore()
+                              .collection("D_user")
+                              .doc(user.uid)
+                              .collection("Hastalarım")
+                              .onSnapshot((querySnaps) => {
+                                querySnaps.forEach((queryFor) => {
+                                  firebase
+                                    .firestore()
+                                    .collection("H_user")
+                                    .doc(queryFor.data().Id)
+                                    .collection("Doktorlarım")
+                                    .where("Id", "==", user.uid)
+                                    .get()
+                                    .then((snapsThen) => {
+                                      snapsThen.forEach((snapsThenFor) => {
+                                        snapsThenFor.ref.update({
+                                          email: user.email,
+                                        });
+                                      });
+                                    });
+                                });
+                              });
+                          })
+                          .then(() => {
+                            setLoading(false);
+                            setEmail("");
+                            setPassword("");
+                            setErrorMessage("");
+                            navigation.navigate("TabD");
+                          });
+                        setLoading(false);
+                        setErrorMessage("");
+                      } else {
+                        setLoading(false);
+                        setErrorMessage("");
+                        Alert.alert(
+                          "Hatalı Gİriş",
+                          "Hatalı Kullanıcı girişi!",
+                          [
+                            {
+                              text: "Tekrar Dene",
+                              style: "destructive",
+                            },
+                          ]
+                        );
+                      }
+                    });
                 }
               });
           });
@@ -103,7 +181,9 @@ const Form = () => {
             //   alert('Email adresi geçersiz.');
             break;
           default:
-            alert("Giriş başarısız. Lütfen tekrar deneyin.");
+            Alert.alert("Hata", "Giriş başarısız. Lütfen tekrar deneyin.", [
+              { text: "Tamam" },
+            ]);
             break;
         }
       });
@@ -113,20 +193,20 @@ const Form = () => {
     if (isPasswordSee) {
       return (
         <TextInput.Icon
-          name="eye-off-outline"
+          icon="eye-off-outline"
           forceTextInputFocus={false}
-          color={"#B71C1C"}
-          style={{ marginTop: "50%" }}
+          iconColor={"#B71C1C"}
+          style={{ marginTop: 15 }}
           onPress={() => setispasswordSee(!isPasswordSee)}
         />
       );
     } else {
       return (
         <TextInput.Icon
-          name="eye-outline"
+          icon="eye-outline"
           forceTextInputFocus={false}
-          color={"#B71C1C"}
-          style={{ marginTop: "50%" }}
+          iconColor={"#B71C1C"}
+          style={{ marginTop: 15 }}
           onPress={() => setispasswordSee(!isPasswordSee)}
         />
       );
@@ -160,11 +240,10 @@ const Form = () => {
         outlineColor="#ECECEC"
         left={
           <TextInput.Icon
-            name="at"
+            icon="at"
             forceTextInputFocus={true}
-            color={"#B71C1C"}
-            style={{ marginTop: "50%" }}
-            onPress={() => {}}
+            iconColor={"#B71C1C"}
+            style={{ marginTop: 15 }}
           />
         }
         value={email}
@@ -181,11 +260,10 @@ const Form = () => {
         outlineColor="#ECECEC"
         left={
           <TextInput.Icon
-            name="lock-outline"
+            icon="lock-outline"
             forceTextInputFocus={true}
-            color={"#B71C1C"}
-            style={{ marginTop: "50%" }}
-            onPress={() => {}}
+            iconColor={"#B71C1C"}
+            style={{ marginTop: 15 }}
           />
         }
         right={PasswordSee()}
