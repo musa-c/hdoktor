@@ -9,27 +9,27 @@ import firebase from "firebase/compat/app";
 const RenderItemSearch = ({ item }) => {
   const navigation = useNavigation();
 
-  const PastSearchUpdate = () => {
-    const user = firebase.auth().currentUser;
-    firebase
-      .firestore()
-      .collection("H_user")
-      .doc(user.uid)
-      .collection("GeçmişAramalar")
-      .where("doctorId", "==", item.key)
-      .get()
-      .then((query) => {
-        if (query.empty) {
-          // sorgu doküman döndürmüyorsa
-          firebase
-            .firestore()
-            .collection("H_user")
-            .doc(user.uid)
-            .collection("GeçmişAramalar")
-            .add({ doctorId: item.key });
-        }
-      });
-  };
+  // const PastSearchUpdate = () => {
+  //   const user = firebase.auth().currentUser;
+  //   firebase
+  //     .firestore()
+  //     .collection("H_user")
+  //     .doc(user.uid)
+  //     .collection("GeçmişAramalar")
+  //     .where("doctorId", "==", item.key)
+  //     .get()
+  //     .then((query) => {
+  //       if (query.empty) {
+  //         // sorgu doküman döndürmüyorsa
+  //         firebase
+  //           .firestore()
+  //           .collection("H_user")
+  //           .doc(user.uid)
+  //           .collection("GeçmişAramalar")
+  //           .add({ doctorId: item.key });
+  //       }
+  //     });
+  // };
 
   return (
     <View style={{ flex: 1 }}>
@@ -47,7 +47,7 @@ const RenderItemSearch = ({ item }) => {
             avatar: item.avatar,
             rating: item.rating,
           });
-          PastSearchUpdate();
+          //   PastSearchUpdate();
         }}
       >
         <View style={styles.card}>
