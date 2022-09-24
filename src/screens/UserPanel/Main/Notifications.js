@@ -12,7 +12,29 @@ const Notifications = () => {
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const DateNotifications = (date) => {
+    //const notificationDate = moment(date).format("l");
+    const d = new Date();
+    const currentDate =
+      d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
+    // console.log("currentDatex:", currentDate);
+    // console.log("date:", moment(date).format("l"));
+    if (moment(date).format("l") == currentDate) {
+      return moment(date).format("LT");
+    } else if (d.getDate() - 1 == moment(date).format("Do")) {
+      return "Dün " + moment(date).format("LT");
+    } else {
+      return moment(date).format("ll");
+    }
+  };
+
   useEffect(() => {
+    const d = new Date();
+    const currentDate =
+      d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
+
+    console.log("date:", currentDate);
+
     let unmounted = false;
     if (!unmounted) {
       setRefreshing(true);
@@ -82,12 +104,22 @@ const Notifications = () => {
                 }}
               >
                 {!item.read ? <Badge status="primary" /> : null}
-                <Avatar
-                  size={60}
-                  rounded
-                  source={{ uri: item.avatar }}
-                  containerStyle={{ backgroundColor: "#3d4db7" }}
-                />
+                {item.avatar == "" ? (
+                  <Avatar
+                    size={60}
+                    rounded
+                    //title="MC"
+                    source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+                    containerStyle={{ backgroundColor: "#3d4db7" }}
+                  />
+                ) : (
+                  <Avatar
+                    size={60}
+                    rounded
+                    source={{ uri: item.avatar }}
+                    containerStyle={{ backgroundColor: "#3d4db7" }}
+                  />
+                )}
               </View>
               <View style={styles.cardCont}>
                 <Text
@@ -97,7 +129,7 @@ const Notifications = () => {
                     color: "grey",
                   }}
                 >
-                  {moment(item.saat.toDate()).format("LT")}{" "}
+                  {DateNotifications(item.saat.toDate())}{" "}
                 </Text>
                 <Text style={[styles.text, { fontWeight: "500" }]}>
                   {item.Doktor}, Randevu talebinizi kabul etti.
