@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, TouchableOpacity } from "react-native";
+import Constants from "expo-constants";
 import Logo from "../Header/Logo";
 import IconFeather from "react-native-vector-icons/Feather";
 
@@ -49,8 +50,8 @@ const styles = StyleSheet.create({
     borderRightWidth: 0,
     borderTopWidth: 0,
     borderColor: "grey",
-    paddingTop: 5,
-    // padding:20
+    paddingBottom: 5,
+    paddingTop: Constants.statusBarHeight - 15,
   },
 });
 
