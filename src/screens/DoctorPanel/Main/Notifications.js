@@ -12,6 +12,22 @@ const Notifications = () => {
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const DateNotifications = (date) => {
+    //const notificationDate = moment(date).format("l");
+    const d = new Date();
+    const currentDate =
+      d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
+    console.log("currentDate:", currentDate);
+    console.log("date:", moment(date).format("l"));
+    if (moment(date).format("l") == currentDate) {
+      return moment(date).format("LT");
+    } else if (d.getDate + 1 == moment(date).format("Do")) {
+      return "Dün " + moment(date).format("LT");
+    } else {
+      return moment(date).format("ll");
+    }
+  };
+
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
@@ -109,7 +125,7 @@ const Notifications = () => {
                     color: "grey",
                   }}
                 >
-                  {moment(item.saat.toDate()).format("LT")}{" "}
+                  {DateNotifications(item.saat.toDate())}{" "}
                 </Text>
                 <Text style={[styles.text, { fontWeight: "500" }]}>
                   {item.name}, randevu talebinde bulundu.
