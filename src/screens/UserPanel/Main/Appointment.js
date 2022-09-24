@@ -1,206 +1,82 @@
-import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  TouchableOpacity,
-  Dimensions,
-  Pressable,
+  ScrollView,
   StyleSheet,
+  TouchableOpacity,
+  FlatList,
 } from "react-native";
-import { Agenda, LocaleConfig } from "react-native-calendars";
-import { Card } from "react-native-paper";
-import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useState } from "react";
+import AppointmentClockCard from "./Components/AppointmentClockCard";
+import AppointmentDayMonthCard from "./Components/AppointmentDayMonthCard";
 import firebase from "firebase/compat/app";
 import moment from "moment";
 import trLocale from "moment/locale/tr";
-import Modal from "react-native-modal";
-
-const timeToString = (time) => {
-  const date = new Date(time);
-  return date.toISOString().split("T")[0];
-};
-
-const date = new Date();
-var year = new Date(date).getFullYear();
-var month = new Date(date).getMonth();
-
-switch (month) {
-  case 0:
-    month = "02";
-    break;
-  case 1:
-    month = "03";
-    break;
-  case 2:
-    month = "04";
-    break;
-  case 3:
-    month = "05";
-    break;
-  case 4:
-    month = "06";
-    break;
-  case 5:
-    month = "07";
-    break;
-  case 6:
-    month = "08";
-    break;
-  case 7:
-    month = "09";
-    break;
-  case 8:
-    month = "10";
-    break;
-  case 9:
-    month = "11";
-    break;
-  case 10:
-    month = "12";
-    break;
-  case 11:
-    month = "01";
-    year += 1;
-    break;
-  default:
-    break;
-}
-
-var day = Number(new Date().getDate());
-
-if (day < 10) {
-  day = "0" + day.toString();
-}
-
-var maxDate = year + "-" + month + "-" + day.toString();
+import LoadigIndicator from "../../../components/LoadigIndicator";
 
 const Appointment = ({ route }) => {
-  const id = route.params.id;
-  // console.log(id);
-
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const toggleModal = (tarih, clock) => {
-    setModalVisible(!isModalVisible);
-    setTarih(tarih);
-    setClocdk(clock);
-  };
-
-  const [ClockStart, setTimeStart] = useState();
-  const [ClockFinish, setTimeFinish] = useState();
-
-  const [Clock, setClock] = useState([]);
-
-  var DoluZamanlarDizi = [];
+  const doctorId = route.params.id;
+  const [DateArray, setDateArray] = useState([]);
+  const [DataClock, setDataClock] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let unmounted = false;
+    if (!unmounted) {
+      setLoading(true);
+    }
+    const CurrentgetFullYear = new Date().getFullYear();
+    const CurrentgetMonth = new Date().getMonth();
+    const CuurentDayNumber = new Date().getDate();
+    const CurrentDate = new Date(
+      CurrentgetFullYear,
+      CurrentgetMonth,
+      0
+    ).getDate();
+    const DateArray = [];
 
-    firebase
-      .firestore()
-      .collection("D_user")
-      .doc(id)
-      .collection("Hastalarım")
-      .onSnapshot((QuerySnapshot) => {
-        QuerySnapshot.forEach((randevu) => {
-          DoluZamanlarDizi.push({
-            saat: randevu.data().RandevuSaat,
-            tarih: randevu.data().RandevuTarih,
-          });
+    for (let i = CuurentDayNumber; i <= CurrentDate; i++) {
+      const Dates = new Date(CurrentgetFullYear, CurrentgetMonth, i);
+      DateArray.push({
+        date: Dates,
+        index: i - 1,
+      });
+    }
+
+    if (CurrentgetMonth != 12) {
+      const NextMonthDay = new Date(
+        CurrentgetFullYear,
+        CurrentgetMonth + 1,
+        0
+      ).getDate();
+
+      for (let i = 1; i <= NextMonthDay; i++) {
+        const Dates = new Date(CurrentgetFullYear, CurrentgetMonth + 1, i);
+        DateArray.push({
+          date: Dates,
+          index: i - 1,
         });
-      });
+      }
+    } else if (CurrentgetMonth == 12) {
+      const NextMonthDay = new Date(CurrentgetFullYear + 1, 0, 0).getDate();
+      for (let i = 1; i <= NextMonthDay; i++) {
+        const Dates = new Date(CurrentgetFullYear + 1, 0, i);
+        DateArray({
+          date: Dates,
+          index: i - 1,
+        });
+      }
+    }
+    setDateArray({
+      selectedIndex: 0,
+      data: DateArray,
+    });
 
-    const user = firebase.auth().currentUser;
-    firebase
-      .firestore()
-      .collection("H_user")
-      .doc(user.uid)
-      .get()
-      .then((snapshot) => {
-        if (!unmounted) {
-          setH_Name(snapshot.data().name);
-          setH_Avatar(snapshot.data()?.avatar ?? "");
-          setH_Cinsiyet(snapshot.data().cinsiyet);
-          setH_Id(snapshot.data().Id);
-          setH_email(snapshot.data().email);
-          setKHastalik(snapshot.data().KHastalik);
-        }
-      });
-    return () => {
-      unmounted = true;
-    };
-  }, []);
-
-  // console.log(Clock);
-
-  // const ClockStart = moment(TimeStart).locale("tr", trLocale).format('LT');
-  // const ClockFinish = moment(TimeFinish).locale("tr", trLocale).format('LT');
-
-  // console.log(TimeStart)
-  // if (ClockStart =! "undefined") {
-  // console.log(ClockStart)
-  // }
-
-  // console.log(ClockStart)
-
-  // console.log("clock length", Clock.length)
-
-  LocaleConfig.locales["tr"] = {
-    monthNames: [
-      "Ocak",
-      "Şubat",
-      "Mart",
-      "Nisan",
-      "Mayıs",
-      "Haziran",
-      "Temmuz",
-      "Ağustos",
-      "Eylül",
-      "Ekim",
-      "Kasım",
-      "Aralık",
-    ],
-    monthNamesShort: [
-      "Oca.",
-      "Şub.",
-      "Mar.",
-      "Nis.",
-      "May.",
-      "Haz.",
-      "Tem.",
-      "Ağu.",
-      "Eyl.",
-      "Eki.",
-      "Kas.",
-      "Ara.",
-    ],
-    dayNames: [
-      "Pazar",
-      "Pazartesi",
-      "Salı",
-      "Çarşamba",
-      "Perşembe",
-      "Cuma",
-      "Cumartesi",
-    ],
-    dayNamesShort: ["Paz.", "Pzt.", "Sal.", "Çar.", "Per.", "Cum.", "Cmt."],
-    today: "Bugün",
-    // today: 'Aujourd\'hui'
-  };
-  LocaleConfig.defaultLocale = "tr";
-
-  const [items, setItems] = useState({});
-
-  const [DoluTarihler, setDoluTarihler] = useState();
-  const [DoluSaatler, setDoluSaatler] = useState();
-
-  const loadItems = (day) => {
     var clock = [];
-
     firebase
       .firestore()
       .collection("D_user")
-      .doc(id)
+      .doc(doctorId)
       .get()
       .then((snapshot) => {
         var Cstart = moment(snapshot.data().time1.toDate())
@@ -324,322 +200,99 @@ const Appointment = ({ route }) => {
             }
           }
         }
-      })
-      .then(() => {
-        // console.log(clock);
-        for (let i = -15; i < 85; i++) {
-          const time = day.timestamp + i * 24 * 60 * 60 * 1000;
-          const strTime = timeToString(time);
-          // const strTime = moment(timeToString(time)).locale("tr", trLocale).format('l');
-          // console.log(moment(time).locale("tr", trLocale).format('LL'));
-          // console.log("deneme:", Clock);
-
-          if (!items[strTime]) {
-            items[strTime] = [];
-
-            // const numItems = Math.floor(Math.random() * 3 + 1);
-            const numItems = clock.length;
-
-            setTimeout(() => {
-              // console.log("numItems", Clock.length)
-              for (let j = 0; j < numItems; j++) {
-                if (
-                  DoluZamanlarDizi.find(
-                    (element) =>
-                      element.tarih ==
-                        moment(strTime).locale("tr", trLocale).format("LL") &&
-                      element.saat == clock[j]
-                  )
-                ) {
-                  items[strTime].push({
-                    // name: "Item for " + strTime + " #" + j,
-                    tarih: strTime,
-                    clock: clock[j],
-                    randevu: true,
-                    height: Math.max(50, Math.floor(Math.random() * 150)),
-                  });
-                } else {
-                  items[strTime].push({
-                    // name: "Item for " + strTime + " #" + j,
-                    tarih: strTime,
-                    randevu: false,
-                    clock: clock[j],
-                    height: Math.max(50, Math.floor(Math.random() * 150)),
-                  });
-                }
-              }
-            }, 1000);
-          }
-        }
-
-        const newItems = {};
-        Object.keys(items).forEach((key) => {
-          newItems[key] = items[key];
-        });
-        setItems(newItems);
-      });
-  };
-
-  const [tarih, setTarih] = useState();
-  const [clockd, setClocdk] = useState();
-
-  const [H_id, setH_Id] = useState();
-  const [H_name, setH_Name] = useState();
-  const [H_Avatar, setH_Avatar] = useState();
-  const [H_Cinsiyet, setH_Cinsiyet] = useState();
-  const [H_email, setH_email] = useState();
-  const [KHastalik, setKHastalik] = useState();
-
-  const [refreshUseEffect, setRefreshUseEffect] = useState(false);
-  const [refresh, setRefresh] = useState(false);
-
-  const Tarih = (tarih) => {
-    return moment(tarih).locale("tr", trLocale).format("LL");
-  };
-
-  const GorusmeTalep = () => {
-    const tarihTr = moment(tarih).locale("tr", trLocale).format("LL");
-
-    firebase
-      .firestore()
-      .collection("D_user")
-      .doc(id)
-      .collection("GorusmeTalep")
-      .where("email", "==", H_email)
-      .where("RandevuTarih", "==", tarihTr)
-      .where("RandevuSaat", "==", clockd)
-      .get()
-      .then((QuerySnapshot) => {
-        if (QuerySnapshot.empty) {
-          console.log(tarihTr);
-          firebase
-            .firestore()
-            .collection("D_user")
-            .doc(id)
-            .collection("GorusmeTalep")
-            .doc()
-            .set({
-              name: H_name,
-              cinsiyet: H_Cinsiyet,
-              // date: H_Date,
-              // KHastalik: H_KHastalik,
-              email: H_email,
-              id: H_id,
-              RandevuTarih: tarihTr,
-              RandevuSaat: clockd,
-              avatar: H_Avatar,
-              KHastalik: KHastalik,
-            });
-          var now = new Date();
-
-          firebase
-            .firestore()
-            .collection("D_user")
-            .doc(id)
-            .collection("Bildirimlerim")
-            .doc()
-            .set({
-              name: H_name,
-              avatar: H_Avatar,
-              RandevuTarih: tarihTr,
-              RandevuSaat: clockd,
-              saat: now,
-              KHastalik: KHastalik,
-              id: H_id,
-              read: false,
-            });
-
-          setModalVisible(!isModalVisible);
-          alert("BAŞARILI!");
-        } else {
-          setModalVisible(!isModalVisible);
-          alert("İlgili saat ve tarihde randevu talebiniz bulunmakta. ");
+        if (!unmounted) {
+          setDataClock(clock);
+          setLoading(false);
         }
       });
-  };
+    return () => {
+      unmounted = true;
+    };
+  }, []);
 
-  const renderItem = (item) => {
-    return (
-      <View style={{ marginRight: 10, marginTop: 17 }}>
-        <Card
-          style={[
-            { borderRadius: 10 },
-            item.randevu == true ? styles.randevuVar : styles.randevuYok,
-          ]}
-        >
-          <Card.Content>
-            <View>
-              {item.randevu === true ? (
-                <>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons
-                      name="calendar-outline"
-                      size={20}
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={{ fontSize: 20, color: "black" }}>
-                      {Tarih(item.tarih)}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 10,
-                    }}
-                  >
-                    <Ionicons
-                      name="time-outline"
-                      size={20}
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={{ fontSize: 20, color: "black" }}>
-                      {item.clock}
-                    </Text>
-                    <View style={{ flex: 1, alignItems: "flex-end" }}>
-                      {/* <Text style={{fontStyle:"italic"}}>DOLU</Text> */}
-                    </View>
-                  </View>
-                </>
-              ) : (
-                <TouchableOpacity
-                  onPress={() => toggleModal(item.tarih, item.clock)}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <Ionicons
-                      name="calendar-outline"
-                      size={20}
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={{ fontSize: 20, color: "black" }}>
-                      {Tarih(item.tarih)}
-                    </Text>
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      marginTop: 10,
-                    }}
-                  >
-                    <Ionicons
-                      name="time-outline"
-                      size={20}
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={{ fontSize: 20, color: "black" }}>
-                      {item.clock}
-                    </Text>
-                    <View style={{ flex: 1, alignItems: "flex-end" }}>
-                      <Text style={{ fontStyle: "italic" }}>Randevu Al</Text>
-                    </View>
-                  </View>
-                </TouchableOpacity>
-              )}
-
-              <Modal
-                isVisible={isModalVisible}
-                style={{ margin: 0, justifyContent: "center" }}
-                // swipeDirection="down"
-                onBackdropPress={() => setModalVisible(false)}
-                // onSwipeComplete = { ( )  =>  setModalVisible ( false ) }
-              >
-                <View
-                  style={{
-                    backgroundColor: "white",
-                    width: Dimensions.get("screen").width / 1.2,
-                    alignSelf: "center",
-                    borderRadius: 10,
-                    padding: 20,
-                  }}
-                >
-                  <Text style={{ fontSize: 25, fontWeight: "bold" }}>
-                    Randevu Onayla
-                  </Text>
-                  <Text style={{ fontSize: 20, marginVertical: 5 }}>
-                    Tarih: {Tarih(tarih)}
-                  </Text>
-                  <Text style={{ fontSize: 20, marginBottom: 5 }}>
-                    Saat: {clockd}
-                  </Text>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      marginTop: 10,
-                    }}
-                  >
-                    <Pressable onPress={() => setModalVisible(false)}>
-                      <View
-                        style={{
-                          backgroundColor: "#fafafa",
-                          padding: 10,
-                          borderRadius: 10,
-                        }}
-                      >
-                        <Text style={{ fontWeight: "bold", fontSize: 20 }}>
-                          KAPAT
-                        </Text>
-                      </View>
-                    </Pressable>
-
-                    <Pressable onPress={GorusmeTalep}>
-                      <View
-                        style={{
-                          backgroundColor: "#fafafa",
-                          padding: 10,
-                          borderRadius: 10,
-                        }}
-                      >
-                        <Text
-                          style={{
-                            fontWeight: "bold",
-                            fontSize: 20,
-                            color: "#0093c4",
-                          }}
-                        >
-                          ONAYLA
-                        </Text>
-                      </View>
-                    </Pressable>
-                  </View>
-                </View>
-              </Modal>
-            </View>
-          </Card.Content>
-        </Card>
-      </View>
-    );
+  const onPress = (index) => {
+    setDateArray({ ...DateArray, selectedIndex: index });
   };
 
   return (
-    <Agenda
-      items={items}
-      // removeClippedSubviews = {true}
-      // Etkinleştirilerek removeClippedSubviews, bir öğe görünümden kaybolduğunda bellek boşaltılır. Uzun ve karmaşık bir listeniz (yani bir kart listesi) olduğunda, her bir kartın DOM'si oldukça büyüyebilir, bu nedenle görünür olmadığında belleği boşaltmak en iyisidir.
-      loadItemsForMonth={loadItems}
-      initialNumToRender={3}
-      renderItem={renderItem}
-      minDate={timeToString(date)}
-      // minDate={'2022-05-08'} // YIL - AY - GÜN  -> GÜN VE AY TEK HANELİ İSE BAŞINA 0 KOY.
-      selected={timeToString(date)}
-      maxDate={maxDate}
-      pastScrollRange={1}
-      futureScrollRange={2}
-      // refreshing={refresh}
-      // rowHasChanged={this.rowHasChanged}
-    />
+    <View style={styles.cont}>
+      <Text style={styles.titleCategory}>Randevu Günleri</Text>
+      <View style={{ height: 80, marginTop: 20, marginBottom: 10 }}>
+        <FlatList
+          horizontal
+          data={DateArray.data}
+          extraData={DateArray}
+          renderItem={({ item, index }) => {
+            //console.log("index", index);
+            return (
+              <AppointmentDayMonthCard
+                month={item.date.getMonth()}
+                day={item.date.getDate()}
+                isSelected={DateArray.selectedIndex == index}
+                onPress={() => {
+                  onPress(index);
+                }}
+              />
+            );
+          }}
+        ></FlatList>
+      </View>
+
+      <View style={{ flex: 3.5, marginBottom: 10 }}>
+        <Text
+          style={[styles.titleCategory, { fontSize: 15, marginBottom: 10 }]}
+        >
+          Randevu Saatleri
+        </Text>
+
+        <FlatList
+          style={{ flexGrow: 1 }}
+          data={DataClock}
+          ListHeaderComponent={<LoadigIndicator loading={loading} />}
+          renderItem={({ item }) => <AppointmentClockCard clock={item} />}
+        ></FlatList>
+      </View>
+      <View style={styles.buttonArea}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={{ color: "#fff" }}>Randevu Al</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  randevuVar: {
-    backgroundColor: "#e57373",
+  cont: {
+    flex: 1,
+    justifyContent: "flex-start",
+    paddingHorizontal: 30,
+    backgroundColor: "#fff",
+    paddingTop: 20,
   },
-  randevuYok: {
-    backgroundColor: "#4fc3f7",
+
+  scrollView: {},
+  titleCategory: {
+    fontWeight: "bold",
+    color: "#7D8392",
+    fontSize: 20,
+  },
+  buttonArea: {
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    flex: 1,
+    //backgroundColor: "blue",
+    height: 100,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  button: {
+    height: 55,
+    width: 350,
+    backgroundColor: "#154DDE",
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
   },
 });
 
