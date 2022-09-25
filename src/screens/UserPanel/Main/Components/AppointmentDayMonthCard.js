@@ -58,12 +58,12 @@ const AppointmentDayMonthCard = ({ month, day, onPress, isSelected }) => {
         style={[
           styles.dataBox,
           isSelected
-            ? { backgroundColor: "#154DDE" }
+            ? { backgroundColor: "#EB1D36" }
             : { backgroundColor: "white" },
         ]}
       >
         <Text style={isSelected ? { color: "white" } : { color: "black" }}>
-          {GetMonth(month + 1)}
+          {GetMonth(month)}
         </Text>
         <Text
           style={[
