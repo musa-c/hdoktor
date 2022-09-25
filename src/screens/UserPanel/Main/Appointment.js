@@ -19,14 +19,74 @@ const Appointment = ({ route }) => {
   const [DateArray, setDateArray] = useState([]);
   const [DataClock, setDataClock] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedDate, setselectedDate] = useState();
+
+  const [H_id, setH_Id] = useState();
+  const [H_name, setH_Name] = useState();
+  const [H_Avatar, setH_Avatar] = useState();
+  const [H_Cinsiyet, setH_Cinsiyet] = useState();
+  const [H_email, setH_email] = useState();
+  const [KHastalik, setKHastalik] = useState();
+
+  const [tarih, setTarih] = useState();
+  const [clockd, setClocdk] = useState();
+
+  const [DoluZamanlar, setDoluZamanlar] = useState([]);
+  console.log("DoluZamanlarDizi:", DoluZamanlar);
 
   useEffect(() => {
     let unmounted = false;
+    //console.log(doctorId);
+    const DoluZamanlarDizi = [];
+    firebase
+      .firestore()
+      .collection("D_user")
+      .doc(doctorId)
+      .collection("Hastalarım")
+      .onSnapshot((QuerySnapshot) => {
+        QuerySnapshot.forEach((Snapshot) => {
+          firebase
+            .firestore()
+            .collection("D_user")
+            .doc(doctorId)
+            .collection("Hastalarım")
+            .doc(Snapshot.id)
+            .collection("RandevuTarih")
+            .get()
+            .then((snaps) => {
+              snaps.forEach((snapsFor) => {
+                DoluZamanlarDizi.push({
+                  saat: snapsFor.data().RandevuSaat,
+                  tarih: snapsFor.data().RandevuTarih,
+                });
+              });
+              setDoluZamanlar(DoluZamanlarDizi.concat(DoluZamanlarDizi));
+            });
+        });
+      });
+
+    const user = firebase.auth().currentUser;
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(user.uid)
+      .get()
+      .then((snapshot) => {
+        if (!unmounted) {
+          setH_Name(snapshot.data().name);
+          setH_Avatar(snapshot.data()?.avatar ?? "");
+          setH_Cinsiyet(snapshot.data().cinsiyet);
+          setH_Id(snapshot.data().Id);
+          setH_email(snapshot.data().email);
+          setKHastalik(snapshot.data().KHastalik);
+        }
+      });
+
     if (!unmounted) {
       setLoading(true);
     }
     const CurrentgetFullYear = new Date().getFullYear();
-    const CurrentgetMonth = new Date().getMonth();
+    const CurrentgetMonth = new Date().getMonth() + 1;
     const CuurentDayNumber = new Date().getDate();
     const CurrentDate = new Date(
       CurrentgetFullYear,
@@ -210,8 +270,69 @@ const Appointment = ({ route }) => {
     };
   }, []);
 
-  const onPress = (index) => {
+  const GorusmeTalep = (date, clock) => {
+    //const tarihTr = moment(tarih).locale("tr", trLocale).format("LL");
+    console.log("date: ", date);
+    console.log("clock: ", clock);
+
+    // firebase
+    //   .firestore()
+    //   .collection("D_user")
+    //   .doc(id)
+    //   .collection("GorusmeTalep")
+    //   .where("email", "==", H_email)
+    //   .where("RandevuTarih", "==", tarihTr)
+    //   .where("RandevuSaat", "==", clockd)
+    //   .get()
+    //   .then((QuerySnapshot) => {
+    //     if (QuerySnapshot.empty) {
+    //       firebase
+    //         .firestore()
+    //         .collection("D_user")
+    //         .doc(id)
+    //         .collection("GorusmeTalep")
+    //         .doc()
+    //         .set({
+    //           name: H_name,
+    //           cinsiyet: H_Cinsiyet,
+    //           // date: H_Date,
+    //           // KHastalik: H_KHastalik,
+    //           email: H_email,
+    //           id: H_id,
+    //           RandevuTarih: tarihTr,
+    //           RandevuSaat: clockd,
+    //           avatar: H_Avatar,
+    //           KHastalik: KHastalik,
+    //         });
+    //       var now = new Date();
+
+    //       firebase
+    //         .firestore()
+    //         .collection("D_user")
+    //         .doc(id)
+    //         .collection("Bildirimlerim")
+    //         .doc()
+    //         .set({
+    //           name: H_name,
+    //           avatar: H_Avatar,
+    //           RandevuTarih: tarihTr,
+    //           RandevuSaat: clockd,
+    //           saat: now,
+    //           KHastalik: KHastalik,
+    //           id: H_id,
+    //           read: false,
+    //         });
+
+    //       alert("BAŞARILI!");
+    //     } else {
+    //       alert("İlgili saat ve tarihde randevu talebiniz bulunmakta. ");
+    //     }
+    //   });
+  };
+
+  const onPress = (index, selectedDate) => {
     setDateArray({ ...DateArray, selectedIndex: index });
+    setselectedDate(selectedDate);
   };
 
   return (
@@ -230,7 +351,7 @@ const Appointment = ({ route }) => {
                 day={item.date.getDate()}
                 isSelected={DateArray.selectedIndex == index}
                 onPress={() => {
-                  onPress(index);
+                  onPress(index, item.date);
                 }}
               />
             );
@@ -249,13 +370,18 @@ const Appointment = ({ route }) => {
           style={{ flexGrow: 1 }}
           data={DataClock}
           ListHeaderComponent={<LoadigIndicator loading={loading} />}
-          renderItem={({ item }) => <AppointmentClockCard clock={item} />}
+          renderItem={({ item }) => {
+            return (
+              <TouchableOpacity>
+                <AppointmentClockCard
+                  clock={item}
+                  data={DateArray}
+                  selectedDate={selectedDate}
+                />
+              </TouchableOpacity>
+            );
+          }}
         ></FlatList>
-      </View>
-      <View style={styles.buttonArea}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={{ color: "#fff" }}>Randevu Al</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -275,24 +401,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#7D8392",
     fontSize: 20,
-  },
-  buttonArea: {
-    justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
-    flex: 1,
-    //backgroundColor: "blue",
-    height: 100,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  button: {
-    height: 55,
-    width: 350,
-    backgroundColor: "#154DDE",
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 10,
   },
 });
 
