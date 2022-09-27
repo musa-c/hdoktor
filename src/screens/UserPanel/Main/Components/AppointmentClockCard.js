@@ -4,19 +4,64 @@ import firebase from "firebase/compat/app";
 import moment from "moment";
 import trLocale from "moment/locale/tr";
 import AppointmentModal from "./AppointmentModal";
+import { Alert } from "react-native";
 
-const AppointmentClockCard = ({ clock, data, selectedDate }) => {
+const AppointmentClockCard = ({
+  clock,
+  data,
+  selectedDate,
+  DoctorId,
+  H_id,
+  H_name,
+  H_Avatar,
+  H_Cinsiyet,
+  H_email,
+  KHastalik,
+}) => {
   const [selectClock, setSelectClock] = useState();
   const [isVisible, setVisible] = useState(false);
+  const [DoluZamanlar, setDoluZamanlar] = useState([]);
+  const [isFull, setIsFull] = useState(false);
 
-  // console.log("seçilen saat:", SelectedData);
-  // const CurrentData = () => {
-  //   data.map((element) => {
-  //     if (element.selectedIndex == selectedIndex) {
-  //       console.log(element);
-  //     }
-  //   });
-  // };
+  //console.log("selectedDate:", moment(selectedDate).format("LL"));
+
+  useEffect(() => {
+    const doluZamanlar = [];
+    firebase
+      .firestore()
+      .collection("D_user")
+      .doc(DoctorId)
+      .collection("Hastalarım")
+      .onSnapshot((snaps) => {
+        snaps.forEach((snapsFor) => {
+          firebase
+            .firestore()
+            .collection("D_user")
+            .doc(DoctorId)
+            .collection("Hastalarım")
+            .doc(snapsFor.id)
+            .collection("RandevuTarih")
+            .onSnapshot((snaps2) => {
+              snaps2.forEach((snaps2For) => {
+                doluZamanlar.push({
+                  RandevuSaat: snaps2For.data().RandevuSaat,
+                  RandevuTarih: snaps2For.data().RandevuTarih,
+                });
+              });
+              setDoluZamanlar(doluZamanlar);
+            });
+        });
+      });
+
+    DoluZamanlar.map((element) => {
+      if (
+        (element.RandevuTarih == moment(selectedDate).format("LL")) &
+        (element.RandevuSaat == clock)
+      ) {
+        setIsFull(true);
+      }
+    });
+  }, []);
 
   const toggleModal = () => {
     setVisible(!isVisible);
@@ -28,18 +73,45 @@ const AppointmentClockCard = ({ clock, data, selectedDate }) => {
         onBackdropPress={toggleModal}
         date={selectedDate}
         clock={clock}
+        H_id={H_id}
+        H_name={H_name}
+        H_Avatar={H_Avatar}
+        H_Cinsiyet={H_Cinsiyet}
+        H_email={H_email}
+        KHastalik={KHastalik}
+        doctorId={DoctorId}
       />
       <TouchableOpacity
         onPress={() => {
           setSelectClock(clock);
-          setVisible(true);
+          if (!isFull) {
+            setVisible(true);
+          } else {
+            Alert.alert(
+              "Dolu!",
+              "Randevu saati daha önce alınmış lütffen başka bir randevu saati ve/veya günü seçiniz!",
+              [{ text: "Tamam" }]
+            );
+          }
         }}
       >
         <View style={styles.timeContainer}>
           <Text style={{ color: "#707070" }}>{clock}</Text>
+
           <View style={styles.freeArea}>
-            <Text style={{ color: "#707070" }}>DOLU</Text>
-            <View style={styles.radio}></View>
+            {isFull ? <Text style={{ color: "#707070" }}>DOLU</Text> : null}
+            <View
+              style={[
+                styles.radio,
+                isFull
+                  ? { backgroundColor: "#C21010" }
+                  : {
+                      backgroundColor: "white",
+                      borderColor: "#7D8392",
+                      borderWidth: 1,
+                    },
+              ]}
+            ></View>
           </View>
         </View>
       </TouchableOpacity>
@@ -65,10 +137,9 @@ const styles = StyleSheet.create({
     height: 15,
     width: 15,
     borderRadius: 30,
-    borderColor: "#7D8392",
-    //borderWidth: 1,
+
     marginLeft: 10,
-    backgroundColor: "#C21010",
+    //backgroundColor: "#C21010",
   },
 });
 
