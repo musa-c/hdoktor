@@ -5,13 +5,93 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import Modal from "react-native-modal";
 import firebase from "firebase/compat/app";
+import moment from "moment";
+import trLocale from "moment/locale/tr";
+import { Button } from "react-native-paper";
 
-const AppointmentModal = ({ isVisible, onBackdropPress, date, clock }) => {
+const AppointmentModal = ({
+  isVisible,
+  onBackdropPress,
+  date,
+  clock,
+  doctorId,
+  H_id,
+  H_name,
+  H_Avatar,
+  H_Cinsiyet,
+  H_email,
+  KHastalik,
+}) => {
   const dateMonth = new Date().getMonth() + 1;
   const dateDay = new Date().getDate();
+  const [loading, setLoading] = useState(false);
+
+  //console.log("mevcutDate:", moment(date).format("LL"));
+
+  const GorusmeTalep = () => {
+    //const tarihTr = moment(tarih).locale("tr", trLocale).format("LL");
+    setLoading(true);
+    const date = moment(date).format("LL");
+
+    firebase
+      .firestore()
+      .collection("D_user")
+      .doc(doctorId)
+      .collection("GorusmeTalep")
+      .where("email", "==", H_email)
+      .where("RandevuTarih", "==", date)
+      .where("RandevuSaat", "==", clock)
+      .get()
+      .then((QuerySnapshot) => {
+        if (QuerySnapshot.empty) {
+          firebase
+            .firestore()
+            .collection("D_user")
+            .doc(doctorId)
+            .collection("GorusmeTalep")
+            .doc()
+            .set({
+              name: H_name,
+              cinsiyet: H_Cinsiyet,
+              // date: H_Date,
+              // KHastalik: H_KHastalik,
+              email: H_email,
+              id: H_id,
+              RandevuTarih: date,
+              RandevuSaat: clock,
+              avatar: H_Avatar,
+              KHastalik: KHastalik,
+            });
+          var now = new Date();
+
+          firebase
+            .firestore()
+            .collection("D_user")
+            .doc(doctorId)
+            .collection("Bildirimlerim")
+            .doc()
+            .set({
+              name: H_name,
+              avatar: H_Avatar,
+              RandevuTarih: date,
+              RandevuSaat: clock,
+              saat: now,
+              KHastalik: KHastalik,
+              id: H_id,
+              read: false,
+            });
+
+          alert("BAŞARILI!");
+          setLoading(false);
+        } else {
+          alert("İlgili saat ve tarihde randevu talebiniz bulunmakta. ");
+          setLoading(false);
+        }
+      });
+  };
 
   const GetMonth = (month) => {
     switch (month) {
@@ -67,16 +147,27 @@ const AppointmentModal = ({ isVisible, onBackdropPress, date, clock }) => {
         <View style={{ flexDirection: "row", marginLeft: 20 }}>
           <Text style={{ fontSize: 20 }}>{date?.getDate() ?? dateDay} </Text>
           <Text style={{ fontSize: 20 }}>
-            {GetMonth(date?.getMonth()) ?? GetMonth(dateMonth)}
+            {GetMonth(date?.getMonth() + 1) ?? GetMonth(dateMonth)}
           </Text>
         </View>
         <Text style={styles.textTitle}>Randevu Saati</Text>
         <Text style={{ fontSize: 20, marginLeft: 20 }}>{clock}</Text>
 
         <View style={styles.buttonArea}>
-          <TouchableOpacity style={styles.button}>
-            <Text style={{ color: "#fff" }}>Randevu Al</Text>
-          </TouchableOpacity>
+          <Button
+            mode="contained"
+            loading={loading}
+            onPress={GorusmeTalep}
+            disabled={loading}
+            style={{
+              borderRadius: 10,
+              padding: 5,
+              backgroundColor: "#B71C1C",
+              marginHorizontal: 20,
+            }}
+          >
+            Randevu Al
+          </Button>
         </View>
       </View>
     </Modal>
@@ -93,13 +184,9 @@ const styles = StyleSheet.create({
   },
   buttonArea: {
     justifyContent: "center",
-    alignItems: "center",
-    alignSelf: "center",
     flex: 1,
     //backgroundColor: "blue",
     height: 100,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
   },
   button: {
     height: 55,
