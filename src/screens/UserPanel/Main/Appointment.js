@@ -28,11 +28,8 @@ const Appointment = ({ route }) => {
   const [H_email, setH_email] = useState();
   const [KHastalik, setKHastalik] = useState();
 
-  const [tarih, setTarih] = useState();
-  const [clockd, setClocdk] = useState();
-
   const [DoluZamanlar, setDoluZamanlar] = useState([]);
-  console.log("DoluZamanlarDizi:", DoluZamanlar);
+  //console.log("DoluZamanlarDizi:", DoluZamanlar);
 
   useEffect(() => {
     let unmounted = false;
@@ -86,11 +83,11 @@ const Appointment = ({ route }) => {
       setLoading(true);
     }
     const CurrentgetFullYear = new Date().getFullYear();
-    const CurrentgetMonth = new Date().getMonth() + 1;
+    const CurrentgetMonth = new Date().getMonth();
     const CuurentDayNumber = new Date().getDate();
     const CurrentDate = new Date(
       CurrentgetFullYear,
-      CurrentgetMonth,
+      CurrentgetMonth + 1,
       0
     ).getDate();
     const DateArray = [];
@@ -270,66 +267,6 @@ const Appointment = ({ route }) => {
     };
   }, []);
 
-  const GorusmeTalep = (date, clock) => {
-    //const tarihTr = moment(tarih).locale("tr", trLocale).format("LL");
-    console.log("date: ", date);
-    console.log("clock: ", clock);
-
-    // firebase
-    //   .firestore()
-    //   .collection("D_user")
-    //   .doc(id)
-    //   .collection("GorusmeTalep")
-    //   .where("email", "==", H_email)
-    //   .where("RandevuTarih", "==", tarihTr)
-    //   .where("RandevuSaat", "==", clockd)
-    //   .get()
-    //   .then((QuerySnapshot) => {
-    //     if (QuerySnapshot.empty) {
-    //       firebase
-    //         .firestore()
-    //         .collection("D_user")
-    //         .doc(id)
-    //         .collection("GorusmeTalep")
-    //         .doc()
-    //         .set({
-    //           name: H_name,
-    //           cinsiyet: H_Cinsiyet,
-    //           // date: H_Date,
-    //           // KHastalik: H_KHastalik,
-    //           email: H_email,
-    //           id: H_id,
-    //           RandevuTarih: tarihTr,
-    //           RandevuSaat: clockd,
-    //           avatar: H_Avatar,
-    //           KHastalik: KHastalik,
-    //         });
-    //       var now = new Date();
-
-    //       firebase
-    //         .firestore()
-    //         .collection("D_user")
-    //         .doc(id)
-    //         .collection("Bildirimlerim")
-    //         .doc()
-    //         .set({
-    //           name: H_name,
-    //           avatar: H_Avatar,
-    //           RandevuTarih: tarihTr,
-    //           RandevuSaat: clockd,
-    //           saat: now,
-    //           KHastalik: KHastalik,
-    //           id: H_id,
-    //           read: false,
-    //         });
-
-    //       alert("BAŞARILI!");
-    //     } else {
-    //       alert("İlgili saat ve tarihde randevu talebiniz bulunmakta. ");
-    //     }
-    //   });
-  };
-
   const onPress = (index, selectedDate) => {
     setDateArray({ ...DateArray, selectedIndex: index });
     setselectedDate(selectedDate);
@@ -344,10 +281,9 @@ const Appointment = ({ route }) => {
           data={DateArray.data}
           extraData={DateArray}
           renderItem={({ item, index }) => {
-            //console.log("index", index);
             return (
               <AppointmentDayMonthCard
-                month={item.date.getMonth()}
+                month={item.date.getMonth() + 1}
                 day={item.date.getDate()}
                 isSelected={DateArray.selectedIndex == index}
                 onPress={() => {
@@ -374,9 +310,16 @@ const Appointment = ({ route }) => {
             return (
               <TouchableOpacity>
                 <AppointmentClockCard
+                  H_id={H_id}
+                  H_name={H_name}
+                  H_Avatar={H_Avatar}
+                  H_Cinsiyet={H_Cinsiyet}
+                  H_email={H_email}
+                  KHastalik={KHastalik}
                   clock={item}
                   data={DateArray}
                   selectedDate={selectedDate}
+                  DoctorId={doctorId}
                 />
               </TouchableOpacity>
             );
