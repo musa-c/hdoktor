@@ -11,6 +11,7 @@ import firebase from "firebase/compat/app";
 import moment from "moment";
 import trLocale from "moment/locale/tr";
 import { Button } from "react-native-paper";
+import { Alert } from "react-native";
 
 const AppointmentModal = ({
   isVisible,
@@ -31,10 +32,10 @@ const AppointmentModal = ({
 
   //console.log("mevcutDate:", moment(date).format("LL"));
 
-  const GorusmeTalep = () => {
+  const GorusmeTalep = (currentDate) => {
     //const tarihTr = moment(tarih).locale("tr", trLocale).format("LL");
     setLoading(true);
-    const date = moment(date).format("LL");
+    const date = moment(currentDate).format("LL");
 
     firebase
       .firestore()
@@ -52,42 +53,73 @@ const AppointmentModal = ({
             .collection("D_user")
             .doc(doctorId)
             .collection("GorusmeTalep")
-            .doc()
-            .set({
-              name: H_name,
-              cinsiyet: H_Cinsiyet,
-              // date: H_Date,
-              // KHastalik: H_KHastalik,
-              email: H_email,
-              id: H_id,
-              RandevuTarih: date,
-              RandevuSaat: clock,
-              avatar: H_Avatar,
-              KHastalik: KHastalik,
-            });
-          var now = new Date();
+            .where("RandevuTarih", "==", date)
+            .where("RandevuSaat", "==", clock)
+            .get()
+            .then((QuerySnap) => {
+              if (QuerySnap.empty) {
+                firebase
+                  .firestore()
+                  .collection("D_user")
+                  .doc(doctorId)
+                  .collection("GorusmeTalep")
+                  .doc()
+                  .set({
+                    name: H_name,
+                    cinsiyet: H_Cinsiyet,
+                    // date: H_Date,
+                    // KHastalik: H_KHastalik,
+                    email: H_email,
+                    id: H_id,
+                    RandevuTarih: date,
+                    RandevuSaat: clock,
+                    avatar: H_Avatar,
+                    KHastalik: KHastalik,
+                  });
+                var now = new Date();
 
-          firebase
-            .firestore()
-            .collection("D_user")
-            .doc(doctorId)
-            .collection("Bildirimlerim")
-            .doc()
-            .set({
-              name: H_name,
-              avatar: H_Avatar,
-              RandevuTarih: date,
-              RandevuSaat: clock,
-              saat: now,
-              KHastalik: KHastalik,
-              id: H_id,
-              read: false,
-            });
+                firebase
+                  .firestore()
+                  .collection("D_user")
+                  .doc(doctorId)
+                  .collection("Bildirimlerim")
+                  .doc()
+                  .set({
+                    name: H_name,
+                    avatar: H_Avatar,
+                    RandevuTarih: date,
+                    RandevuSaat: clock,
+                    saat: now,
+                    KHastalik: KHastalik,
+                    id: H_id,
+                    read: false,
+                  });
 
-          alert("BAŞARILI!");
-          setLoading(false);
+                alert("BAŞARILI!");
+                setLoading(false);
+              } else {
+                Alert.alert(
+                  "UYARI",
+                  "İlgili saat ve tarihde randevu talebi bulunmakta. Lütfen başka bir gün veya saat seçiniz.",
+                  [
+                    {
+                      text: "Tamam",
+                    },
+                  ]
+                );
+                setLoading(false);
+              }
+            });
         } else {
-          alert("İlgili saat ve tarihde randevu talebiniz bulunmakta. ");
+          Alert.alert(
+            "UYARI",
+            "İlgili saat ve tarihde randevu talebiniz bulunmakta. Lütfen başka bir gün veya saat seçiniz.",
+            [
+              {
+                text: "Tamam",
+              },
+            ]
+          );
           setLoading(false);
         }
       });
@@ -157,7 +189,7 @@ const AppointmentModal = ({
           <Button
             mode="contained"
             loading={loading}
-            onPress={GorusmeTalep}
+            onPress={() => GorusmeTalep(date)}
             disabled={loading}
             style={{
               borderRadius: 10,
