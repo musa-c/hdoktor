@@ -29,6 +29,7 @@ const Appointment = ({ route }) => {
   const [KHastalik, setKHastalik] = useState();
 
   const [DoluZamanlar, setDoluZamanlar] = useState([]);
+
   //console.log("DoluZamanlarDizi:", DoluZamanlar);
 
   useEffect(() => {
@@ -129,7 +130,14 @@ const Appointment = ({ route }) => {
       data: DateArray,
     });
 
+    return () => {
+      unmounted = true;
+    };
+  }, []);
+
+  useEffect(() => {
     var clock = [];
+    let unmounted = false;
     firebase
       .firestore()
       .collection("D_user")
@@ -262,10 +270,7 @@ const Appointment = ({ route }) => {
           setLoading(false);
         }
       });
-    return () => {
-      unmounted = true;
-    };
-  }, []);
+  }, [DateArray.selectedIndex]);
 
   const onPress = (index, selectedDate) => {
     setDateArray({ ...DateArray, selectedIndex: index });
@@ -308,20 +313,18 @@ const Appointment = ({ route }) => {
           ListHeaderComponent={<LoadigIndicator loading={loading} />}
           renderItem={({ item }) => {
             return (
-              <TouchableOpacity>
-                <AppointmentClockCard
-                  H_id={H_id}
-                  H_name={H_name}
-                  H_Avatar={H_Avatar}
-                  H_Cinsiyet={H_Cinsiyet}
-                  H_email={H_email}
-                  KHastalik={KHastalik}
-                  clock={item}
-                  data={DateArray}
-                  selectedDate={selectedDate}
-                  DoctorId={doctorId}
-                />
-              </TouchableOpacity>
+              <AppointmentClockCard
+                H_id={H_id}
+                H_name={H_name}
+                H_Avatar={H_Avatar}
+                H_Cinsiyet={H_Cinsiyet}
+                H_email={H_email}
+                KHastalik={KHastalik}
+                clock={item}
+                data={DateArray}
+                selectedDate={selectedDate}
+                DoctorId={doctorId}
+              />
             );
           }}
         ></FlatList>
