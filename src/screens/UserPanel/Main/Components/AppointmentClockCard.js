@@ -22,6 +22,7 @@ const AppointmentClockCard = ({
   const [isVisible, setVisible] = useState(false);
   const [DoluZamanlar, setDoluZamanlar] = useState([]);
   const [isFull, setIsFull] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   //console.log("selectedDate:", moment(selectedDate).format("LL"));
 
@@ -43,25 +44,40 @@ const AppointmentClockCard = ({
             .collection("RandevuTarih")
             .onSnapshot((snaps2) => {
               snaps2.forEach((snaps2For) => {
-                doluZamanlar.push({
-                  RandevuSaat: snaps2For.data().RandevuSaat,
-                  RandevuTarih: snaps2For.data().RandevuTarih,
-                });
+                if (
+                  (snaps2For.data().RandevuTarih ==
+                    moment(selectedDate).format("LL")) &
+                  (snaps2For.data().RandevuSaat == clock)
+                ) {
+                  setIsFull(true);
+                } else {
+                  if (isFull) {
+                    setIsFull(false);
+                  }
+                }
+                // doluZamanlar.push({
+                //   RandevuSaat: snaps2For.data().RandevuSaat,
+                //   RandevuTarih: snaps2For.data().RandevuTarih,
+                // });
               });
-              setDoluZamanlar(doluZamanlar);
             });
         });
       });
+    // setDoluZamanlar(doluZamanlar);
+    setLoading(false);
 
-    DoluZamanlar.map((element) => {
-      if (
-        (element.RandevuTarih == moment(selectedDate).format("LL")) &
-        (element.RandevuSaat == clock)
-      ) {
-        setIsFull(true);
-      }
-    });
-  }, []);
+    // doluZamanlar.map((element) => {
+    //   console.log("rT:", element.RandevuTarih);
+    //   console.log("rTS:", moment(selectedDate).format("LL"));
+
+    //   if (
+    //     (element.RandevuTarih == moment(selectedDate).format("LL")) &
+    //     (element.RandevuSaat == clock)
+    //   ) {
+    //     setIsFull(true);
+    //   }
+    // });
+  }, [selectedDate]);
 
   const toggleModal = () => {
     setVisible(!isVisible);
@@ -84,7 +100,7 @@ const AppointmentClockCard = ({
       <TouchableOpacity
         onPress={() => {
           setSelectClock(clock);
-          if (!isFull) {
+          if (!isFull & !loading) {
             setVisible(true);
           } else {
             Alert.alert(
