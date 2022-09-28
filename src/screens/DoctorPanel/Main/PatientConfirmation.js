@@ -316,7 +316,8 @@ const PatientConfirmation = ({ navigation }) => {
       .delete();
   };
 
-  const HastaRed = (DocumentId, H_ID) => {
+  const HastaRed = (DocumentId, H_ID, RandevuTarih, RandevuSaat) => {
+    var now = new Date();
     setloadingMinus(true);
     firebase.auth().onAuthStateChanged((doctor) => {
       if (doctor) {
@@ -470,7 +471,14 @@ const PatientConfirmation = ({ navigation }) => {
                   />
                   <LoadingButton
                     icon="minus-box"
-                    onPress={() => HastaRed(element.item.key, element.item.id)}
+                    onPress={() =>
+                      HastaRed(
+                        element.item.key,
+                        element.item.id,
+                        element.item.RandevuTarih,
+                        element.item.RandevuSaat
+                      )
+                    }
                     loading={loadingMinus}
                   />
                 </View>
