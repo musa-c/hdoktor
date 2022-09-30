@@ -143,7 +143,7 @@ const MyDoctor = ({ route }) => {
             <TouchableOpacity
               onPress={() =>
                 navigation.navigate("MoreDoctorInfo", {
-                  doctorId: element.item.key,
+                  doctorId: element.item.Id,
                   name: element.item.name,
                   brans: element.item.brans,
                   gender: element.item.cinsiyet,
