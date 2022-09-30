@@ -38,7 +38,7 @@ function Home({ route }) {
       .firestore()
       .collection("D_user")
       .orderBy("rating", "desc")
-      .limit(5);
+      .limit(20);
 
     first.get().then((querySnapshot) => {
       const users = [];
