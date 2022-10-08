@@ -17,8 +17,7 @@ const MoreDoctorInfo = () => {
   const avatar = route.params.avatar;
   const email = route.params.email;
   const gender = route.params.gender;
-
-  const [raiting, setRaiting] = useState();
+  const rating = route.params.rating;
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", flexGrow: 1 }}>
@@ -39,8 +38,7 @@ const MoreDoctorInfo = () => {
           ratingCount={5}
           imageSize={20}
           readonly
-          onFinishRating={(text) => setRaiting(text)}
-          startingValue={2}
+          startingValue={rating}
           tintColor="white"
           // style={{marginBottom:20}}
         />
