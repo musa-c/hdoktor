@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
@@ -16,37 +17,119 @@ import Separator from "../../../components/Separator";
 import ListEmptyComponent from "../../../components/ListEmptyComponent";
 import trLocale from "moment/locale/tr";
 import moment from "moment";
+import { isEqual } from "lodash";
 
 function HomeU(props) {
   const [users, setUsers] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  const [LastCount, setLastCount] = useState();
+  const [loading, setLoading] = useState(false);
+  const [LoadingDone, setLoadingDone] = useState(false);
+
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
       setRefreshing(true);
     }
-    firebase
+
+    const myuser = firebase.auth().currentUser;
+    var first = firebase
       .firestore()
       .collection("D_user")
-      .onSnapshot((querySnapshot) => {
-        const users = [];
-        querySnapshot.forEach((documentSnapshot) => {
-          users.push({
-            ...documentSnapshot.data(),
-            key: documentSnapshot.id,
-          });
+      .orderBy("rating", "desc")
+      .limit(20);
+
+    first.get().then((querySnapshot) => {
+      const users = [];
+      querySnapshot.forEach((documentSnapshot) => {
+        users.push({
+          ...documentSnapshot.data(),
+          key: documentSnapshot.id,
         });
-        if (!unmounted) {
-          setUsers(users);
-          setRefreshing(false);
-        }
       });
+      if (!unmounted) {
+        setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setUsers(users);
+        setRefreshing(false);
+      }
+    });
+
+    // firebase
+    //   .firestore()
+    //   .collection("D_user")
+    //   .onSnapshot((querySnapshot) => {
+    //     const users = [];
+    //     querySnapshot.forEach((documentSnapshot) => {
+    //       users.push({
+    //         ...documentSnapshot.data(),
+    //         key: documentSnapshot.id,
+    //       });
+    //     });
+    //     if (!unmounted) {
+    //       setUsers(users);
+    //       setRefreshing(false);
+    //     }
+    //   });
     return () => {
       unmounted = true;
     };
   }, [refresh]);
+
+  const getOtherData = () => {
+    setLoading(true);
+    if (LastCount != undefined) {
+      firebase
+        .firestore()
+        .collection("D_user")
+        .orderBy("rating", "desc")
+        .startAfter(LastCount)
+        .limit(20)
+        .get()
+        .then((querySnapshot) => {
+          if (
+            isEqual(
+              querySnapshot.docs[querySnapshot.docs.length - 1],
+              LastCount
+            )
+          ) {
+            // eşit ise
+            setLoadingDone(true);
+            setLoading(false);
+          } else {
+            // eşit değil ise
+            const usersOther = [];
+            querySnapshot.forEach((documentSnapshot) => {
+              usersOther.push({
+                ...documentSnapshot.data(),
+                key: documentSnapshot.id,
+              });
+            });
+            setUsers(users.concat(usersOther));
+            setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
+            setLoading(false);
+          }
+        })
+        .catch(() => {
+          const erroCorde = e.code;
+          setLoading(false);
+          console.log(erroCorde);
+          console.log(e);
+          console.log("hata");
+        });
+    } else {
+      setLoading(false);
+    }
+  };
+
+  const footerIndicator = () => {
+    return loading ? (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator animating size="small" />
+      </View>
+    ) : null;
+  };
 
   const navigation = useNavigation();
   return (
@@ -61,7 +144,13 @@ function HomeU(props) {
       <Ad />
       <FlatList
         contentContainerStyle={{ flexGrow: 1 }}
+        onEndReached={() => {
+          if (!LoadingDone) {
+            getOtherData();
+          }
+        }}
         refreshing={refreshing}
+        ListFooterComponent={footerIndicator}
         onRefresh={() => {
           setRefresh(!refresh);
           setRefreshing(true);
