@@ -31,7 +31,7 @@ const LoadingButton = ({
         }}
         style={[styles.cont, style]}
         icon={icon}
-        color={color}
+        buttonColor={color}
         disabled={disabled}
         labelStyle={[styles.labelStyle, FontStyle]}
       >

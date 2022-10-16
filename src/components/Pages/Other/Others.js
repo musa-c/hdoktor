@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     textAlign: "justify",
-    fontSize: 17,
+    fontSize: 18,
   },
   HDoktorCont: {
     alignItems: "center",

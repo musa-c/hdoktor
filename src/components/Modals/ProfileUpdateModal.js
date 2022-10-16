@@ -324,8 +324,6 @@ const ProfileUpdateModal = ({
     setDatePickerVisibility2(false);
   };
 
-  console.log(updateValue);
-
   const handleConfirm2 = (time2) => {
     if (updateValue[0] != undefined) {
       setUpdateValue([updateValue[0], time2]);
@@ -553,6 +551,12 @@ const ProfileUpdateModal = ({
 
   const nameUpdate = (id, UpdateName) => {
     setLoading(true);
+
+    var NameArray = [];
+    for (let i = 1; i < UpdateName.toLowerCase().length + 1; i++) {
+      NameArray.push(UpdateName.substring(0, i));
+    }
+
     firebase
       .auth()
       .currentUser.updateProfile({ displayName: UpdateName })
@@ -561,7 +565,7 @@ const ProfileUpdateModal = ({
           .firestore()
           .collection(w_user)
           .doc(id)
-          .update({ name: UpdateName })
+          .update({ name: UpdateName, nameSearch: NameArray })
           .then(() => {
             firebase
               .firestore()
@@ -582,6 +586,10 @@ const ProfileUpdateModal = ({
                         snapshot1.forEach((snapshot1For) => {
                           snapshot1For.ref.update({ name: UpdateName });
                         });
+                      })
+                      .catch(() => {
+                        setUpdate(false);
+                        setLoading(false);
                       });
 
                     // D_user -> Bildirimler'e hastanın emailini ekle.
@@ -620,8 +628,25 @@ const ProfileUpdateModal = ({
                           setLoading(false);
                           toggleModal();
                         }, 3000);
+                      })
+                      .catch(() => {
+                        setUpdate(false);
+                        setLoading(false);
                       });
                   });
+                })
+                .then(() => {
+                  setLoading(false);
+                  setUpdate(true);
+                  setTimeout(() => {
+                    setUpdate(false);
+                    setLoading(false);
+                    toggleModal();
+                  }, 3000);
+                })
+                .catch(() => {
+                  setUpdate(false);
+                  setLoading(false);
                 });
             } else {
               firebase
@@ -637,6 +662,7 @@ const ProfileUpdateModal = ({
                       .doc(snapsFor.id)
                       .update({ names: [snapsFor.data().names[0], UpdateName] })
                       .then(() => {
+                        setLoading(false);
                         setUpdate(true);
                         setTimeout(() => {
                           setUpdate(false);
@@ -645,6 +671,18 @@ const ProfileUpdateModal = ({
                         }, 3000);
                       });
                   });
+                })
+                .then(() => {
+                  setUpdate(true);
+                  setTimeout(() => {
+                    setUpdate(false);
+                    setLoading(false);
+                    toggleModal();
+                  }, 3000);
+                })
+                .catch(() => {
+                  setUpdate(false);
+                  setLoading(false);
                 });
             }
           });
@@ -1029,11 +1067,17 @@ const ProfileUpdateModal = ({
 
   const BransUpdate = (id, updateBrans) => {
     setLoading(true);
+
+    var BransArray = [];
+    for (let i = 1; i < updateBrans.toLowerCase().length + 1; i++) {
+      BransArray.push(updateBrans.substring(0, i));
+    }
+
     firebase
       .firestore()
       .collection("D_user")
       .doc(id)
-      .update({ brans: updateBrans })
+      .update({ brans: updateBrans, bransSearch: BransArray })
       .then(() => {
         firebase
           .firestore()
@@ -1041,34 +1085,57 @@ const ProfileUpdateModal = ({
           .doc(id)
           .collection("Hastalarım")
           .onSnapshot((snaps) => {
-            snaps.forEach((snapsFor) => {
-              firebase
-                .firestore()
-                .collection("H_user")
-                .doc(snapsFor.data().Id)
-                .collection("Doktorlarım")
-                .where("Id", "==", user.uid)
-                .get()
-                .then((snaps2) => {
-                  snaps2.forEach((snaps2For) => {
-                    snaps2For.ref.update({ brans: updateBrans });
-                  });
-                })
-                .then(() => {
-                  setLoading(false);
-                  setUpdate(true);
-                  setTimeout(() => {
-                    setUpdate(false);
-                    setValidation(false);
+            if (!snaps.empty) {
+              snaps.forEach((snapsFor) => {
+                firebase
+                  .firestore()
+                  .collection("H_user")
+                  .doc(snapsFor.data().Id)
+                  .collection("Doktorlarım")
+                  .where("Id", "==", user.uid)
+                  .get()
+                  .then((snaps2) => {
+                    snaps2.forEach((snaps2For) => {
+                      snaps2For.ref.update({ brans: updateBrans });
+                    });
+                  })
+                  .then(() => {
                     setLoading(false);
-                    toggleModal();
-                  }, 3000);
-                })
-                .catch((e) => {
-                  console.log(e);
-                });
-            });
+                    setUpdate(true);
+                    setTimeout(() => {
+                      setUpdate(false);
+                      setValidation(false);
+                      setLoading(false);
+                      toggleModal();
+                    }, 3000);
+                  })
+                  .catch((e) => {
+                    setLoading(false);
+                    console.log(e);
+                  });
+              });
+            } else {
+              setLoading(false);
+              setUpdate(true);
+              setTimeout(() => {
+                setUpdate(false);
+                setValidation(false);
+                setLoading(false);
+                toggleModal();
+              }, 3000);
+            }
           });
+      })
+      .catch((e) => {
+        console.log(e);
+        setLoading(false);
+        //setUpdate(true);
+        // setTimeout(() => {
+        //   setUpdate(false);
+        //   setValidation(false);
+        //   setLoading(false);
+        //   toggleModal();
+        // }, 3000);
       });
   };
 
@@ -1126,11 +1193,20 @@ const ProfileUpdateModal = ({
 
   const CalisilanYerUpdate = (id, CalisilanYerUpdate) => {
     setLoading(true);
+
+    var CalisilanYerArray = [];
+    for (let i = 1; i < CalisilanYerUpdate.toLowerCase().length + 1; i++) {
+      CalisilanYerArray.push(CalisilanYerUpdate.substring(0, i));
+    }
+
     firebase
       .firestore()
       .collection("D_user")
       .doc(id)
-      .update({ CalisilanYer: CalisilanYerUpdate })
+      .update({
+        CalisilanYer: CalisilanYerUpdate,
+        calislanYerSearch: CalisilanYerArray,
+      })
       .then(() => {
         firebase
           .firestore()

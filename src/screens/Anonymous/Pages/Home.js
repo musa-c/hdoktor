@@ -264,13 +264,16 @@ function Home({ route }) {
           />
         }
         data={users}
-        renderItem={useCallback(_renderItem, [users])}
+        renderItem={({ item }) => (
+          <RenderItem item={item} w_anonymous={w_anonymous} />
+        )}
+        // renderItem={useCallback(_renderItem, [users])}
       />
     </View>
   );
 }
 
-const _renderItem = ({ item }) => <RenderItem item={item} />;
+// const _renderItem = ({ item }) => <RenderItem item={item} />;
 
 const styles = StyleSheet.create({
   card: {
