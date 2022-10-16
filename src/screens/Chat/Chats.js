@@ -3,6 +3,8 @@ import { StyleSheet, ScrollView, View, Text } from "react-native";
 import firebase from "firebase/compat/app";
 import ContactRow from "../../components/ContactRow";
 import Separator from "../../components/Separator";
+import moment from "moment";
+import trLocale from "moment/locale/tr";
 
 //     ***********   FİREBASE USERUPDATE NESNESİ OLMADIĞI İÇİN HATA GELİYOR HASTA PANELİNDEN ***********
 
@@ -13,15 +15,31 @@ const Chats = ({ navigation }) => {
   const [chats, setChats] = useState([]);
   useEffect(() => {
     let unmounted = false;
+
+    const Chats = [];
+
     firebase
       .firestore()
       .collection("Chats")
-      .where("users", "array-contains", firebase.auth()?.currentUser?.email) // benim mailimin içerdiği dokümanları getirecek!.
+      .where("users", "array-contains", firebase.auth().currentUser.email)
+
+      // benim mailimin içerdiği dokümanları getirecek!.
       .onSnapshot((snapshot) => {
         if (!unmounted) {
-          setChats(snapshot.docs);
+          snapshot.forEach((snapshotQuery) => {
+            setChats(
+              snapshot.docs.sort(
+                (objA, objB) =>
+                  Number(objB.data()?.messages[0]?.createdAt ?? "") -
+                  Number(objA.data()?.messages[0]?.createdAt ?? "")
+              )
+            );
+          });
+
+          // setChats(snapshot.docs);
         }
       });
+
     const user = firebase.auth().currentUser;
     firebase
       .firestore()
@@ -73,6 +91,13 @@ const Chats = ({ navigation }) => {
   const user = firebase.auth().currentUser;
   const [name, setName] = useState();
 
+  // chats.map((chat) => {
+  //   console.log(
+  //     "MESAJ: ",
+  //     chat.data().messages[chat.data().messages.length - 1].createdAt
+  //   );
+  // });
+
   return (
     <>
       {chats.length > 0 ? (
@@ -86,6 +111,13 @@ const Chats = ({ navigation }) => {
                     (x) => x !== firebase.auth().currentUser?.displayName
                   )}
                 avatar={chat.data().avatar.find((x) => x != DAvatar)}
+                date={
+                  chat.data().messages.length > 0
+                    ? moment(chat.data()?.messages[0]?.createdAt.toDate())
+                        .locale("tr", trLocale)
+                        .format("LT")
+                    : ""
+                }
                 subtitle={
                   chat.data().messages.length === 0
                     ? ""
