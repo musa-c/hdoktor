@@ -1,24 +1,33 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import firebase from "firebase/compat/app";
 import moment from "moment";
 import { Avatar, Badge } from "react-native-elements";
 import Separator from "../../../components/Separator";
 import ListEmptyComponent from "../../../components/ListEmptyComponent";
+import { isEqual } from "lodash";
 
 const Notifications = () => {
   const user = firebase.auth().currentUser;
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [LastCount, setLastCount] = useState();
+  const [loading, setLoading] = useState(false);
+  const [LoadingDone, setLoadingDone] = useState(false);
 
   const DateNotifications = (date) => {
     //const notificationDate = moment(date).format("l");
     const d = new Date();
     const currentDate =
       d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
-    console.log("currentDate:", currentDate);
-    console.log("date:", moment(date).format("l"));
     if (moment(date).format("l") == currentDate) {
       return moment(date).format("LT");
     } else if (d.getDate + 1 == moment(date).format("Do")) {
@@ -33,22 +42,28 @@ const Notifications = () => {
     if (!unmounted) {
       setRefreshing(true);
     }
-    firebase
+
+    var first = firebase
       .firestore()
       .collection("D_user")
       .doc(user.uid)
       .collection("Bildirimlerim")
+      .orderBy("saat", "desc")
+      .limit(20);
+
+    first
       .get()
-      .then((snapshot) => {
-        const data = [];
-        snapshot.forEach((documentSnapshot) => {
-          data.push({
+      .then((querySnapshot) => {
+        const users = [];
+        querySnapshot.forEach((documentSnapshot) => {
+          users.push({
             ...documentSnapshot.data(),
-            id: documentSnapshot.id,
+            key: documentSnapshot.id,
           });
         });
         if (!unmounted) {
-          setData(data);
+          setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
+          setUsers(users);
           setRefreshing(false);
         }
       })
@@ -67,17 +82,117 @@ const Notifications = () => {
           });
       });
 
+    // firebase
+    //   .firestore()
+    //   .collection("D_user")
+    //   .doc(user.uid)
+    //   .collection("Bildirimlerim")
+    //   .get()
+    //   .then((snapshot) => {
+    //     const data = [];
+    //     snapshot.forEach((documentSnapshot) => {
+    //       data.push({
+    //         ...documentSnapshot.data(),
+    //         id: documentSnapshot.id,
+    //       });
+    //     });
+    //     if (!unmounted) {
+    //       setData(data);
+    //       setRefreshing(false);
+    //     }
+    //   })
+    // .then(() => {
+    //   firebase
+    //     .firestore()
+    //     .collection("D_user")
+    //     .doc(user.uid)
+    //     .collection("Bildirimlerim")
+    //     .where("read", "==", false)
+    //     .get()
+    //     .then((snaps) => {
+    //       snaps.forEach((snapsFor) => {
+    //         snapsFor.ref.update({ read: true });
+    //       });
+    //     });
+    // });
+
     return () => {
       unmounted = true;
     };
   }, [refresh]);
 
+  const getOtherData = () => {
+    setLoading(true);
+    if (LastCount != undefined) {
+      firebase
+        .firestore()
+        .collection("D_user")
+        .doc(user.uid)
+        .collection("Bildirimlerim")
+        .orderBy("saat", "desc")
+        .startAfter(LastCount)
+        .limit(20)
+        .get()
+        .then((querySnapshot) => {
+          if (
+            isEqual(
+              querySnapshot.docs[querySnapshot.docs.length - 1],
+              LastCount
+            )
+          ) {
+            // eşit ise
+            setLoadingDone(true);
+            setLoading(false);
+          } else {
+            // eşit değil ise
+            const usersOther = [];
+            querySnapshot.forEach((documentSnapshot) => {
+              usersOther.push({
+                ...documentSnapshot.data(),
+                key: documentSnapshot.id,
+              });
+            });
+            setUsers(users.concat(usersOther));
+            setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
+            setLoading(false);
+          }
+        })
+        .catch((e) => {
+          const errorCode = e.code;
+          setLoading(false);
+          console.log(errorCode);
+          console.log(e);
+          console.log("hata");
+        });
+    } else {
+      setLoading(false);
+    }
+  };
+
+  const footerIndicator = () => {
+    return loading ? (
+      <View
+        style={{
+          paddingVertical: 20,
+        }}
+      >
+        <ActivityIndicator animating size="small" />
+      </View>
+    ) : null;
+  };
+
   return (
     <View style={styles.cont}>
       <FlatList
-        data={data}
+        data={users}
         refreshing={refreshing}
+        ListFooterComponent={footerIndicator}
         contentContainerStyle={{ flexGrow: 1 }}
+        onEndReached={() => {
+          if (!LoadingDone) {
+            getOtherData();
+          }
+        }}
         onRefresh={() => {
           setRefresh(!refresh);
           setRefreshing(true);
