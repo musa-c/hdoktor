@@ -5,7 +5,9 @@ import Separator from "../../../components/Separator";
 import Icon from "react-native-vector-icons/FontAwesome";
 import { useNavigation } from "@react-navigation/native";
 
-const RenderItem = ({ item }) => {
+const RenderItem = ({ item, w_anonymous }) => {
+  // console.log(item);
+  console.log(w_anonymous);
   const navigation = useNavigation();
   return (
     <View style={{ flex: 1 }}>
@@ -22,6 +24,7 @@ const RenderItem = ({ item }) => {
             CalisilanYer: item.CalisilanYer,
             avatar: item.avatar,
             rating: item.rating,
+            w_anonymous: w_anonymous,
           })
         }
       >
