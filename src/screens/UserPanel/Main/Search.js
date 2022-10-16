@@ -64,7 +64,7 @@ const Search = ({ navigation, route }) => {
     firebase
       .firestore()
       .collection("D_user")
-      .where("nameSearch", "array-contains", searchx)
+      .where("nameSearch", "array-contains", searchx.toLowerCase())
       .onSnapshot((snaps) => {
         var users = [];
         if (UsersData.length > 0) {
@@ -106,7 +106,7 @@ const Search = ({ navigation, route }) => {
     firebase
       .firestore()
       .collection("D_user")
-      .where("bransSearch", "array-contains", searchx)
+      .where("bransSearch", "array-contains", searchx.toLowerCase())
       .onSnapshot((snaps) => {
         var users = [];
         if (UsersData.length > 0) {
@@ -147,7 +147,7 @@ const Search = ({ navigation, route }) => {
     firebase
       .firestore()
       .collection("D_user")
-      .where("calislanYerSearch", "array-contains", searchx)
+      .where("calislanYerSearch", "array-contains", searchx.toLowerCase())
       .onSnapshot((snaps) => {
         var users = [];
         if (UsersData.length > 0) {

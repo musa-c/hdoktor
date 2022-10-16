@@ -39,7 +39,7 @@ const MyDoctor = ({ route }) => {
         firebase
           .firestore()
           .collection("H_user")
-          .doc(user?.uid ?? "")
+          .doc(user.uid)
           .collection("Doktorlarım")
           .onSnapshot((querySnapshot) => {
             const DrUsers = [];

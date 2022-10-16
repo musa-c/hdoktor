@@ -34,7 +34,6 @@ const Appointment = ({ route }) => {
 
   useEffect(() => {
     let unmounted = false;
-    //console.log(doctorId);
     const DoluZamanlarDizi = [];
     firebase
       .firestore()

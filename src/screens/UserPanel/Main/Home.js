@@ -114,6 +114,7 @@ function HomeU(props) {
         .catch(() => {
           const erroCorde = e.code;
           setLoading(false);
+          alert("hata!");
           console.log(erroCorde);
           console.log(e);
           console.log("hata");

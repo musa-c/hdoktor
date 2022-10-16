@@ -30,10 +30,7 @@ const AppointmentModal = ({
   const dateDay = new Date().getDate();
   const [loading, setLoading] = useState(false);
 
-  //console.log("mevcutDate:", moment(date).format("LL"));
-
   const GorusmeTalep = (currentDate) => {
-    //const tarihTr = moment(tarih).locale("tr", trLocale).format("LL");
     setLoading(true);
     const date = moment(currentDate).format("LL");
 

@@ -153,6 +153,7 @@ const SignUp1 = ({ navigation }) => {
             errorMessage("Email adresi geçersiz.");
             break;
           default:
+            SetCreateAccountUnEnabled(false);
             Alert.alert("Hata❗", "Kayıt başarısız. Lütfen tekrar deneyin.", [
               { text: "Tamam", style: "cancel" },
             ]);
