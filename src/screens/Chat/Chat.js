@@ -33,8 +33,10 @@ const Chat = ({ route }) => {
                 // mevcut olarak d user açıksa karşı tarafına read false vermemem gerekir.
                 setW_user("H_user");
                 setAvatar(
-                  snaps.data()?.avatar ??
-                    "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
+                  snaps.data().avatar == ""
+                    ? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
+                    : snaps.data()?.avatar === undefined &&
+                        "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
                 );
               }
             });
@@ -58,8 +60,10 @@ const Chat = ({ route }) => {
                 // mevcut olarak H user açıksa karşı tarafına read false vermemem gerekir.
                 setW_user("D_user");
                 setAvatar(
-                  snaps.data()?.avatar ??
-                    "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FH_avatars%2FDefaultHastaAvatar.png?alt=media&token=66f93caf-ef41-461b-9e20-b35ac92a8084"
+                  snaps.data().avatar == ""
+                    ? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FH_avatars%2FDefaultHastaAvatar.png?alt=media&token=66f93caf-ef41-461b-9e20-b35ac92a8084"
+                    : snaps.data()?.avatar === undefined &&
+                        "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FH_avatars%2FDefaultHastaAvatar.png?alt=media&token=66f93caf-ef41-461b-9e20-b35ac92a8084"
                 );
               }
             });
@@ -111,7 +115,6 @@ const Chat = ({ route }) => {
           .doc("Chats/" + route.params.id)
           .set({ Hread: false, Dread: true }, { merge: true });
       } else if (W_user == "D_user") {
-        console.log(W_user == "D_user");
         firebase
           .firestore()
           .doc("Chats/" + route.params.id)
