@@ -14,6 +14,7 @@ const ProfilePhotoChangeModal = ({
   showImagePicker,
   AvatarUpdate,
   loadingButton,
+  error,
 }) => {
   return (
     <Modal
@@ -43,6 +44,8 @@ const ProfilePhotoChangeModal = ({
         >
           <Avatar.Accessory size={27} onPress={showImagePicker} />
         </Avatar>
+
+        <Text style={{ fontSize: 20, color: "red" }}>{error}</Text>
 
         <LoadingButton
           mode="contained"
