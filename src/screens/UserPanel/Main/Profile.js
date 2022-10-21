@@ -19,13 +19,13 @@ const Profile = ({ navigation }) => {
 
   useEffect(() => {
     let unmounted = false;
-    if (!unmounted) {
-      const user = firebase.auth().currentUser;
-      firebase
-        .firestore()
-        .collection("H_user")
-        .doc(user.uid)
-        .onSnapshot((snapshot) => {
+    const user = firebase.auth().currentUser;
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(user.uid)
+      .onSnapshot((snapshot) => {
+        if (!unmounted) {
           setName(snapshot.data().name);
           setEmail(snapshot.data().email);
           setCinsiyet(snapshot.data()?.cinsiyet);
@@ -34,11 +34,8 @@ const Profile = ({ navigation }) => {
           setDate(snapshot.data().date);
           setId(snapshot.data().Id);
           setAvatar(snapshot.data()?.avatar ?? "");
-          // TEL NO
-          // YAŞ
-          //
-        });
-    }
+        }
+      });
 
     return () => {
       unmounted = true;
