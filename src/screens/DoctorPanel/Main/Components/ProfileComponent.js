@@ -124,6 +124,20 @@ const ProfileComponent = ({
                               );
                             });
                           });
+                        firebase
+                          .firestore()
+                          .collection("H_user")
+                          .doc(snapsFor.data().Id)
+                          .collection("Bildirimlerim")
+                          .where("Id", "==", user.uid)
+                          .onSnapshot((snaps3) => {
+                            snaps3.forEach((snaps3For) => {
+                              snaps3For.ref.set(
+                                { avatar: url },
+                                { merge: true }
+                              );
+                            });
+                          });
                       });
                     }
                   });
@@ -154,6 +168,7 @@ const ProfileComponent = ({
           })
           .catch((error) => {
             const ErrorCode = error.code;
+            console.log(error);
             switch (ErrorCode.substr(8)) {
               case "unknown":
                 setError("Bilinmeyen bir hata oluştu.");
