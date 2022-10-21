@@ -28,6 +28,8 @@ const AppointmentClockCard = ({
 
   useEffect(() => {
     const doluZamanlar = [];
+    let unmounted = false;
+
     firebase
       .firestore()
       .collection("D_user")
@@ -49,10 +51,14 @@ const AppointmentClockCard = ({
                     moment(selectedDate).format("LL")) &
                   (snaps2For.data().RandevuSaat == clock)
                 ) {
-                  setIsFull(true);
+                  if (!unmounted) {
+                    setIsFull(true);
+                  }
                 } else {
                   if (isFull) {
-                    setIsFull(false);
+                    if (!unmounted) {
+                      setIsFull(false);
+                    }
                   }
                 }
                 // doluZamanlar.push({
@@ -64,7 +70,9 @@ const AppointmentClockCard = ({
         });
       });
     // setDoluZamanlar(doluZamanlar);
-    setLoading(false);
+    if (!unmounted) {
+      setLoading(false);
+    }
 
     // doluZamanlar.map((element) => {
     //   console.log("rT:", element.RandevuTarih);
@@ -77,6 +85,9 @@ const AppointmentClockCard = ({
     //     setIsFull(true);
     //   }
     // });
+    return () => {
+      unmounted = true;
+    };
   }, [selectedDate]);
 
   const toggleModal = () => {
