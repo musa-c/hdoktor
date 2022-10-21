@@ -27,10 +27,12 @@ const ProfileComponent = ({
   const [NewAvatarUri, setNewAvatarUri] = useState("");
   const [ImageName, setImageName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState();
 
   const toggleModalAvatar = () => {
     if (!loading) {
       setModalVisible(!isModalVisible);
+      setError();
     }
   };
 
@@ -115,6 +117,20 @@ const ProfileComponent = ({
                           .onSnapshot((snaps2) => {
                             snaps2.forEach((snaps2For) => {
                               snaps2For.ref.set(
+                                { avatar: url },
+                                { merge: true }
+                              );
+                            });
+                          });
+                        firebase
+                          .firestore()
+                          .collection("D_user")
+                          .doc(snapsFor.data().Id)
+                          .collection("Bildirimlerim")
+                          .where("id", "==", user.uid)
+                          .onSnapshot((snaps3) => {
+                            snaps3.forEach((snaps3For) => {
+                              snaps3For.ref.set(
                                 { avatar: url },
                                 { merge: true }
                               );
@@ -281,7 +297,7 @@ const ProfileComponent = ({
         <ProfilePhotoChangeModal
           isModalVisible={isModalVisible}
           onBackdropPress={() => {
-            !loading ? setModalVisible(false) : null;
+            !loading ? toggleModalAvatar() : null;
           }}
           // onSwipeComplete={() => {
           //   !loading ? setModalVisible(false) : null;
@@ -291,6 +307,7 @@ const ProfileComponent = ({
           showImagePicker={showImagePicker}
           AvatarUpdate={() => AvatarUpdate(NewAvatarUri, ImageName)}
           loadingButton={loading}
+          error={error}
         />
 
         {/* --- Modal --- */}
