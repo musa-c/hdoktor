@@ -57,7 +57,9 @@ const Appointment = ({ route }) => {
                   tarih: snapsFor.data().RandevuTarih,
                 });
               });
-              setDoluZamanlar(DoluZamanlarDizi.concat(DoluZamanlarDizi));
+              if (!unmounted) {
+                setDoluZamanlar(DoluZamanlarDizi.concat(DoluZamanlarDizi));
+              }
             });
         });
       });

@@ -49,10 +49,12 @@ function HomeD(props) {
     first.get().then((querySnapshot) => {
       const users = [];
       querySnapshot.forEach((documentSnapshot) => {
-        users.push({
-          ...documentSnapshot.data(),
-          key: documentSnapshot.id,
-        });
+        if (documentSnapshot.id != myuser.uid) {
+          users.push({
+            ...documentSnapshot.data(),
+            key: documentSnapshot.id,
+          });
+        }
       });
       if (!unmounted) {
         setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
@@ -111,10 +113,12 @@ function HomeD(props) {
             // eşit değil ise
             const usersOther = [];
             querySnapshot.forEach((documentSnapshot) => {
-              usersOther.push({
-                ...documentSnapshot.data(),
-                key: documentSnapshot.id,
-              });
+              if (documentSnapshot.id != myuser.uid) {
+                usersOther.push({
+                  ...documentSnapshot.data(),
+                  key: documentSnapshot.id,
+                });
+              }
             });
             setUsers(users.concat(usersOther));
             setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
@@ -161,7 +165,7 @@ function HomeD(props) {
         data={users}
         ListEmptyComponent={
           <ListEmptyComponent
-            text={"Doktor Bulunmamakta."}
+            text={"Doktor bulunmamakta."}
             refreshing={refreshing}
           />
         }
@@ -179,55 +183,65 @@ function HomeD(props) {
         }}
         renderItem={(element) => (
           <View>
-            {element.item.key != myuser.uid && (
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate("MoreDoctorInfo", {
-                    doctorId: element.item.key,
-                    name: element.item.name,
-                    CalisilanYer: element.item.CalisilanYer,
-                    time1: element.item.time1.toDate(),
-                    time2: element.item.time2.toDate(),
-                    email: element.item.email,
-                    avatar: element.item.avatar,
-                    gender: element.item.cinsiyet,
-                    brans: element.item.brans,
-                    rating: element.item.rating,
-                  })
-                }
-              >
-                <View style={styles.cont}>
-                  <View style={styles.card}>
-                    <View style={styles.cardImage}>
-                      {element.item.avatar == "" ? (
-                        <Avatar
-                          size={95}
-                          source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
-                          avatarStyle={styles.imageStyle}
-                          activeOpacity={0.7}
-                          rounded
-                        />
-                      ) : (
-                        <Avatar
-                          size={95}
-                          rounded
-                          source={{ uri: element.item.avatar }}
-                          avatarStyle={styles.imageStyle}
-                          activeOpacity={0.7}
-                        />
-                      )}
-                    </View>
-                    <View style={styles.CardInfo}>
-                      <Text
-                        style={{
-                          color: "black",
-                          fontSize: 17,
-                          paddingStart: 5,
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {element.item.name}
-                      </Text>
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("MoreDoctorInfo", {
+                  doctorId: element.item.key,
+                  name: element.item.name,
+                  CalisilanYer: element.item.CalisilanYer,
+                  time1: element.item.time1.toDate(),
+                  time2: element.item.time2.toDate(),
+                  email: element.item.email,
+                  avatar: element.item.avatar,
+                  gender: element.item.cinsiyet,
+                  brans: element.item.brans,
+                  rating: element.item.rating,
+                })
+              }
+            >
+              <View style={styles.cont}>
+                <View style={styles.card}>
+                  <View style={styles.cardImage}>
+                    {element.item.avatar == "" ? (
+                      <Avatar
+                        size={95}
+                        source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
+                        avatarStyle={styles.imageStyle}
+                        activeOpacity={0.7}
+                        rounded
+                      />
+                    ) : (
+                      <Avatar
+                        size={95}
+                        rounded
+                        source={{ uri: element.item.avatar }}
+                        avatarStyle={styles.imageStyle}
+                        activeOpacity={0.7}
+                      />
+                    )}
+                  </View>
+                  <View style={styles.CardInfo}>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontSize: 17,
+                        paddingStart: 5,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {element.item.name}
+                    </Text>
+                    <Text
+                      style={{
+                        color: "black",
+                        fontSize: 19,
+                        paddingStart: 5,
+                      }}
+                    >
+                      <Icon name="stethoscope" size={22} color="#B71C1C" />
+                      &nbsp;&nbsp;{element.item.brans}
+                    </Text>
+                    {element.item.CalisilanYer != "" ? (
                       <Text
                         style={{
                           color: "black",
@@ -235,48 +249,34 @@ function HomeD(props) {
                           paddingStart: 5,
                         }}
                       >
-                        <Icon name="stethoscope" size={22} color="#B71C1C" />
-                        &nbsp;&nbsp;{element.item.brans}
+                        <Icon name="h-square" size={22} color="#B71C1C" />
+                        &nbsp;&nbsp;{element.item.CalisilanYer}
                       </Text>
-                      {element.item.CalisilanYer != "" ? (
-                        <Text
-                          style={{
-                            color: "black",
-                            fontSize: 19,
-                            paddingStart: 5,
-                          }}
-                        >
-                          <Icon name="h-square" size={22} color="#B71C1C" />
-                          &nbsp;&nbsp;{element.item.CalisilanYer}
-                        </Text>
-                      ) : null}
+                    ) : null}
 
-                      <View
-                        style={{ marginHorizontal: 5, marginTop: 5 }}
-                      ></View>
-                      <View
+                    <View style={{ marginHorizontal: 5, marginTop: 5 }}></View>
+                    <View
+                      style={{
+                        marginHorizontal: 5,
+                        marginTop: 5,
+                        alignItems: "flex-end",
+                      }}
+                    >
+                      <Text
                         style={{
-                          marginHorizontal: 5,
-                          marginTop: 5,
-                          alignItems: "flex-end",
+                          color: "grey",
+                          fontSize: 15,
+                          fontStyle: "italic",
                         }}
                       >
-                        <Text
-                          style={{
-                            color: "grey",
-                            fontSize: 15,
-                            fontStyle: "italic",
-                          }}
-                        >
-                          Daha fazla bilgi al
-                        </Text>
-                      </View>
+                        Daha fazla bilgi al
+                      </Text>
                     </View>
                   </View>
-                  <Separator />
                 </View>
-              </TouchableOpacity>
-            )}
+                <Separator />
+              </View>
+            </TouchableOpacity>
           </View>
         )}
       />

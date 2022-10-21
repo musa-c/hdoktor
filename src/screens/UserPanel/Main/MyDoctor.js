@@ -35,12 +35,12 @@ const MyDoctor = ({ route }) => {
     }
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
-        // alert("Null Değilim")
         firebase
           .firestore()
           .collection("H_user")
           .doc(user.uid)
           .collection("Doktorlarım")
+          .orderBy("timestamp", "desc")
           .onSnapshot((querySnapshot) => {
             const DrUsers = [];
             const RandevuDate = [];
@@ -152,6 +152,7 @@ const MyDoctor = ({ route }) => {
                   time2: element.item.iletisimSaat2.toDate(),
                   CalisilanYer: element.item.calisilanYer,
                   avatar: element.item.avatar,
+                  rating: element.item.rating,
                 })
               }
             >

@@ -34,7 +34,7 @@ const MoreDoctorInfo = ({ navigation }) => {
   const avatar = route.params.avatar;
   const email = route.params.email;
   const gender = route.params.gender;
-  const ratingF = route.params?.rating ?? 0;
+  const ratingF = route.params.rating;
   const [firabaseRating, setFirabaseRating] = useState(ratingF);
 
   const user = firebase.auth().currentUser;
@@ -75,6 +75,7 @@ const MoreDoctorInfo = ({ navigation }) => {
                 .then((snaps) => {
                   snaps.forEach((snapsFor) => {
                     let ratingAvg = snapsFor.data().rating / snaps.docs.length;
+
                     setFirabaseRating(ratingAvg);
                     firebase
                       .firestore()
@@ -85,6 +86,27 @@ const MoreDoctorInfo = ({ navigation }) => {
                 })
                 .catch(() => {
                   alert("Hata! Lütfen daha sonra tekrar deneyiniz.");
+                });
+            })
+            .then(() => {
+              // YENİ EKLENDİ
+              firebase
+                .firestore()
+                .collection("H_user")
+                .doc(user.uid)
+                .collection("Doktorlarım")
+                .where("Id", "==", DoctorId)
+                .get()
+                .then((query) => {
+                  query.forEach((queryFor) => {
+                    firebase
+                      .firestore()
+                      .collection("H_user")
+                      .doc(user.uid)
+                      .collection("Doktorlarım")
+                      .doc(queryFor.id)
+                      .set({ rating: firabaseRating });
+                  });
                 });
             })
             .then(() => {
@@ -124,6 +146,31 @@ const MoreDoctorInfo = ({ navigation }) => {
                       },
                       { merge: true }
                     );
+                    firebase
+                      .firestore()
+                      .collection("D_user")
+                      .doc(DoctorId)
+                      .collection("Hastalarım")
+                      .get()
+                      .then((snaps) => {
+                        snaps.forEach((snapsFor) => {
+                          firebase
+                            .firestore()
+                            .collection("H_user")
+                            .doc(snapsFor.data().Id)
+                            .collection("Doktorlarım")
+                            .where("Id", "==", DoctorId)
+                            .get()
+                            .then((query) => {
+                              query.forEach((queryFor) => {
+                                queryFor.ref.set(
+                                  { rating: ratingAvg },
+                                  { merge: true }
+                                );
+                              });
+                            });
+                        });
+                      });
                   })
                   .then(() => {
                     setLoadingRating(false);
@@ -140,7 +187,7 @@ const MoreDoctorInfo = ({ navigation }) => {
               })
               .catch((e) => {
                 setLoadingRating(false);
-                alert("Başaramadım abi");
+                alert("Hata! Lütfen tekrar deneyiniz.");
               });
           });
         }

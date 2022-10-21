@@ -29,6 +29,7 @@ const PatientConfirmation = ({ navigation }) => {
   const [DIletisimSaat2, setIletisimSaat2] = useState("");
   const [D_Cinsiyet, setD_Cinsiyet] = useState("");
   const [DAvatar, setD_Avatar] = useState("");
+  const [D_Rating, setD_Rating] = useState();
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingPlus, setLoadingPlus] = useState(false);
@@ -76,6 +77,7 @@ const PatientConfirmation = ({ navigation }) => {
               setIletisimSaat2(snapshot.data()?.time2);
               setD_Avatar(snapshot.data()?.avatar);
               setD_Cinsiyet(snapshot.data().cinsiyet);
+              setD_Rating(snapshot.data().rating);
             }
           });
       }
@@ -97,6 +99,9 @@ const PatientConfirmation = ({ navigation }) => {
     Havatar
   ) => {
     setLoadingPlus(true);
+
+    var now = new Date();
+
     firebase
       .firestore()
       .collection("H_user")
@@ -105,7 +110,6 @@ const PatientConfirmation = ({ navigation }) => {
       .where("Id", "==", DId)
       .get()
       .then((snapshot) => {
-        console.log(snapshot.empty);
         if (snapshot.empty) {
           // doc yoksa
 
@@ -127,6 +131,8 @@ const PatientConfirmation = ({ navigation }) => {
               Id: DId,
               cinsiyet: D_Cinsiyet,
               avatar: DAvatar,
+              rating: D_Rating,
+              timestamp: now,
             })
             .then((docRef) => {
               //  console.log(docRef.id)
@@ -185,14 +191,14 @@ const PatientConfirmation = ({ navigation }) => {
         }
       });
 
-    var now = new Date();
-
     firebase
       .firestore()
       .collection("H_user")
       .doc(H_ID)
       .collection("Bildirimlerim")
-      .add({
+      .doc()
+      .set({
+        Id: DId,
         Doktor: DName,
         RandevuTarih: RandevuTarih,
         RandevuSaat: RandevuSaat,
@@ -319,16 +325,15 @@ const PatientConfirmation = ({ navigation }) => {
   const HastaRed = (DocumentId, H_ID, RandevuTarih, RandevuSaat) => {
     var now = new Date();
     setloadingMinus(true);
-    firebase.auth().onAuthStateChanged((doctor) => {
-      if (doctor) {
-        firebase
-          .firestore()
-          .collection("D_user")
-          .doc(doctor?.uid ?? "")
-          .collection("GorusmeTalep")
-          .doc(DocumentId)
-          .delete();
-
+    const doctor = firebase.auth().currentUser;
+    firebase
+      .firestore()
+      .collection("D_user")
+      .doc(doctor?.uid ?? "")
+      .collection("GorusmeTalep")
+      .doc(DocumentId)
+      .delete()
+      .then(() => {
         firebase
           .firestore()
           .collection("H_user")
@@ -337,15 +342,21 @@ const PatientConfirmation = ({ navigation }) => {
           .doc()
           .set({
             Doktor: DName,
+            Id: DId,
             RandevuTarih: RandevuTarih,
             RandevuSaat: RandevuSaat,
             saat: now,
             randevu: false,
             read: false,
+            avatar: DAvatar,
           });
-      }
-    });
-    setloadingMinus(false);
+      })
+      .then(() => {
+        setloadingMinus(false);
+      })
+      .catch(() => {
+        setloadingMinus(false);
+      });
   };
 
   return (

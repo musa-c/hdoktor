@@ -70,17 +70,17 @@ const SignUp1 = ({ navigation }) => {
 
     var NameArray = [];
     for (let i = 1; i < name.toLowerCase().length + 1; i++) {
-      NameArray.push(name.substring(0, i));
+      NameArray.push(name.substring(0, i).toLowerCase());
     }
 
     var BransArray = [];
     for (let i = 1; i < brans.toLowerCase().length + 1; i++) {
-      BransArray.push(brans.substring(0, i));
+      BransArray.push(brans.substring(0, i).toLowerCase());
     }
 
     var CalisilanYerArray = [];
     for (let i = 1; i < CalisilanYer.toLowerCase().length + 1; i++) {
-      CalisilanYerArray.push(CalisilanYer.substring(0, i));
+      CalisilanYerArray.push(CalisilanYer.substring(0, i).toLowerCase());
     }
 
     await firebase
