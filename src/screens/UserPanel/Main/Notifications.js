@@ -1,87 +1,145 @@
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
 import React, { useEffect, useState } from "react";
 import firebase from "firebase/compat/app";
-import moment from "moment";
-import { Avatar, Badge } from "react-native-elements";
-import Separator from "../../../components/Separator";
 import ListEmptyComponent from "../../../components/ListEmptyComponent";
+import { isEqual } from "lodash";
+import ItemBoxNotification from "./Components/ItemBoxNotification";
 
 const Notifications = () => {
   const user = firebase.auth().currentUser;
   const [data, setData] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
-  const DateNotifications = (date) => {
-    //const notificationDate = moment(date).format("l");
-    const d = new Date();
-    const currentDate =
-      d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
-    // console.log("currentDatex:", currentDate);
-    // console.log("date:", moment(date).format("l"));
-    if (moment(date).format("l") == currentDate) {
-      return moment(date).format("LT");
-    } else if (d.getDate() - 1 == moment(date).format("Do")) {
-      return "Dün " + moment(date).format("LT");
-    } else {
-      return moment(date).format("ll");
-    }
-  };
+  const [LastCount, setLastCount] = useState();
+  const [loading, setLoading] = useState(false);
+  const [LoadingDone, setLoadingDone] = useState(false);
+  const [LoadingDelete, setLoadingDelete] = useState(false);
+  const [DeleteKey, setDeleteKey] = useState();
 
   useEffect(() => {
-    const d = new Date();
-    const currentDate =
-      d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear();
-
-    console.log("date:", currentDate);
-
     let unmounted = false;
     if (!unmounted) {
       setRefreshing(true);
     }
+
+    var first = firebase
+      .firestore()
+      .collection("H_user")
+      .doc(user.uid)
+      .collection("Bildirimlerim")
+      .orderBy("saat", "desc")
+      .limit(20);
+
+    first.onSnapshot((querySnapshot) => {
+      const data = [];
+      querySnapshot.forEach((documentSnapshot) => {
+        data.push({
+          ...documentSnapshot.data(),
+          key: documentSnapshot.id,
+        });
+      });
+      if (!unmounted) {
+        setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        setData(data);
+        setRefreshing(false);
+      }
+    });
     firebase
       .firestore()
       .collection("H_user")
       .doc(user.uid)
       .collection("Bildirimlerim")
+      .where("read", "==", false)
       .get()
-      .then((snapshot) => {
-        const data = [];
-        snapshot.forEach((documentSnapshot) => {
-          data.push({
-            ...documentSnapshot.data(),
-            id: documentSnapshot.id,
-          });
+      .then((snaps) => {
+        snaps.forEach((snapsFor) => {
+          snapsFor.ref.update({ read: true });
         });
-        if (!unmounted) {
-          setData(data);
-          setRefreshing(false);
-        }
-      })
-      .then(() => {
-        firebase
-          .firestore()
-          .collection("H_user")
-          .doc(user.uid)
-          .collection("Bildirimlerim")
-          .where("read", "==", false)
-          .get()
-          .then((snaps) => {
-            snaps.forEach((snapsFor) => {
-              snapsFor.ref.update({ read: true });
-            });
-          });
       });
+
     return () => {
       unmounted = true;
     };
   }, [refresh]);
+
+  const getOtherData = () => {
+    setLoading(true);
+    if (LastCount != undefined) {
+      firebase
+        .firestore()
+        .collection("H_user")
+        .doc(user.uid)
+        .collection("Bildirimlerim")
+        .orderBy("saat", "desc")
+        .startAfter(LastCount)
+        .limit(20)
+        .onSnapshot((querySnapshot) => {
+          if (
+            isEqual(
+              querySnapshot.docs[querySnapshot.docs.length - 1],
+              LastCount
+            )
+          ) {
+            // eşit ise
+            setLoadingDone(true);
+            setLoading(false);
+          } else {
+            // eşit değil ise
+            const DataOther = [];
+            querySnapshot.forEach((documentSnapshot) => {
+              DataOther.push({
+                ...documentSnapshot.data(),
+                key: documentSnapshot.id,
+              });
+            });
+            setData(data.concat(DataOther));
+            setLastCount(querySnapshot.docs[querySnapshot.docs.length - 1]);
+            setLoading(false);
+          }
+        });
+    } else {
+      setLoading(false);
+    }
+  };
+
+  const footerIndicator = () => {
+    return loading ? (
+      <View style={{ paddingVertical: 20 }}>
+        <ActivityIndicator animating size={"small"} />
+      </View>
+    ) : null;
+  };
+
+  const deleteItem = (key) => {
+    setLoadingDelete(true);
+    setDeleteKey(key);
+    firebase
+      .firestore()
+      .collection("H_user")
+      .doc(user.uid)
+      .collection("Bildirimlerim")
+      .doc(key)
+      .delete()
+      .then(() => {
+        setLoadingDelete(false);
+      })
+      .catch(() => {
+        setLoadingDelete(false);
+        alert("Silme başarısız. Lütfen tekrar deneyiniz.");
+      });
+  };
 
   return (
     <View style={styles.cont}>
       <FlatList
         data={data}
         refreshing={refreshing}
+        ListFooterComponent={footerIndicator}
+        onEndReached={() => {
+          if (!LoadingDone) {
+            getOtherData();
+          }
+        }}
         contentContainerStyle={{ flexGrow: 1 }}
         onRefresh={() => {
           setRefresh(!refresh);
@@ -94,61 +152,12 @@ const Notifications = () => {
           />
         }
         renderItem={({ item }) => (
-          <>
-            <View style={{ flexDirection: "row" }}>
-              <View
-                style={{
-                  justifyContent: "center",
-                  alignItems: "flex-end",
-                  marginLeft: 10,
-                }}
-              >
-                {!item.read ? <Badge status="primary" /> : null}
-                {item.avatar == "" ? (
-                  <Avatar
-                    size={60}
-                    rounded
-                    //title="MC"
-                    source={require("../../../rec/Avatars/DefaultDoctorAvatar.png")}
-                    containerStyle={{ backgroundColor: "#3d4db7" }}
-                  />
-                ) : (
-                  <Avatar
-                    size={60}
-                    rounded
-                    source={{ uri: item.avatar }}
-                    containerStyle={{ backgroundColor: "#3d4db7" }}
-                  />
-                )}
-              </View>
-              <View style={styles.cardCont}>
-                <Text
-                  style={{
-                    alignSelf: "flex-end",
-                    position: "absolute",
-                    color: "grey",
-                  }}
-                >
-                  {DateNotifications(item.saat.toDate())}{" "}
-                </Text>
-                <Text style={[styles.text, { fontWeight: "500" }]}>
-                  {item.Doktor}, Randevu talebinizi kabul etti.
-                </Text>
-                <Text style={[styles.text, { fontStyle: "italic" }]}>
-                  Randevu Saatiniz:{" "}
-                  <Text style={{ fontWeight: "bold" }}>{item.RandevuSaat}</Text>
-                </Text>
-                <Text style={[styles.text, { fontStyle: "italic" }]}>
-                  Randevu Tarihiniz:{" "}
-                  <Text style={{ fontWeight: "bold" }}>
-                    {item.RandevuTarih}
-                  </Text>
-                </Text>
-                {/* <IconFeather name="info" size={30} color="#4fc3f7"/> */}
-              </View>
-            </View>
-            <Separator marginStart={40} />
-          </>
+          <ItemBoxNotification
+            item={item}
+            handleDelete={() => deleteItem(item.key)}
+            pressKey={DeleteKey}
+            loading={LoadingDelete}
+          />
         )}
       />
     </View>
@@ -174,6 +183,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     // backgroundColor:"red",
     paddingTop: 5,
+  },
+  deleteBox: {
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 100,
   },
 });
 
