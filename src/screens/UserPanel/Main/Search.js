@@ -69,16 +69,12 @@ const Search = ({ navigation, route }) => {
         var users = [];
         if (UsersData.length > 0) {
           snaps.forEach((snapsFor) => {
-            const found = UsersData.find((user) => user.key == snapsFor.id);
-            if (found == undefined) {
-              // eşit değilse(eleman daha önce bulunmuyorsa ekle!)
-              users.push({
-                ...snapsFor.data(),
-                key: snapsFor.id,
-              });
-            }
+            users.push({
+              ...snapsFor.data(),
+              key: snapsFor.id,
+            });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         } else {
           // hiç eleman yoksa direk ekle zaten
@@ -88,7 +84,7 @@ const Search = ({ navigation, route }) => {
               key: snapsFor.id,
             });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         }
 
@@ -111,16 +107,12 @@ const Search = ({ navigation, route }) => {
         var users = [];
         if (UsersData.length > 0) {
           snaps.forEach((snapsFor) => {
-            const found = UsersData.find((user) => user.key == snapsFor.id);
-            if (found == undefined) {
-              // eşit değilse(eleman daha önce bulunmuyorsa ekle!)
-              users.push({
-                ...snapsFor.data(),
-                key: snapsFor.id,
-              });
-            }
+            users.push({
+              ...snapsFor.data(),
+              key: snapsFor.id,
+            });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         } else {
           // hiç eleman yoksa direk ekle zaten
@@ -130,7 +122,7 @@ const Search = ({ navigation, route }) => {
               key: snapsFor.id,
             });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         }
         if (snaps.empty) {
@@ -152,16 +144,12 @@ const Search = ({ navigation, route }) => {
         var users = [];
         if (UsersData.length > 0) {
           snaps.forEach((snapsFor) => {
-            const found = UsersData.find((user) => user.key == snapsFor.id);
-            if (found == undefined) {
-              // eşit değilse(eleman daha önce bulunmuyorsa ekle!)
-              users.push({
-                ...snapsFor.data(),
-                key: snapsFor.id,
-              });
-            }
+            users.push({
+              ...snapsFor.data(),
+              key: snapsFor.id,
+            });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         } else {
           // hiç eleman yoksa direk ekle zaten
@@ -171,7 +159,7 @@ const Search = ({ navigation, route }) => {
               key: snapsFor.id,
             });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         }
         if (snaps.empty) {
@@ -216,19 +204,17 @@ const Search = ({ navigation, route }) => {
 
   const searchFirestore = (search) => {
     setSearch(search);
-    const searchx =
-      search != "" ? search[0].toUpperCase() + search.substring(1) : "";
     if (search != undefined) {
       if (search != "") {
         switch (searchTitle) {
           case "isim":
-            NameSearch(searchx);
+            NameSearch(search);
             break;
           case "brans":
-            BransSearch(searchx);
+            BransSearch(search);
             break;
           case "calisilanYer":
-            CalisilanYerSearch(searchx);
+            CalisilanYerSearch(search);
             break;
           default:
             break;
