@@ -27,16 +27,12 @@ const Search = ({ navigation, route }) => {
         var users = [];
         if (UsersData.length > 0) {
           snaps.forEach((snapsFor) => {
-            const found = UsersData.find((user) => user.key == snapsFor.id);
-            if (found == undefined) {
-              // eşit değilse(eleman daha önce bulunmuyorsa ekle!)
-              users.push({
-                ...snapsFor.data(),
-                key: snapsFor.id,
-              });
-            }
+            users.push({
+              ...snapsFor.data(),
+              key: snapsFor.id,
+            });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         } else {
           // hiç eleman yoksa direk ekle zaten
@@ -46,7 +42,7 @@ const Search = ({ navigation, route }) => {
               key: snapsFor.id,
             });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         }
 
@@ -68,16 +64,12 @@ const Search = ({ navigation, route }) => {
         var users = [];
         if (UsersData.length > 0) {
           snaps.forEach((snapsFor) => {
-            const found = UsersData.find((user) => user.key == snapsFor.id);
-            if (found == undefined) {
-              // eşit değilse(eleman daha önce bulunmuyorsa ekle!)
-              users.push({
-                ...snapsFor.data(),
-                key: snapsFor.id,
-              });
-            }
+            users.push({
+              ...snapsFor.data(),
+              key: snapsFor.id,
+            });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         } else {
           // hiç eleman yoksa direk ekle zaten
@@ -87,7 +79,7 @@ const Search = ({ navigation, route }) => {
               key: snapsFor.id,
             });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         }
         if (snaps.empty) {
@@ -108,16 +100,12 @@ const Search = ({ navigation, route }) => {
         var users = [];
         if (UsersData.length > 0) {
           snaps.forEach((snapsFor) => {
-            const found = UsersData.find((user) => user.key == snapsFor.id);
-            if (found == undefined) {
-              // eşit değilse(eleman daha önce bulunmuyorsa ekle!)
-              users.push({
-                ...snapsFor.data(),
-                key: snapsFor.id,
-              });
-            }
+            users.push({
+              ...snapsFor.data(),
+              key: snapsFor.id,
+            });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         } else {
           // hiç eleman yoksa direk ekle zaten
@@ -127,7 +115,7 @@ const Search = ({ navigation, route }) => {
               key: snapsFor.id,
             });
           });
-          setUsersData(UsersData.concat(users));
+          setUsersData(users);
           setLoading(false);
         }
         if (snaps.empty) {
