@@ -36,6 +36,7 @@ const ProfileUpdateModal = ({
   const [updateValue, setUpdateValue] = useState("");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [dogumTarih, setdogumTarih] = useState(value);
+
   const [checkedE, setCheckedE] = useState(value == "Erkek" ? true : false);
   const [checkedK, setCheckedK] = useState(value == "Kadın" ? true : false);
   const [cinsiyet, setCinsiyet] = useState("");
@@ -204,6 +205,7 @@ const ProfileUpdateModal = ({
     { label: "Yoğun Bakım(İç Hast.)", value: "136" },
     { label: "Yoğun Bakım(Nöroloji)", value: "137" },
   ]);
+
   const [error, setError] = useState("");
   const isCheckedErkek = () => {
     if (value == "Erkek") {
@@ -259,10 +261,11 @@ const ProfileUpdateModal = ({
   const handleConfirm = (dogumTarih) => {
     setdogumTarih(moment(dogumTarih).locale("tr", trLocale).format("l"));
     Validate(topInfo, moment(dogumTarih).locale("tr", trLocale).format("l"));
+
     hideDatePicker();
   };
   const hideDatePicker = () => {
-    setValidation(false);
+    // setValidation(false);
     setDatePickerVisibility(false);
   };
   const showDatePicker = () => {
@@ -373,6 +376,7 @@ const ProfileUpdateModal = ({
   };
 
   const [Validation, setValidation] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const Validate = (topInfo, updateValue) => {
     switch (topInfo) {
@@ -481,11 +485,9 @@ const ProfileUpdateModal = ({
         }
         break;
       case "Yaş":
-        // 13> büyük olma zorunluluğu getir!
         if (updateValue != value) {
-          if (!Validation) {
-            setValidation(true);
-          }
+          // > 13 yaş
+          setValidation(true);
         } else {
           if (Validation) {
             setValidation(false);
@@ -587,23 +589,37 @@ const ProfileUpdateModal = ({
                           snapshot1For.ref.update({ name: UpdateName });
                         });
                       })
+                      .then(() => {
+                        if (w_user == "H_user") {
+                          firebase
+                            .firestore()
+                            .collection("D_user")
+                            .doc(query.data().Id)
+                            .collection("Bildirimlerim")
+                            .where("id", "==", user.uid)
+                            .onSnapshot((snapshot2) => {
+                              snapshot2.forEach((snapshot2For) => {
+                                snapshot2For.ref.update({ name: UpdateName });
+                              });
+                            });
+                        } else {
+                          firebase
+                            .firestore()
+                            .collection("H_user")
+                            .doc(query.data().Id)
+                            .collection("Bildirimlerim")
+                            .where("Id", "==", user.uid)
+                            .onSnapshot((snapshot2) => {
+                              snapshot2.forEach((snapshot2For) => {
+                                snapshot2For.ref.update({ Doktor: UpdateName });
+                              });
+                            });
+                        }
+                      })
                       .catch(() => {
                         setUpdate(false);
                         setLoading(false);
                       });
-
-                    // D_user -> Bildirimler'e hastanın emailini ekle.
-                    // firebase
-                    //   .firestore()
-                    //   .collection("D_user")
-                    //   .doc(query.data().Id)
-                    //   .collection("Bildirimlerim")
-                    //   .where("id", "==", user.uid)
-                    //   .onSnapshot((snapshot2) => {
-                    //     snapshot2.forEach((snapshot2For) => {
-                    //       snapshot2For.ref.update({ name: UpdateName });
-                    //     });
-                    //   });
                   });
                 }
               });
