@@ -35,7 +35,7 @@ const Chat = ({ route }) => {
                 setAvatar(
                   snaps.data().avatar == ""
                     ? "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
-                    : snaps.data()?.avatar === undefined &&
+                    : snaps.data().avatar === undefined &&
                         "https://firebasestorage.googleapis.com/v0/b/hdoktor-1b373.appspot.com/o/avatars%2FD_avatars%2FDefaultDoctorAvatar.png?alt=media&token=64165142-27b8-486b-9a58-5cab9baf340a"
                 );
               }

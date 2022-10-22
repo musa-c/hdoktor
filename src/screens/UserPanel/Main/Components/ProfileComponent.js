@@ -166,6 +166,7 @@ const ProfileComponent = ({
           })
           .catch((error) => {
             const ErrorCode = error.code;
+            console.log(error);
             switch (ErrorCode.substr(8)) {
               case "unknown":
                 setError("Bilinmeyen bir hata oluştu.");

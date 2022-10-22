@@ -12,6 +12,7 @@ import moment from "moment";
 import trLocale from "moment/locale/tr";
 import { Button } from "react-native-paper";
 import { Alert } from "react-native";
+import CreateAccountSucces from "../../../../components/Animations/CreateAccountSucces";
 
 const AppointmentModal = ({
   isVisible,
@@ -29,6 +30,7 @@ const AppointmentModal = ({
   const dateMonth = new Date().getMonth() + 1;
   const dateDay = new Date().getDate();
   const [loading, setLoading] = useState(false);
+  const [isSucces, setIsSucces] = useState(false);
 
   // console.log("selectedDate:", date);
   // console.log("selectedClock:", clock);
@@ -39,6 +41,8 @@ const AppointmentModal = ({
   const GorusmeTalepx = (currentDate) => {
     const date =
       moment(currentDate)?.format("LL") ?? moment(new Date()).format("LL");
+    var now = new Date();
+
     firebase
       .firestore()
       .collection("D_user")
@@ -77,28 +81,32 @@ const AppointmentModal = ({
                     RandevuSaat: clock,
                     avatar: H_Avatar,
                     KHastalik: KHastalik,
+                  })
+                  .then(() => {
+                    firebase
+                      .firestore()
+                      .collection("D_user")
+                      .doc(doctorId)
+                      .collection("Bildirimlerim")
+                      .doc()
+                      .set({
+                        name: H_name,
+                        avatar: H_Avatar,
+                        RandevuTarih: date,
+                        RandevuSaat: clock,
+                        saat: now,
+                        KHastalik: KHastalik,
+                        id: H_id,
+                        read: false,
+                      });
+                  })
+                  .then(() => {
+                    setLoading(false);
+                    setIsSucces(true);
+                    setTimeout(() => {
+                      setIsSucces(false);
+                    }, 3000);
                   });
-                var now = new Date();
-
-                firebase
-                  .firestore()
-                  .collection("D_user")
-                  .doc(doctorId)
-                  .collection("Bildirimlerim")
-                  .doc()
-                  .set({
-                    name: H_name,
-                    avatar: H_Avatar,
-                    RandevuTarih: date,
-                    RandevuSaat: clock,
-                    saat: now,
-                    KHastalik: KHastalik,
-                    id: H_id,
-                    read: false,
-                  });
-
-                alert("BAŞARILI!");
-                setLoading(false);
               } else {
                 Alert.alert(
                   "UYARI",
@@ -257,6 +265,11 @@ const AppointmentModal = ({
           height: Dimensions.get("screen").height / 2.5,
         }}
       >
+        <CreateAccountSucces
+          isCreateAccount={isSucces}
+          title={"Randevu Talebi başarıyla oluşturuldu."}
+        />
+
         <Text style={styles.textTitle}>Randevu Tarihi</Text>
         <View style={{ flexDirection: "row", marginLeft: 20 }}>
           <Text style={{ fontSize: 20 }}>{date?.getDate() ?? dateDay} </Text>

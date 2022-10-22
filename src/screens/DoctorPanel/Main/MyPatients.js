@@ -25,7 +25,6 @@ const MyPatients = (props) => {
   const [refreshing, setRefreshing] = useState(false);
   const [RandevuDate, setRandevuDate] = useState([]);
   const [modalCardVisible, setmodalCardVisible] = useState();
-  console.log("modalCardVisible:", modalCardVisible);
   useEffect(() => {
     let unmounted = false;
     if (!unmounted) {
@@ -106,7 +105,6 @@ const MyPatients = (props) => {
       .get()
       .then((get) => {
         get.forEach((getFor) => {
-          console.log("getFor:", getFor.id);
           getFor.ref.delete().then(() => {
             firebase
               .firestore()

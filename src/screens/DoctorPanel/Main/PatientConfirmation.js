@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
+  Alert,
 } from "react-native";
 // import Constants from 'expo-constants'; //
 var _ = require("lodash");
@@ -32,8 +33,8 @@ const PatientConfirmation = ({ navigation }) => {
   const [D_Rating, setD_Rating] = useState();
   const [refresh, setRefresh] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [loadingPlus, setLoadingPlus] = useState(false);
-  const [loadingMinus, setloadingMinus] = useState(false);
+  const [SelectedDeleteKey, SetSelectedDeleteKey] = useState();
+  const [SelectedInsertKey, setSelectedInsertKey] = useState();
 
   useEffect(() => {
     let unmounted = false;
@@ -98,7 +99,7 @@ const PatientConfirmation = ({ navigation }) => {
     RandevuTarih,
     Havatar
   ) => {
-    setLoadingPlus(true);
+    setSelectedInsertKey(DocumentId);
 
     var now = new Date();
 
@@ -149,7 +150,12 @@ const PatientConfirmation = ({ navigation }) => {
                   Id: DId,
                 })
                 .catch(() => {
-                  console.log("hata");
+                  setSelectedInsertKey("");
+                  Alert.alert(
+                    "Hata!",
+                    "Hata, Lütfen daha sonra tekrar deneyiniz.",
+                    [{ text: "Tamam" }]
+                  );
                 });
             });
         } else {
@@ -177,7 +183,6 @@ const PatientConfirmation = ({ navigation }) => {
                   .doc(querySnapshot.id)
                   .collection("RandevuTarih")
                   .onSnapshot((query) => {
-                    console.log(query.docs.length);
                     firebase
                       .firestore()
                       .collection("H_user")
@@ -217,7 +222,6 @@ const PatientConfirmation = ({ navigation }) => {
       .where("Id", "==", H_ID)
       .get()
       .then((snapshot) => {
-        console.log(snapshot.empty);
         if (snapshot.empty) {
           // doc yoksa
           firebase
@@ -251,7 +255,10 @@ const PatientConfirmation = ({ navigation }) => {
                 });
             })
             .catch(() => {
-              console.log("HATA");
+              setSelectedInsertKey("");
+              Alert.alert("Hata!", "Lütfen tekrar deneyizin.", [
+                { text: "Tamam" },
+              ]);
             });
         } else {
           // doc varsa
@@ -296,8 +303,6 @@ const PatientConfirmation = ({ navigation }) => {
       .where("users", "in", [[email, DEmail]])
       .get()
       .then((snapshot) => {
-        //   console.log(snapshot.empty)
-        console.log("chat:", snapshot.empty);
         if (snapshot.empty) {
           // doc yoksa
           firebase
@@ -312,7 +317,6 @@ const PatientConfirmation = ({ navigation }) => {
         }
       });
 
-    setLoadingPlus(false);
     firebase
       .firestore()
       .collection("D_user")
@@ -324,7 +328,7 @@ const PatientConfirmation = ({ navigation }) => {
 
   const HastaRed = (DocumentId, H_ID, RandevuTarih, RandevuSaat) => {
     var now = new Date();
-    setloadingMinus(true);
+    SetSelectedDeleteKey(DocumentId);
     const doctor = firebase.auth().currentUser;
     firebase
       .firestore()
@@ -351,11 +355,10 @@ const PatientConfirmation = ({ navigation }) => {
             avatar: DAvatar,
           });
       })
-      .then(() => {
-        setloadingMinus(false);
-      })
       .catch(() => {
-        setloadingMinus(false);
+        Alert.alert("Hata!", "Hata, Lütfen daha sonra tekrar deneyiniz.", [
+          { text: "Tamam" },
+        ]);
       });
   };
 
@@ -464,7 +467,7 @@ const PatientConfirmation = ({ navigation }) => {
                 </View>
                 <View style={styles.cardIcon}>
                   <LoadingButton
-                    onPress={() =>
+                    onPress={() => {
                       HastaKabul(
                         element.item.name,
                         element.item.cinsiyet,
@@ -475,22 +478,22 @@ const PatientConfirmation = ({ navigation }) => {
                         element.item.RandevuSaat,
                         element.item.RandevuTarih,
                         element.item.avatar
-                      )
-                    }
+                      );
+                    }}
                     icon="plus-box"
-                    loading={loadingPlus}
+                    loading={element.item.key == SelectedInsertKey}
                   />
                   <LoadingButton
                     icon="minus-box"
-                    onPress={() =>
+                    onPress={() => {
                       HastaRed(
                         element.item.key,
                         element.item.id,
                         element.item.RandevuTarih,
                         element.item.RandevuSaat
-                      )
-                    }
-                    loading={loadingMinus}
+                      );
+                    }}
+                    loading={element.item.key == SelectedDeleteKey}
                   />
                 </View>
               </View>
