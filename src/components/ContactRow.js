@@ -66,42 +66,40 @@ const ContactRow = ({
     }
   };
 
-  const leftSwipe = (progress, dragX) => {
-    const scale = dragX.interpolate({
-      inputRange: [0, 100],
-      outputRange: [0, 1],
-      extrapolate: "clamp",
-    });
-    return (
-      <TouchableOpacity activeOpacity={0.6} style={styles.deleteBox}>
-        <Animated.View style={{ transform: [{ scale: scale }] }}>
-          <Ionicons name="trash" size={30} color="red" />
-        </Animated.View>
-      </TouchableOpacity>
-    );
-  };
+  // const leftSwipe = (progress, dragX) => {
+  //   const scale = dragX.interpolate({
+  //     inputRange: [0, 100],
+  //     outputRange: [0, 1],
+  //     extrapolate: "clamp",
+  //   });
+  //   return (
+  //     <TouchableOpacity activeOpacity={0.6} style={styles.deleteBox}>
+  //       <Animated.View style={{ transform: [{ scale: scale }] }}>
+  //         <Ionicons name="trash" size={30} color="red" />
+  //       </Animated.View>
+  //     </TouchableOpacity>
+  //   );
+  // };
 
   return (
-    <Swipeable renderLeftActions={leftSwipe}>
-      <TouchableOpacity style={[styles.row, style]} onPress={onPress}>
-        <View style={styles.avatar}>{<AvatarReturn />}</View>
-        <View style={styles.textsContainer}>
-          <Text style={styles.name}>{name}</Text>
-          <Text style={styles.subtitle}>{subtitle}</Text>
-        </View>
+    <TouchableOpacity style={[styles.row, style]} onPress={onPress}>
+      <View style={styles.avatar}>{<AvatarReturn />}</View>
+      <View style={styles.textsContainer}>
+        <Text style={styles.name}>{name}</Text>
+        <Text style={styles.subtitle}>{subtitle}</Text>
+      </View>
 
-        {read == false ? <Badge status="primary" /> : null}
-        <View style={{ alignItems: "center" }}>
-          {date != "" ? (
-            <Text style={{ fontSize: 13, color: "grey", marginVertical: 10 }}>
-              {date}
-            </Text>
-          ) : null}
+      {read == false ? <Badge status="primary" /> : null}
+      <View style={{ alignItems: "center" }}>
+        {date != "" ? (
+          <Text style={{ fontSize: 13, color: "grey", marginVertical: 10 }}>
+            {date}
+          </Text>
+        ) : null}
 
-          <Ionicons name="chevron-forward-outline" size={20} />
-        </View>
-      </TouchableOpacity>
-    </Swipeable>
+        <Ionicons name="chevron-forward-outline" size={20} />
+      </View>
+    </TouchableOpacity>
   );
 };
 

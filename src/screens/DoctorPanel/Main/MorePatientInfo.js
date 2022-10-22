@@ -2,11 +2,12 @@ import React from "react";
 import { View, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Rating, Avatar } from "react-native-elements";
+import firebase from "firebase/compat/app";
 import { useRoute } from "@react-navigation/native";
 import InfoCardMoreDoctorPatients from "../../../components/Card/InfoCardMoreDoctorPatients";
 import LoadingButton from "../../../components/Buttons/LoadingButton";
 
-const MorePatientInfo = () => {
+const MorePatientInfo = ({ navigation }) => {
   const route = useRoute();
   const Id = route.params.Id;
   const name = route.params.name;
@@ -14,6 +15,24 @@ const MorePatientInfo = () => {
   const KHastalik = route.params.KHastalik;
   const avatar = route.params.avatar;
   const gender = route.params.gender;
+  const user = firebase.auth().currentUser;
+
+  const ChatId = (email, name) => {
+    // [[hastaEmail, doctorEmail]]
+    firebase
+      .firestore()
+      .collection("Chats")
+      .where("users", "in", [[email, user.email]])
+      .get()
+      .then((docs) => {
+        docs.forEach((doc) => {
+          navigation.navigate("ChatsScreen", {
+            screen: "Chat",
+            params: { id: doc.id, name: name },
+          });
+        });
+      });
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: "white", flexGrow: 1 }}>
@@ -52,6 +71,7 @@ const MorePatientInfo = () => {
             mode="contained"
             style={{ borderRadius: 15 }}
             color="#FF2442"
+            onPress={() => ChatId(email, name)}
           />
         </View>
 

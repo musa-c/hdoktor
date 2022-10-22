@@ -78,7 +78,7 @@ const MyPatients = (props) => {
 
   const user = firebase.auth().currentUser;
 
-  const ChatId = (email) => {
+  const ChatId = (email, name) => {
     // [[hastaEmail, doctorEmail]]
     firebase
       .firestore()
@@ -89,7 +89,7 @@ const MyPatients = (props) => {
         docs.forEach((doc) => {
           navigation.navigate("ChatsScreen", {
             screen: "Chat",
-            params: { id: doc.id },
+            params: { id: doc.id, name: name },
           });
         });
       });
@@ -124,7 +124,6 @@ const MyPatients = (props) => {
                   .get()
                   .then((snapshot) => {
                     snapshot.forEach((snaps) => {
-                      console.log("snaps.id:", snaps.id);
                       firebase
                         .firestore()
                         .collection("H_user")
@@ -331,7 +330,9 @@ const MyPatients = (props) => {
                   setHEmail(element.item.email);
                   setmodalCardVisible(!modalCardVisible);
                 }}
-                onPressChatId={() => ChatId(element.item.email)}
+                onPressChatId={() =>
+                  ChatId(element.item.email, element.item.name)
+                }
                 onPressGetNotes={() => getNotes(element.item.key)}
                 PatientRemoveIconPress={() =>
                   PatientRemove(element.item.key, element.item.email)
