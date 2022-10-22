@@ -18,6 +18,25 @@ const InfoCard = ({
     setModalVisible(!isModalVisible);
   };
 
+  function calculateAge(date) {
+    const birthDate = new Date(
+      date.split(".")[2],
+      date.split(".")[1],
+      date.split(".")[0]
+    );
+    const otherDate = new Date();
+    var years = otherDate.getFullYear() - birthDate.getFullYear();
+
+    if (
+      otherDate.getMonth() < birthDate.getMonth() ||
+      (otherDate.getMonth() == birthDate.getMonth() &&
+        otherDate.getDate() < birthDate.getDate())
+    ) {
+      years--;
+    }
+    return years;
+  }
+
   return (
     <>
       <ProfileUpdateModal
@@ -51,7 +70,7 @@ const InfoCard = ({
                 : { fontStyle: "normal" },
             ]}
           >
-            {value}
+            {topInfo == "Yaş" ? calculateAge(value) : value}
           </Text>
           <Ionicons
             name="ellipsis-horizontal-circle"

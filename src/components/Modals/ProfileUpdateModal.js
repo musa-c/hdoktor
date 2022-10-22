@@ -5,6 +5,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { HelperText, TextInput } from "react-native-paper";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -261,7 +262,6 @@ const ProfileUpdateModal = ({
   const handleConfirm = (dogumTarih) => {
     setdogumTarih(moment(dogumTarih).locale("tr", trLocale).format("l"));
     Validate(topInfo, moment(dogumTarih).locale("tr", trLocale).format("l"));
-
     hideDatePicker();
   };
   const hideDatePicker = () => {
@@ -486,8 +486,17 @@ const ProfileUpdateModal = ({
         break;
       case "Yaş":
         if (updateValue != value) {
-          // > 13 yaş
-          setValidation(true);
+          const age = calculateAge(updateValue);
+          if (age >= 13) {
+            setValidation(true);
+          } else {
+            Alert.alert("Uyarı", "Lütfen geçerli bir doğum tarihi giriniz.", [
+              { text: "Tamam" },
+            ]);
+            if (Validation) {
+              setValidation(false);
+            }
+          }
         } else {
           if (Validation) {
             setValidation(false);
@@ -1342,6 +1351,25 @@ const ProfileUpdateModal = ({
     }
   };
 
+  function calculateAge(date) {
+    const birthDate = new Date(
+      date.split(".")[2],
+      date.split(".")[1],
+      date.split(".")[0]
+    );
+    const otherDate = new Date();
+    var years = otherDate.getFullYear() - birthDate.getFullYear();
+
+    if (
+      otherDate.getMonth() < birthDate.getMonth() ||
+      (otherDate.getMonth() == birthDate.getMonth() &&
+        otherDate.getDate() < birthDate.getDate())
+    ) {
+      years--;
+    }
+    return years;
+  }
+
   return (
     <Modal
       isVisible={isInfoModalVisible}
@@ -1405,6 +1433,8 @@ const ProfileUpdateModal = ({
                 ? moment(value[0]).locale("tr", trLocale).format("LT") +
                   " - " +
                   moment(value[1]).locale("tr", trLocale).format("LT")
+                : topInfo == "Yaş"
+                ? calculateAge(value)
                 : value}{" "}
             </Text>
             {infoTitle}

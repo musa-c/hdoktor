@@ -36,6 +36,25 @@ const SignUp00 = ({ navigation }) => {
   const [isCreateAccount, setIsCreateAccount] = useState(false);
   const [CreateAccountUnEnabled, SetCreateAccountUnEnabled] = useState(false);
 
+  function calculateAge(date) {
+    const birthDate = new Date(
+      date.split(".")[2],
+      date.split(".")[1],
+      date.split(".")[0]
+    );
+    const otherDate = new Date();
+    var years = otherDate.getFullYear() - birthDate.getFullYear();
+
+    if (
+      otherDate.getMonth() < birthDate.getMonth() ||
+      (otherDate.getMonth() == birthDate.getMonth() &&
+        otherDate.getDate() < birthDate.getDate())
+    ) {
+      years--;
+    }
+    return years;
+  }
+
   const isCreateAccountInfo = () => {
     setIsCreateAccount(true);
     console.log("fonksiyonda succes başladı.");
@@ -164,6 +183,7 @@ const SignUp00 = ({ navigation }) => {
     const KHastalik = route.params?.KHastalik ?? "";
     const avatarLocal = route.params?.avatarLocal ?? "";
     const avatarFirebase = route.params?.avatarFirebase ?? "";
+    const [HelperTextVisible, setHelperTextVisible] = useState(false);
 
     const NextForm = (name, email, dogumTarih, PhoneNumber) => {
       if (
@@ -177,19 +197,23 @@ const SignUp00 = ({ navigation }) => {
       ) {
         setError("Formu lütfen doldurunuz.");
       } else {
-        navigation.navigate("SignUp1", {
-          name: name,
-          email: email,
-          avatarLocal: avatarLocal,
-          avatarFirebase: avatarFirebase,
-          dogumTarih: dogumTarih,
-          phoneNumber: PhoneNumber,
-          password: password,
-          againPassword: againPassword,
-          cinsiyet: cinsiyet,
-          isSozlesmeOnay: isSozlesmeOnay,
-          KHastalik: KHastalik,
-        });
+        if (calculateAge(dogumTarih) < 13) {
+          setHelperTextVisible(true);
+        } else {
+          navigation.navigate("SignUp1", {
+            name: name,
+            email: email,
+            avatarLocal: avatarLocal,
+            avatarFirebase: avatarFirebase,
+            dogumTarih: dogumTarih,
+            phoneNumber: PhoneNumber,
+            password: password,
+            againPassword: againPassword,
+            cinsiyet: cinsiyet,
+            isSozlesmeOnay: isSozlesmeOnay,
+            KHastalik: KHastalik,
+          });
+        }
       }
     };
 
@@ -459,11 +483,28 @@ const SignUp00 = ({ navigation }) => {
                   />
                 </View>
 
+                {HelperTextVisible ? (
+                  <HelperText
+                    type="info"
+                    visible={HelperTextVisible}
+                    style={{
+                      color: "#f44336",
+                      textAlign: "center",
+                      alignSelf: "center",
+                      fontSize: 18,
+                      marginTop: 5,
+                    }}
+                  >
+                    <Ionicons name="alert-circle-outline" size={18} />
+                    &nbsp; 13 yaşından küçük kullanıcılar kayıt olamaz.
+                  </HelperText>
+                ) : null}
+
                 <View
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-between",
-                    marginTop: 20,
+                    marginTop: 5,
                     flex: 1,
                   }}
                 >
@@ -479,7 +520,7 @@ const SignUp00 = ({ navigation }) => {
                         paddingVertical: 8,
                         alignSelf: "flex-end",
                         textAlign: "center",
-                        marginTop: 10,
+                        marginTop: 5,
                       }}
                     >
                       <Ionicons
