@@ -30,10 +30,15 @@ const AppointmentModal = ({
   const dateDay = new Date().getDate();
   const [loading, setLoading] = useState(false);
 
-  const GorusmeTalep = (currentDate) => {
-    setLoading(true);
-    const date = moment(currentDate).format("LL");
+  // console.log("selectedDate:", date);
+  // console.log("selectedClock:", clock);
+  // console.log("dateDay:", dateDay);
+  // console.log("dateMonth:", dateMonth);
+  const CurrentClcok = moment(new Date()).locale("tr", trLocale).format("LT");
 
+  const GorusmeTalepx = (currentDate) => {
+    const date =
+      moment(currentDate)?.format("LL") ?? moment(new Date()).format("LL");
     firebase
       .firestore()
       .collection("D_user")
@@ -122,6 +127,86 @@ const AppointmentModal = ({
       });
   };
 
+  const MonthToNumber = (month) => {
+    switch (month) {
+      case "Ocak":
+        return 1;
+      case "Şubat":
+        return 2;
+      case "Mart":
+        return 3;
+      case "Nisan":
+        return 4;
+      case "Mayıs":
+        return 5;
+      case "Haziran":
+        return 6;
+      case "Temmuz":
+        return 7;
+      case "Ağustos":
+        return 8;
+      case "Eylül":
+        return 9;
+      case "Ekim":
+        return 10;
+      case "Kasım":
+        return 11;
+      case "Aralık":
+        return 12;
+      default:
+        break;
+    }
+  };
+
+  console.log(
+    MonthToNumber(
+      moment(date)?.format("LL").split(" ")[1] ??
+        moment(new Date()).format("LL").split(" ")[1]
+    )
+  );
+
+  const GorusmeTalep = (currentDate) => {
+    setLoading(true);
+    const date =
+      moment(currentDate)?.format("LL") ?? moment(new Date()).format("LL");
+    if (
+      MonthToNumber(date.split(" ")[1]) == dateMonth &&
+      currentDate.getDate() == dateDay
+    ) {
+      if (
+        parseInt(parseInt(clock.split(":")[0])) <
+        parseInt(parseInt(CurrentClcok.split(":")[0]))
+      ) {
+        Alert.alert(
+          "UYARI",
+          "Geçmiş tarihin randevusunu alamazsınız. Lütfen ileri bir tarih veya saat seçiniz.",
+          [{ text: "Tamam", onPress: onBackdropPress }]
+        );
+        setLoading(false);
+      } else if (
+        parseInt(clock.split(":")[0]) == parseInt(CurrentClcok.split(":")[0])
+      ) {
+        if (
+          parseInt(parseInt(clock.split(":")[1])) <
+          parseInt(parseInt(CurrentClcok.split(":")[1]))
+        ) {
+          Alert.alert(
+            "UYARI",
+            "Geçmiş tarihin randevusunu alamazsınız. Lütfen ileri bir tarih veya saat seçiniz.",
+            [{ text: "Tamam", onPress: onBackdropPress }]
+          );
+          setLoading(false);
+        } else {
+          GorusmeTalepx(currentDate);
+        }
+      } else {
+        GorusmeTalepx(currentDate);
+      }
+    } else {
+      GorusmeTalepx(currentDate);
+    }
+  };
+
   const GetMonth = (month) => {
     switch (month) {
       case 1:
@@ -186,7 +271,7 @@ const AppointmentModal = ({
           <Button
             mode="contained"
             loading={loading}
-            onPress={() => GorusmeTalep(date)}
+            onPress={() => GorusmeTalep(date ?? new Date())}
             disabled={loading}
             style={{
               borderRadius: 10,
