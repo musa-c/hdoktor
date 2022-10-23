@@ -109,17 +109,25 @@ const Chat = ({ route }) => {
         .doc("Chats/" + route.params.id)
         .set({ messages: GiftedChat.append(messages, m) }, { merge: true });
 
-      if (W_user == "H_user") {
-        firebase
-          .firestore()
-          .doc("Chats/" + route.params.id)
-          .set({ Hread: false, Dread: true }, { merge: true });
-      } else if (W_user == "D_user") {
-        firebase
-          .firestore()
-          .doc("Chats/" + route.params.id)
-          .set({ Dread: false, Hread: true }, { merge: true });
-      }
+      const user = firebase.auth().currentUser;
+
+      firebase
+        .firestore()
+        .collection("D_user")
+        .doc(user.uid)
+        .onSnapshot((snaps) => {
+          if (snaps.exists) {
+            firebase
+              .firestore()
+              .doc("Chats/" + route.params.id)
+              .set({ Hread: false, Dread: true }, { merge: true });
+          } else {
+            firebase
+              .firestore()
+              .doc("Chats/" + route.params.id)
+              .set({ Dread: false, Hread: true }, { merge: true });
+          }
+        });
 
       // append içindeki 1. parametre mevcut mesajlar, 2. parametre gönder butonuna basıldıktan sonraki mesajlar
       // bu iki mesajları birleştiriyoruz.

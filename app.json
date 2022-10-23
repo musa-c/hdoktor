@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "DH",
-    "slug": "DH",
+    "name": "HDOKTOR",
+    "slug": "HD",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/hdoktor-logo-icon.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/hdoktor-splashs.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -37,7 +37,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/hdoktor-logo-icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "softwareKeyboardLayoutMode": "pan",

@@ -142,7 +142,7 @@ function HomeU(props) {
         onPressNotifications={() => navigation.navigate("Notifications")}
         W_user="H_user"
       />
-      <Ad />
+      {/* <Ad /> */}
       <FlatList
         contentContainerStyle={{ flexGrow: 1 }}
         onEndReached={() => {

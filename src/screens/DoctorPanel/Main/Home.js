@@ -159,7 +159,7 @@ function HomeD(props) {
         onPressNotifications={() => navigation.navigate("Notifications")}
         W_user="D_user"
       />
-      <Ad />
+      {/* <Ad /> */}
 
       <FlatList
         data={users}

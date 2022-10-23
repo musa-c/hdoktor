@@ -18,7 +18,7 @@ const Iletisim = () => {
       subject: subject,
       body: message,
       isHtml: true,
-      recipients: ["musac1903@gmail.com"],
+      recipients: ["info@hdoktor.com"],
     }).then((data) => {
       switch (data.status) {
         case "saved":

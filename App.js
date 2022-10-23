@@ -1,13 +1,13 @@
 import "./ignoreWarnings";
 import React, { Component } from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, LogBox, View, StatusBar } from "react-native";
+import Constants from "expo-constants";
 import { NavigationContainer } from "@react-navigation/native";
 import TabD from "./src/Tabs/TabD";
 import TabU from "./src/Tabs/TabU";
 import TabAnonuymous from "./src/Tabs/AnonymousTabs/Tab";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Login from "./src/screens/Login";
-import { LogBox, View, StatusBar } from "react-native";
 import ImagePickerExample1 from "./ImagePickerExample1";
 
 // firebase
@@ -46,7 +46,7 @@ export default function App() {
     // <View style={style.HomeStyle}>
     //   <ImagePickerExample1 />
     // </View>
-    <>
+    <View style={style.HomeStyle}>
       <StatusBar backgroundColor={"white"} barStyle="dark-content" />
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
@@ -74,7 +74,7 @@ export default function App() {
           />
         </Stack.Navigator>
       </NavigationContainer>
-    </>
+    </View>
   );
 }
 
