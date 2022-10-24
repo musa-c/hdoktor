@@ -1,8 +1,9 @@
 {
   "expo": {
     "name": "HDOKTOR",
-    "slug": "HD",
+    "slug": "hdoktor",
     "version": "1.0.0",
+    "owner": "musac",
     "orientation": "portrait",
     "icon": "./assets/hdoktor-logo-icon.png",
     "splash": {
@@ -32,7 +33,7 @@
       "infoPlist": {
         "NSCameraUsageDescription": "HDOKTOR, kullanıcının profil fotoğrafına bir fotoğraf koymasına izin vermek için kamerayı kullanır.",
         "NSPhotoLibraryUsageDescription": "HDOKTOR, kullanıcının fotoğraflarını uygulamaya yüklemek için galerinize erişir.",
-        "CFBundleDevelopmentRegion":"tr"
+        "CFBundleDevelopmentRegion": "tr"
       }
     },
     "android": {
@@ -41,13 +42,21 @@
         "backgroundColor": "#FFFFFF"
       },
       "softwareKeyboardLayoutMode": "pan",
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE"],
-      
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ],
       "package": "com.hd.hdoktor",
-      "versionCode": 1 
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b7e16731-b94f-41af-b486-b17092e52945"
+      }
     }
   }
 }
