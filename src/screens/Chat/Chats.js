@@ -113,9 +113,7 @@ const Chats = ({ navigation }) => {
                 avatar={chat.data().avatar.find((x) => x != DAvatar)}
                 date={
                   chat.data().messages.length > 0
-                    ? moment(chat.data()?.messages[0]?.createdAt.toDate())
-                        .locale("tr", trLocale)
-                        .format("LT")
+                    ? chat.data()?.messages[0]?.createdAt.toDate()
                     : ""
                 }
                 subtitle={
