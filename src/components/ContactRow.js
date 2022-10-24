@@ -10,6 +10,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { Avatar, Badge } from "react-native-elements";
 // import { colors } from "../config/constants";
 import Swipeable from "react-native-gesture-handler/Swipeable";
+import moment from "moment";
+import trLocale from "moment/locale/tr";
 
 const ContactRow = ({
   name,
@@ -66,6 +68,15 @@ const ContactRow = ({
     }
   };
 
+  const dateReturn = (messageDate) => {
+    const now = moment(new Date()).locale("tr", trLocale).format("l");
+
+    if (moment(messageDate).locale("tr", trLocale).format("l") == now) {
+      return moment(messageDate).locale("tr", trLocale).format("LT");
+    } else {
+      return moment(new Date()).locale("tr", trLocale).format("l");
+    }
+  };
   // const leftSwipe = (progress, dragX) => {
   //   const scale = dragX.interpolate({
   //     inputRange: [0, 100],
@@ -83,17 +94,24 @@ const ContactRow = ({
 
   return (
     <TouchableOpacity style={[styles.row, style]} onPress={onPress}>
+      <View style={{ marginRight: 5 }}>
+        {read == false ? (
+          <Badge
+            status="primary"
+            badgeStyle={{ width: 10, height: 10, borderRadius: 20 }}
+          />
+        ) : null}
+      </View>
       <View style={styles.avatar}>{<AvatarReturn />}</View>
       <View style={styles.textsContainer}>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </View>
 
-      {read == false ? <Badge status="primary" /> : null}
       <View style={{ alignItems: "center" }}>
         {date != "" ? (
           <Text style={{ fontSize: 13, color: "grey", marginVertical: 10 }}>
-            {date}
+            {dateReturn(date)}
           </Text>
         ) : null}
 
